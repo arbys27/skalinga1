@@ -1,0 +1,11 @@
+Options -Indexes
+
+RewriteEngine On
+RewriteRule ^(database|includes|logs|scripts|vendor)(/|$) - [F,NC,L]
+RewriteRule (^|/)\.git[^/]*(/|$) - [F,NC,L]
+RewriteRule (^|/)\.env[^/]*(/|$) - [F,NC,L]
+RewriteRule (^|/)config[^/]*\.php$ - [F,NC,L]
+RewriteRule \.(sql|md|log|bak)$ - [F,NC,L]
+
+php_flag display_errors off
+php_flag log_errors on

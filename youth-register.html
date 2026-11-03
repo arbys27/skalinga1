@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SKalinga Youth | Activate Account</title>
+<link rel="icon" type="image/x-icon" href="/SKalinga/assets/icons/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/SKalinga/assets/icons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/SKalinga/assets/icons/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/SKalinga/assets/icons/apple-touch-icon.png">
+<link rel="manifest" href="/SKalinga/assets/icons/site.webmanifest">
+<meta name="msapplication-config" content="/SKalinga/assets/icons/browserconfig.xml">
+<meta name="theme-color" content="#FF6B9D">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/loader.css?v=3">
+<style>
+:root{--g:#228B57;--gd:#0F4D31;--mint:#A8E6CF;--pk:#FF6B9D;--pkd:#E04F7E;--ink:#16303F;--mu:#5F7788;--ln:#E3ECE7;--paper:#FFF8FB;--h:"Bricolage Grotesque",system-ui,sans-serif;--b:"Plus Jakarta Sans",system-ui,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;min-height:100svh;font:400 15px/1.55 var(--b);color:var(--ink);background:var(--paper);-webkit-font-smoothing:antialiased}
+a{color:var(--g);font-weight:700;text-decoration:none}a:hover{color:var(--pkd)}
+:focus-visible{outline:3px solid var(--pkd);outline-offset:3px}
+.hidden{display:none!important}
+.ic{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.shell{min-height:100svh;display:grid}
+@media(min-width:1000px){.shell{grid-template-columns:1fr 1.05fr}}
+
+/* brand side */
+.brand{position:relative;overflow:hidden;color:#fff;padding:24px 22px 28px;background:linear-gradient(150deg,var(--g),var(--gd) 75%);display:flex;flex-direction:column;gap:22px}
+.brand::before{content:"";position:absolute;right:-140px;top:-120px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,var(--pk),rgba(255,107,157,0) 68%);opacity:.7}
+.brand::after{content:"";position:absolute;left:-120px;bottom:-140px;width:360px;height:360px;border-radius:50%;background:radial-gradient(circle,var(--mint),rgba(168,230,207,0) 68%);opacity:.38}
+.brand>*{position:relative;z-index:1}
+.logos{display:flex;align-items:center;gap:10px;font:800 21px var(--h);letter-spacing:-.04em}
+.logos img{width:44px;height:44px;border-radius:50%;border:2px solid #fff;background:#fff;object-fit:contain}
+.logos img+img{margin-left:-18px}
+.copy h2{margin:0 0 10px;font:800 clamp(28px,4.2vw,52px)/1.05 var(--h);letter-spacing:-.04em;max-width:14ch}
+.copy p{margin:0;max-width:42ch;color:rgba(255,255,255,.86);font-size:16px}
+.mosaic{display:none}
+.tagline{display:none;margin-top:auto;font:800 18px var(--h);color:var(--mint)}
+@media(min-width:1000px){
+  .brand{padding:40px 52px;gap:30px}
+  .mosaic{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  .mosaic div{aspect-ratio:1;border-radius:20px;overflow:hidden;background:rgba(255,255,255,.14);border:2px solid rgba(255,255,255,.5)}
+  .mosaic div:nth-child(even){transform:translateY(14px)}
+  .mosaic img{width:100%;height:100%;object-fit:cover;display:block}
+  .tagline{display:block}
+}
+
+/* form side */
+.panel{display:grid;place-items:center;padding:26px 18px 48px}
+.card{width:min(100%,480px)}
+.partners{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.partners img{width:40px;height:40px;object-fit:contain;border-radius:50%;border:1.5px solid var(--ln);background:#fff}
+.card h1{margin:0 0 6px;font:800 clamp(28px,5vw,38px)/1.08 var(--h);letter-spacing:-.04em}
+.sub{margin:0 0 22px;color:var(--mu)}
+
+.steps{display:flex;align-items:center;gap:10px;margin:0 0 26px;padding:0;list-style:none}
+.steps li:not(.line){display:flex;align-items:center;gap:9px;font-weight:700;font-size:13.5px;color:var(--mu)}
+.steps b{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:#eef3f0;color:var(--mu);font-size:13px}
+.steps .active{color:var(--ink)}.steps .active b{background:var(--pk);color:var(--ink);box-shadow:0 6px 16px rgba(255,107,157,.4)}
+.steps .done b{background:var(--g);color:#fff}
+.steps .line{flex:1;height:3px;border-radius:9px;background:#e6efe9}
+.steps .line.on{background:var(--g)}
+@media(max-width:420px){.steps li:not(.line) span{display:none}.steps li.active span{display:inline}}
+
+.note{margin:0 0 18px;padding:12px 14px;border-radius:16px;background:#e9f7ef;color:var(--gd);font-size:13.5px;font-weight:600}
+.field{margin-bottom:16px}
+label{display:block;margin:0 0 7px;font-weight:700;font-size:13.5px}
+label small{color:var(--mu);font-weight:600}
+.inp{position:relative}
+.inp>.ic{position:absolute;left:15px;top:50%;margin-top:-9.5px;color:var(--mu);pointer-events:none}
+input:not([type=checkbox]):not([type=hidden]){width:100%;min-height:54px;padding:0 16px 0 46px;border:1.5px solid var(--ln);border-radius:16px;background:#fff;font:inherit;color:var(--ink);transition:border-color .15s,box-shadow .15s}
+input::placeholder{color:#9fb0a7}
+input:focus{outline:none;border-color:var(--g);box-shadow:0 0 0 4px rgba(34,139,87,.15)}
+.inp:focus-within>.ic{color:var(--g)}
+.inp.pw input{padding-right:52px}
+.eye{position:absolute;right:6px;top:50%;width:44px;height:44px;margin-top:-22px;border:0;border-radius:12px;background:none;color:var(--mu);cursor:pointer;display:grid;place-items:center}
+.eye:hover{background:#f1f6f3;color:var(--ink)}
+.two{display:grid;gap:16px}
+.hint{margin:6px 2px 0;color:var(--mu);font-size:12.5px}
+
+.found{display:flex;gap:14px;align-items:flex-start;margin:0 0 22px;padding:16px;border:1.5px solid #b9d9c8;border-radius:22px;background:linear-gradient(140deg,#f4fbf7,#e9f7ef)}
+.av{display:grid;place-items:center;width:52px;height:52px;border-radius:18px;background:var(--g);color:#fff;font:800 22px var(--h);flex:none}
+.found h2{margin:0 0 2px;font:700 18px/1.2 var(--h);letter-spacing:-.02em;overflow-wrap:anywhere}
+.found .ok{display:inline-flex;align-items:center;gap:5px;margin-bottom:8px;color:var(--g);font-size:12.5px;font-weight:700}
+.found .ok .ic{width:15px;height:15px}
+.found dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0;font-size:13.5px}
+.found dt{color:var(--mu)}.found dd{margin:0;font-weight:600;overflow-wrap:anywhere}
+
+.consent{display:flex;gap:12px;align-items:flex-start;margin:6px 0 18px;padding:14px;border-radius:16px;background:#fff0f5;font-size:13.5px;line-height:1.5}
+.consent input{width:22px;height:22px;margin:1px 0 0;accent-color:var(--g);flex:none;cursor:pointer}
+.consent label{margin:0;font-weight:600;cursor:pointer}
+
+.status-message{display:none;margin:0 0 14px;padding:12px 14px;border-radius:14px;font-size:14px;font-weight:600}
+.status-message.error{display:block;background:#fff0ef;color:#b42318}
+.status-message.success{display:block;background:#e8f7ef;color:var(--gd)}
+.btn{width:100%;min-height:56px;border:0;border-radius:16px;background:var(--pk);color:var(--ink);font:700 16px var(--b);cursor:pointer;box-shadow:0 10px 26px rgba(255,107,157,.38);transition:transform .15s,background .15s}
+.btn:hover:not(:disabled){background:#ff82ae}.btn:active:not(:disabled){transform:scale(.98)}.btn:disabled{opacity:.65;cursor:wait}
+.back-link{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;min-height:48px;margin-top:8px;border:0;background:none;color:var(--g);font:700 14px var(--b);cursor:pointer}
+.back-link:hover{color:var(--pkd)}
+.signin{margin:24px 0 0;text-align:center;color:var(--mu);font-size:14px}
+.view{animation:in .3s ease-out}
+@keyframes in{from{opacity:0;transform:translateY(10px)}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<symbol id="r-id" viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="3"/><circle cx="9" cy="11" r="2"/><path d="M5.5 16a3.8 3.8 0 0 1 7 0M15 10h3M15 14h3"/></symbol>
+<symbol id="r-u" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+<symbol id="r-cal" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+<symbol id="r-ph" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></symbol>
+<symbol id="r-m" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m3 8 9 6 9-6"/></symbol>
+<symbol id="r-k" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="3"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
+<symbol id="r-eye" viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></symbol>
+<symbol id="r-ok" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></symbol>
+<symbol id="r-back" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></symbol>
+</svg>
+
+<div class="shell">
+  <aside class="brand">
+    <div class="logos"><img src="assets/images/logosanantonio.jpg" alt="San Antonio logo"><img src="assets/images/sklogo.jpg" alt="SK San Antonio logo"><span>SKalinga</span></div>
+    <div class="copy">
+      <h2>Welcome to SKalinga Youth</h2>
+      <p>Activate your account using the official Katipunan ng Kabataan Masterlist of Barangay San Antonio.</p>
+    </div>
+    <div class="mosaic" aria-hidden="true">
+      <div><img src="assets/images/print.jpg" alt=""></div><div><img src="assets/images/skoffice.jpg" alt=""></div>
+      <div><img src="assets/images/skexample.jpg" alt=""></div><div><img src="assets/images/zumba.jpg" alt=""></div>
+      <div><img src="assets/images/supplieskit.jpg" alt=""></div><div><img src="assets/images/groupphoto.jpg" alt=""></div>
+      <div><img src="assets/images/awardsk.jpg" alt=""></div><div><img src="assets/images/sammap.jpg" alt=""></div>
+    </div>
+    <div class="tagline">#YanAngSKko SKSanAntonio!</div>
+  </aside>
+
+  <main class="panel">
+    <div class="card youth-auth-card">
+      <h1>Activate your account</h1>
+      <p class="sub">Confirm your official youth record to continue.</p>
+
+      <ol class="steps" aria-label="Account activation steps">
+        <li id="stepOneIndicator" class="active"><b>1</b><span>Find your record</span></li>
+        <li class="line" id="stepLine" aria-hidden="true"></li>
+        <li id="stepTwoIndicator"><b>2</b><span>Set up account</span></li>
+      </ol>
+
+      <section id="stepOne" class="view">
+        <p class="note">Use the details exactly as they appear on the KK Masterlist.</p>
+        <form id="verifyForm">
+          <div class="field"><label for="voterId">Voter ID</label><div class="inp"><svg class="ic"><use href="#r-id"/></svg><input type="text" id="voterId" name="voter_id" autocomplete="off" required></div></div>
+          <div class="field"><label for="fullName">Full name</label><div class="inp"><svg class="ic"><use href="#r-u"/></svg><input type="text" id="fullName" name="full_name" placeholder="First Middle Last" autocomplete="name" required></div></div>
+          <div class="field"><label for="birthday">Birthday</label><div class="inp"><svg class="ic"><use href="#r-cal"/></svg><input type="date" id="birthday" name="birthday" required></div></div>
+          <span id="verifyStatus" class="status-message" role="status"></span>
+          <button type="submit" class="btn" id="verifySubmit">Find my record</button>
+        </form>
+      </section>
+
+      <section id="stepTwo" class="hidden view">
+        <div class="found" aria-live="polite">
+          <span class="av" id="avatar" aria-hidden="true">?</span>
+          <div>
+            <span class="ok"><svg class="ic"><use href="#r-ok"/></svg>Record found</span>
+            <h2 id="profileName"></h2>
+            <dl>
+              <dt>Birthday</dt><dd id="profileBirthday"></dd>
+              <dt>Age</dt><dd id="profileAge"></dd>
+              <dt>Sex</dt><dd id="profileSex"></dd>
+              <dt>Address</dt><dd id="profileAddress"></dd>
+            </dl>
+          </div>
+        </div>
+        <form id="activationForm">
+          <input type="hidden" id="activationVoterId" name="voter_id">
+          <input type="hidden" id="activationFullName" name="full_name">
+          <input type="hidden" id="activationBirthday" name="birthday">
+          <div class="field"><label for="mobile">Mobile number</label><div class="inp"><svg class="ic"><use href="#r-ph"/></svg><input type="tel" id="mobile" name="mobile" placeholder="09XXXXXXXXX" pattern="09[0-9]{9}" maxlength="11" inputmode="numeric" autocomplete="tel" required></div></div>
+          <div class="field"><label for="email">Email address <small>(optional)</small></label><div class="inp"><svg class="ic"><use href="#r-m"/></svg><input type="email" id="email" name="email" placeholder="juan@example.com" autocomplete="email"></div></div>
+          <div class="field"><label for="password">Create password</label><div class="inp pw"><svg class="ic"><use href="#r-k"/></svg><input type="password" id="password" name="password" minlength="8" autocomplete="new-password" required><button type="button" class="eye" id="togglePw" aria-label="Show passwords"><svg class="ic"><use href="#r-eye"/></svg></button></div><p class="hint">Use at least 8 characters.</p></div>
+          <div class="field"><label for="confirmPassword">Confirm password</label><div class="inp"><svg class="ic"><use href="#r-k"/></svg><input type="password" id="confirmPassword" name="confirm_password" minlength="8" autocomplete="new-password" required></div></div>
+          <div class="consent"><input type="checkbox" id="privacyConsent" required><label for="privacyConsent">I agree to the Data Privacy Policy and consent to the processing of my data under RA 10173.</label></div>
+          <span id="activationStatus" class="status-message" role="status"></span>
+          <button type="submit" class="btn" id="activationSubmit">Activate account</button>
+          <button type="button" class="back-link" id="backButton"><svg class="ic"><use href="#r-back"/></svg>Back to verification</button>
+        </form>
+      </section>
+
+      <p class="signin required-note">Already have an account? <a href="login.html">Sign in here</a></p>
+    </div>
+  </main>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const verifyForm=$('verifyForm'),activationForm=$('activationForm'),stepOne=$('stepOne'),stepTwo=$('stepTwo');
+const verifyStatus=$('verifyStatus'),activationStatus=$('activationStatus'),verifySubmit=$('verifySubmit'),activationSubmit=$('activationSubmit');
+
+function setStatus(el,message,type){el.textContent=message||'';el.className='status-message '+(type||'')}
+function setStep(n){
+  const first=n===1;
+  stepOne.classList.toggle('hidden',!first);stepTwo.classList.toggle('hidden',first);
+  $('stepOneIndicator').classList.toggle('active',first);$('stepOneIndicator').classList.toggle('done',!first);
+  $('stepTwoIndicator').classList.toggle('active',!first);$('stepLine').classList.toggle('on',!first);
+  $('stepOneIndicator').querySelector('b').textContent=first?'1':'✓';
+  scrollTo({top:0,behavior:'smooth'});
+  (first?$('voterId'):$('mobile')).focus({preventScroll:true});
+}
+const prettyDate=v=>{const d=new Date(`${v}T00:00:00`);return isNaN(d)?(v||''):d.toLocaleDateString(undefined,{month:'long',day:'numeric',year:'numeric'})};
+
+verifyForm.addEventListener('submit',async e=>{
+  e.preventDefault();verifySubmit.disabled=true;verifySubmit.textContent='Checking...';setStatus(verifyStatus,'','');
+  try{
+    const r=await fetch('api/masterlist_verify.php',{method:'POST',body:new FormData(verifyForm)}),data=await r.json();
+    if(!data.success){setStatus(verifyStatus,data.message||'We could not find a matching record. Check your details and try again.','error');return}
+    const p=data.profile,name=[p.first_name,p.middle_name,p.last_name].filter(Boolean).join(' ');
+    $('profileName').textContent=name;$('avatar').textContent=(p.first_name||name||'?').trim().charAt(0).toUpperCase();
+    $('profileBirthday').textContent=prettyDate(p.birthday);$('profileAge').textContent=p.age;$('profileSex').textContent=p.sex;$('profileAddress').textContent=p.address;
+    $('activationVoterId').value=$('voterId').value;$('activationFullName').value=$('fullName').value;$('activationBirthday').value=$('birthday').value;
+    setStep(2);
+  }catch(err){setStatus(verifyStatus,'Unable to verify your record. Please try again.','error')}
+  finally{verifySubmit.disabled=false;verifySubmit.textContent='Find my record'}
+});
+
+$('mobile').addEventListener('input',e=>{e.target.value=e.target.value.replace(/\D/g,'').slice(0,11)});
+$('togglePw').addEventListener('click',()=>{
+  const show=$('password').type==='password';
+  $('password').type=$('confirmPassword').type=show?'text':'password';
+  $('togglePw').setAttribute('aria-label',show?'Hide passwords':'Show passwords');
+});
+
+activationForm.addEventListener('submit',async e=>{
+  e.preventDefault();
+  if($('password').value!==$('confirmPassword').value){setStatus(activationStatus,'Passwords do not match.','error');$('confirmPassword').focus();return}
+  activationSubmit.disabled=true;activationSubmit.textContent='Activating...';setStatus(activationStatus,'','');
+  try{
+    const r=await fetch('api/masterlist_activate.php',{method:'POST',body:new FormData(activationForm)}),data=await r.json();
+    if(!data.success){setStatus(activationStatus,data.message||'Unable to activate your account.','error');return}
+    setStatus(activationStatus,`Account activated. Your Member ID is ${data.member_id}. Taking you to sign in...`,'success');
+    activationSubmit.disabled=true;
+    setTimeout(()=>{location.href=data.redirect||'login.html'},1800);
+    return;
+  }catch(err){setStatus(activationStatus,'Unable to activate your account. Please try again.','error')}
+  activationSubmit.disabled=false;activationSubmit.textContent='Activate account';
+});
+
+$('backButton').addEventListener('click',()=>setStep(1));
+document.addEventListener('error',e=>{if(e.target.tagName==='IMG'&&e.target.closest('.mosaic'))e.target.remove()},true);
+</script>
+<script src="assets/js/loader.js?v=3"></script>
+</body>
+</html>

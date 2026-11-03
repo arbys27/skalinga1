@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SKalinga - Health Announcements</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/x-icon" href="/SKalinga/assets/icons/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/SKalinga/assets/icons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/SKalinga/assets/icons/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/SKalinga/assets/icons/apple-touch-icon.png">
+<link rel="manifest" href="/SKalinga/assets/icons/site.webmanifest">
+<meta name="msapplication-config" content="/SKalinga/assets/icons/browserconfig.xml">
+<meta name="theme-color" content="#FF6B9D">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="assets/css/dashboard.css">
+<link rel="stylesheet" href="assets/css/admin-theme.css">
+<link rel="stylesheet" href="assets/css/loader.css?v=3">
+<style>
+.main-content{min-width:0}
+.dashboard-content{min-width:0;max-width:100%}
+.hm,.hm-modal{--g:#228B57;--gd:#0F4D31;--mint:#A8E6CF;--pk:#FF6B9D;--pkd:#E04F7E;--ink:#16303F;--mu:#5F7788;--ln:#E3ECE7}
+.hm *,.hm-modal *{box-sizing:border-box}
+.hm [hidden],.hm-modal [hidden]{display:none!important}
+.hm :focus-visible,.hm-modal :focus-visible{outline:3px solid var(--pkd);outline-offset:2px}
+
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:18px}
+@media(min-width:900px){.stats{grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}}
+.stat{display:flex;align-items:center;gap:14px;padding:16px 18px;border:1px solid var(--ln);border-radius:20px;background:#fff;box-shadow:0 2px 12px rgba(34,139,87,.06)}
+.stat .si{display:grid;place-items:center;width:46px;height:46px;border-radius:15px;background:#e9f7ef;color:var(--g);font-size:18px;flex:none}
+.stat.pink .si{background:#ffe9f1;color:var(--pkd)}.stat.amber .si{background:#fff4d6;color:#a86a00}.stat.sky .si{background:#e3f1fb;color:#14537e}
+.stat b{display:block;font-size:26px;line-height:1;letter-spacing:-.03em;color:var(--ink)}
+.stat span{display:block;margin-top:4px;color:var(--mu);font-size:12.5px;font-weight:600}
+
+.bar{display:grid;gap:12px;margin-bottom:14px}
+@media(min-width:900px){.bar{grid-template-columns:minmax(0,1fr) auto auto;align-items:center}}
+.find{position:relative;display:block;max-width:460px}
+.find i{position:absolute;left:16px;top:50%;margin-top:-7px;color:var(--mu);font-size:14px;pointer-events:none}
+.find input,.sel{width:100%;min-height:46px;border:1.5px solid var(--ln);border-radius:14px;background:#fff;font:inherit;color:var(--ink)}
+.find input{padding:0 16px 0 42px}.sel{padding:0 14px;min-width:190px;cursor:pointer}
+.find input:focus,.sel:focus{outline:none;border-color:var(--g);box-shadow:0 0 0 4px rgba(34,139,87,.14)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 20px;border:0;border-radius:14px;font:600 14px inherit;font-family:inherit;cursor:pointer;transition:transform .15s,background .15s}
+.btn:active{transform:scale(.97)}
+.btn.pink{background:var(--pk);color:var(--ink);box-shadow:0 8px 20px rgba(255,107,157,.35)}.btn.pink:hover{background:#ff82ae}
+.btn.green{background:var(--g);color:#fff}.btn.green:hover{background:var(--gd)}
+.btn.soft{background:#f1f6f3;color:var(--ink)}.btn.soft:hover{background:#e3ece7}
+.btn.red{background:#d64545;color:#fff}.btn.red:hover{background:#b93636}
+.btn:disabled{opacity:.6;cursor:wait}
+.chips{display:flex;gap:8px;overflow-x:auto;margin-bottom:14px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 14px;border:1.5px solid var(--ln);border-radius:999px;background:#fff;color:var(--ink);font:600 13px inherit;font-family:inherit;cursor:pointer}
+.chip em{font-style:normal;min-width:22px;padding:1px 7px;border-radius:999px;background:#eef3f0;color:var(--mu);font-size:11.5px;text-align:center}
+.chip[aria-pressed="true"]{border-color:var(--g);background:var(--g);color:#fff}.chip[aria-pressed="true"] em{background:rgba(255,255,255,.22);color:#fff}
+
+.tw{min-width:0;max-width:100%;border:1px solid var(--ln);border-radius:20px;background:#fff;overflow:hidden;box-shadow:0 2px 12px rgba(34,139,87,.06)}
+.tw .scroll{overflow-x:auto}
+table.ht{width:100%;border-collapse:collapse;font-size:14px}
+.ht th{padding:13px 16px;background:#f4fbf7;color:var(--mu);font-size:11.5px;font-weight:700;letter-spacing:.06em;text-align:left;text-transform:uppercase;white-space:nowrap;border-bottom:1px solid var(--ln)}
+.ht td{padding:14px 16px;border-bottom:1px solid #eef3f0;color:var(--ink);vertical-align:middle}
+.ht tbody tr:last-child td{border-bottom:0}.ht tbody tr:hover{background:#fafdfb}
+.ttl{display:flex;align-items:center;gap:12px;min-width:200px}
+.th{display:grid;place-items:center;width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,var(--mint),#ffd3e2);color:var(--g);overflow:hidden;flex:none}
+.th img{width:100%;height:100%;object-fit:cover;display:block}
+.ttl b{display:block;font-weight:600;overflow-wrap:anywhere}.ttl span{color:var(--mu);font-size:12.5px}
+.cat{display:inline-block;padding:4px 10px;border-radius:999px;background:#e9f7ef;color:var(--gd);font-size:12px;font-weight:700;white-space:nowrap}
+.when b{display:block;font-weight:600;white-space:nowrap}.when span{color:var(--mu);font-size:12.5px;white-space:nowrap}
+.loc{max-width:180px;color:var(--mu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap}
+.pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.pill.Published{background:#dff5e8;color:var(--gd)}.pill.Draft{background:#eceff1;color:#4a5961}.pill.Cancelled{background:#ffe3ec;color:#a02350}.pill.Archived{background:#e6e9f2;color:#4b5470}
+.ab{display:flex;gap:6px}
+.ib{display:grid;place-items:center;width:36px;height:36px;border:0;border-radius:11px;background:#f1f6f3;color:var(--ink);cursor:pointer;transition:background .15s,color .15s}
+.ib:hover{background:var(--g);color:#fff}.ib.pub:hover{background:var(--pk);color:var(--ink)}.ib.del:hover{background:#d64545;color:#fff}
+.empty{padding:44px 20px;text-align:center;color:var(--mu)}
+.empty i{display:block;margin-bottom:10px;font-size:30px;color:#b9d9c8}
+@media(max-width:860px){
+  .ht thead{display:none}
+  .ht,.ht tbody,.ht tr,.ht td{display:block;width:100%}
+  .ht tr{padding:14px 16px;border-bottom:1px solid var(--ln)}.ht tr:last-child{border-bottom:0}
+  .ht td{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:5px 0;border:0;text-align:right}
+  .ht td::before{content:attr(data-l);color:var(--mu);font-size:12px;font-weight:700;text-align:left;flex:none}
+  .ht td.nl::before{display:none}.ht td.ab-td{justify-content:flex-end;padding-top:10px}.loc{max-width:60%}
+}
+
+.hm-modal{position:fixed;inset:0;z-index:9500;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(15,77,49,.55);backdrop-filter:blur(6px);opacity:0;visibility:hidden;transition:opacity .2s,visibility .2s;font-family:inherit}
+.hm-modal.on{opacity:1;visibility:visible}
+.box{position:relative;width:min(100%,520px);max-height:92vh;overflow-y:auto;padding:26px;border-radius:24px;background:#fff;color:var(--ink);transform:translateY(12px);transition:transform .25s}
+.hm-modal.on .box{transform:none}.box.sm{width:min(100%,420px)}.box.wide{width:min(100%,760px)}
+.box h2{margin:0 44px 6px 0;font-size:22px;letter-spacing:-.02em}
+.box>p.lead{margin:0 0 16px;color:var(--mu);font-size:14px}
+.cl{position:absolute;top:14px;right:14px;display:grid;place-items:center;width:40px;height:40px;border:1px solid var(--ln);border-radius:50%;background:#fff;color:var(--mu);cursor:pointer;z-index:2}.cl:hover{color:var(--pkd)}
+.form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:16px}
+.form .full{grid-column:1/-1}
+@media(max-width:640px){.form{grid-template-columns:1fr}.form .full{grid-column:auto}}
+.f label{display:block;margin:0 0 6px;font-weight:600;font-size:13px}
+.f input:not([type=file]),.f select,.f textarea{width:100%;min-height:46px;padding:10px 14px;border:1.5px solid var(--ln);border-radius:12px;background:#fff;font:inherit;color:var(--ink)}
+.f textarea{min-height:100px;resize:vertical}
+.f input:focus,.f select:focus,.f textarea:focus{outline:none;border-color:var(--g);box-shadow:0 0 0 4px rgba(34,139,87,.14)}
+.f .err{min-height:16px;margin-top:4px;color:#b42318;font-size:12.5px;font-weight:600}
+.drop{display:flex;align-items:center;gap:14px;padding:14px;border:2px dashed #b9d9c8;border-radius:16px;background:#f4fbf7;cursor:pointer}
+.drop:hover{border-color:var(--g)}.drop:focus-within{outline:3px solid var(--pkd);outline-offset:2px}
+.drop input{position:absolute;width:1px;height:1px;opacity:0}
+.drop .pv{display:grid;place-items:center;width:64px;height:64px;border-radius:14px;background:#fff;color:var(--g);font-size:22px;overflow:hidden;flex:none}
+.drop .pv img{width:100%;height:100%;object-fit:cover}
+.drop b{display:block;font-size:14px}.drop span{color:var(--mu);font-size:12.5px}
+.fa-end{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:20px}
+.pvc .img{aspect-ratio:16/8;border-radius:18px;overflow:hidden;background:linear-gradient(135deg,var(--mint),#ffd3e2);display:grid;place-items:center;color:var(--g);font-size:34px;margin:14px 0}
+.pvc .img img{width:100%;height:100%;object-fit:cover}
+.pvc h3{margin:8px 0 10px;font-size:24px;letter-spacing:-.02em}
+.pvc .meta{display:grid;gap:6px;margin:0 0 14px;color:var(--mu);font-size:14px}.pvc .meta i{width:20px;color:var(--g)}
+.pvc p{margin:0 0 12px;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6}
+.pvc .rq{padding:12px 14px;border-radius:14px;background:#fff0f5;font-size:14px}
+#toastContainer{position:fixed;z-index:10001;right:20px;bottom:20px;display:grid;gap:10px;width:min(360px,calc(100% - 40px))}
+.toast{padding:14px 16px;border-radius:14px;background:#fff;border-left:4px solid var(--g);box-shadow:0 12px 32px rgba(22,48,63,.2);font-size:14px;font-weight:600}
+.toast.error{border-color:#d64545}.toast.warning{border-color:#e0a100}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app-container">
+  <aside class="sidebar" id="adminSidebar"></aside>
+  <main class="main-content">
+    <header class="top-header">
+      <div class="header-left"><h2>Health Announcements</h2><p id="dashboard-datetime">Manage SK health programs and activities</p></div>
+      <div class="header-right"><div class="user-profile-card"><div class="user-avatar-new" id="userAvatarInitials">--</div><div class="user-details"><h4 id="userFullName">Loading...</h4><span class="user-role-badge" id="userRole">Administrator</span></div></div></div>
+    </header>
+
+    <section class="dashboard-content hm">
+      <div class="stats" aria-label="Health announcement summary">
+        <div class="stat sky"><span class="si"><i class="fas fa-heart-pulse"></i></span><div><b id="sTotal">0</b><span>Total posts</span></div></div>
+        <div class="stat"><span class="si"><i class="fas fa-bullhorn"></i></span><div><b id="sPub">0</b><span>Published</span></div></div>
+        <div class="stat amber"><span class="si"><i class="fas fa-pen-to-square"></i></span><div><b id="sDraft">0</b><span>Drafts</span></div></div>
+        <div class="stat pink"><span class="si"><i class="fas fa-calendar-check"></i></span><div><b id="sSoon">0</b><span>Published, upcoming</span></div></div>
+      </div>
+
+      <div class="bar">
+        <label class="find"><span style="position:absolute;width:1px;height:1px;overflow:hidden">Search announcements</span><i class="fas fa-magnifying-glass"></i><input id="search" type="search" placeholder="Search title, description or venue" autocomplete="off"></label>
+        <select id="categoryFilter" class="sel" aria-label="Filter by category"><option value="">All categories</option></select>
+        <button class="btn pink" id="newButton" type="button"><i class="fas fa-plus"></i>New announcement</button>
+      </div>
+
+      <div class="chips" id="tabs" role="group" aria-label="Filter by status">
+        <button class="chip" type="button" data-status="" aria-pressed="true">All<em id="cAll">0</em></button>
+        <button class="chip" type="button" data-status="Published" aria-pressed="false">Published<em id="cPublished">0</em></button>
+        <button class="chip" type="button" data-status="Draft" aria-pressed="false">Drafts<em id="cDraft">0</em></button>
+        <button class="chip" type="button" data-status="Cancelled" aria-pressed="false">Cancelled<em id="cCancelled">0</em></button>
+        <button class="chip" type="button" data-status="Archived" aria-pressed="false">Archived<em id="cArchived">0</em></button>
+      </div>
+
+      <div class="tw"><div class="scroll">
+        <table class="ht">
+          <thead><tr><th>Announcement</th><th>Category</th><th>Date and time</th><th>Venue</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div></div>
+    </section>
+  </main>
+</div>
+
+<!-- Form -->
+<div id="formModal" class="hm-modal" role="dialog" aria-modal="true" aria-labelledby="formTitle">
+  <div class="box wide">
+    <button type="button" class="cl" data-close="formModal" aria-label="Close"><i class="fas fa-xmark"></i></button>
+    <h2 id="formTitle">New health announcement</h2><p class="lead">Drafts stay hidden. Published posts appear on the youth Health page.</p>
+    <form id="announcementForm" enctype="multipart/form-data" novalidate>
+      <input type="hidden" id="postId">
+      <div class="form">
+        <div class="f"><label for="title">Title *</label><input id="title" name="title" required><div class="err" id="titleError"></div></div>
+        <div class="f"><label for="category">Category *</label><select id="category" name="category" required></select><div class="err" id="categoryError"></div></div>
+        <div class="f"><label for="eventDate">Event date *</label><input id="eventDate" name="event_date" type="date" required><div class="err" id="dateError"></div></div>
+        <div class="f"><label for="venue">Venue</label><input id="venue" name="venue"></div>
+        <div class="f"><label for="startTime">Start time</label><input id="startTime" name="start_time" type="time"></div>
+        <div class="f"><label for="endTime">End time</label><input id="endTime" name="end_time" type="time"><div class="err" id="timeError"></div></div>
+        <div class="f"><label for="slots">Slots <small style="color:var(--mu);font-weight:500">(blank for unlimited)</small></label><input id="slots" name="slots" type="number" min="1"><div class="err" id="slotsError"></div></div>
+        <div class="f"><label for="image">Image</label>
+          <label class="drop" for="image" style="margin:0;font-weight:400"><span class="pv" id="pvBox"><i class="fas fa-image"></i></span><span><b>Choose image</b><span>JPG, PNG or WebP, max 2 MB</span></span><input id="image" name="image" type="file" accept=".jpg,.jpeg,.png,.webp"></label>
+          <div class="err" id="imageError"></div></div>
+        <div class="f full"><label for="description">Description</label><textarea id="description" name="description"></textarea></div>
+        <div class="f full"><label for="requirements">Requirements</label><textarea id="requirements" name="requirements" placeholder="e.g. Bring your Digital Youth ID"></textarea></div>
+      </div>
+      <div class="fa-end">
+        <button type="button" class="btn soft" data-close="formModal">Close</button>
+        <button type="button" class="btn soft" id="previewButton"><i class="fas fa-eye"></i>Preview</button>
+        <button type="submit" class="btn green" name="save_status" value="Draft">Save as draft</button>
+        <button type="submit" class="btn pink" name="save_status" value="Published"><i class="fas fa-bullhorn"></i>Publish</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Preview -->
+<div id="previewModal" class="hm-modal" role="dialog" aria-modal="true" aria-labelledby="pvTitle">
+  <div class="box">
+    <button type="button" class="cl" data-close="previewModal" aria-label="Close"><i class="fas fa-xmark"></i></button>
+    <h2 id="pvTitle">Youth preview</h2>
+    <div id="previewContent" class="pvc"></div>
+  </div>
+</div>
+
+<!-- Confirm -->
+<div id="confirmModal" class="hm-modal" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle">
+  <div class="box sm">
+    <h2 id="confirmTitle">Confirm action</h2><p class="lead" id="confirmMessage"></p>
+    <div class="fa-end"><button id="confirmCancel" class="btn soft" type="button">Cancel</button><button id="confirmOk" class="btn red" type="button"><span id="confirmOkText">Confirm</span></button></div>
+  </div>
+</div>
+
+<div id="toastContainer" aria-live="polite"></div>
+
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const safe=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+const CATS=['Dental Caravan','Medical Mission','Vaccination','Free Check-up','Mental Health','Nutrition and Fitness','Blood Donation','Other'];
+const ICON={'Blood Donation':'fa-droplet','Vaccination':'fa-syringe','Dental Caravan':'fa-tooth','Mental Health':'fa-brain','Nutrition and Fitness':'fa-apple-whole','Medical Mission':'fa-kit-medical','Free Check-up':'fa-stethoscope'};
+const icon=c=>ICON[c]||'fa-heart-pulse';
+let all=[],activeStatus='',objectUrl=null;
+CATS.forEach(c=>{$('category').add(new Option(c,c));$('categoryFilter').add(new Option(c,c))});
+
+function notify(msg,type='success'){
+  if(typeof showAlert==='function'){showAlert(msg,type);return}
+  const t=document.createElement('div');t.className='toast '+type;t.textContent=msg;$('toastContainer').appendChild(t);setTimeout(()=>t.remove(),4000);
+}
+const openM=id=>{$(id).classList.add('on');document.body.style.overflow='hidden'};
+const closeM=id=>{$(id).classList.remove('on');if(!document.querySelector('.hm-modal.on'))document.body.style.overflow=''};
+document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>closeM(b.dataset.close)));
+document.querySelectorAll('.hm-modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeM(m.id)}));
+addEventListener('keydown',e=>{if(e.key==='Escape'){const top=[...document.querySelectorAll('.hm-modal.on')].pop();if(top)closeM(top.id)}});
+function confirmBox(message,label,onOk){
+  $('confirmMessage').textContent=message;$('confirmOkText').textContent=label;openM('confirmModal');$('confirmCancel').focus();
+  $('confirmOk').onclick=()=>{closeM('confirmModal');onOk()};$('confirmCancel').onclick=()=>closeM('confirmModal');
+}
+
+/* ---- formatting ---- */
+const dateText=v=>{const d=new Date(`${v}T00:00:00`);return v&&!isNaN(d)?d.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}):'—'};
+const t12=s=>{if(!s)return'';const d=new Date(`1970-01-01T${s}`);return isNaN(d)?String(s):d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})};
+const timeRange=(a,b)=>a?t12(a)+(b?' – '+t12(b):''):'';
+const isUpcoming=p=>{const d=new Date(`${p.event_date}T00:00:00`),t=new Date();t.setHours(0,0,0,0);return !isNaN(d)&&d>=t};
+
+/* ---- data ---- */
+async function load(){
+  try{
+    const r=await fetch('api/health_announcements/list_admin.php?page=1&per_page=100',{credentials:'same-origin'}),d=await r.json();
+    if(!r.ok||!d.success)throw new Error(d.message||'Unable to load');
+    all=d.data||[];render();
+  }catch(e){console.error(e);$('rows').innerHTML=`<tr><td colspan="6" class="empty"><i class="fas fa-triangle-exclamation"></i>${safe(e.message)}</td></tr>`}
+}
+function render(){
+  const n=s=>all.filter(p=>p.status===s).length;
+  $('sTotal').textContent=all.length;$('sPub').textContent=n('Published');$('sDraft').textContent=n('Draft');
+  $('sSoon').textContent=all.filter(p=>p.status==='Published'&&isUpcoming(p)).length;
+  $('cAll').textContent=all.length;$('cPublished').textContent=n('Published');$('cDraft').textContent=n('Draft');$('cCancelled').textContent=n('Cancelled');$('cArchived').textContent=n('Archived');
+  const q=$('search').value.toLowerCase().trim(),cat=$('categoryFilter').value;
+  const list=all.filter(p=>(!activeStatus||p.status===activeStatus)&&(!cat||p.category===cat)&&(!q||`${p.title} ${p.description||''} ${p.venue||''}`.toLowerCase().includes(q)));
+  if(!list.length){$('rows').innerHTML=`<tr><td colspan="6" class="empty"><i class="fas fa-heart-pulse"></i>No health announcements found.</td></tr>`;return}
+  $('rows').innerHTML=list.map(p=>{
+    const id=safe(p.id),pub=p.status==='Published';
+    return `<tr>
+      <td data-l="Announcement" class="nl"><div class="ttl"><span class="th">${p.image_path?`<img src="${safe(p.image_path)}" alt="" loading="lazy">`:`<i class="fas ${icon(p.category)}"></i>`}</span><div><b>${safe(p.title)}</b>${p.slots?`<span>${safe(p.slots)} slots</span>`:''}</div></div></td>
+      <td data-l="Category"><span class="cat">${safe(p.category)}</span></td>
+      <td data-l="Date and time"><div class="when"><b>${safe(dateText(p.event_date))}</b><span>${safe(timeRange(p.start_time,p.end_time))}</span></div></td>
+      <td data-l="Venue"><div class="loc" title="${safe(p.venue||'')}">${safe(p.venue||'—')}</div></td>
+      <td data-l="Status"><span class="pill ${safe(p.status)}">${safe(p.status)}</span></td>
+      <td class="ab-td nl"><div class="ab">
+        <button class="ib" type="button" data-action="view" data-id="${id}" aria-label="View" title="View"><i class="fas fa-eye"></i></button>
+        <button class="ib" type="button" data-action="edit" data-id="${id}" aria-label="Edit" title="Edit"><i class="fas fa-pen"></i></button>
+        <button class="ib pub" type="button" data-action="${pub?'unpublish':'publish'}" data-id="${id}" aria-label="${pub?'Unpublish':'Publish'}" title="${pub?'Unpublish':'Publish'}"><i class="fas ${pub?'fa-eye-slash':'fa-bullhorn'}"></i></button>
+        ${p.status!=='Cancelled'&&p.status!=='Archived'?`<button class="ib del" type="button" data-action="cancel" data-id="${id}" aria-label="Cancel activity" title="Cancel activity"><i class="fas fa-ban"></i></button>`:''}
+        ${p.status!=='Archived'?`<button class="ib del" type="button" data-action="archive" data-id="${id}" aria-label="Archive" title="Archive"><i class="fas fa-box-archive"></i></button>`:''}</div></td></tr>`;
+  }).join('');
+}
+$('search').addEventListener('input',render);$('categoryFilter').addEventListener('change',render);
+$('tabs').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;activeStatus=b.dataset.status;document.querySelectorAll('#tabs .chip').forEach(x=>x.setAttribute('aria-pressed',x===b));render()});
+
+/* ---- form ---- */
+function setPv(src){$('pvBox').innerHTML=src?`<img src="${safe(src)}" alt="Preview">`:'<i class="fas fa-image"></i>'}
+function resetForm(){
+  $('announcementForm').reset();$('postId').value='';$('formTitle').textContent='New health announcement';setPv('');
+  document.querySelectorAll('.err').forEach(e=>e.textContent='');if(objectUrl){URL.revokeObjectURL(objectUrl);objectUrl=null}
+}
+function openForm(post){
+  resetForm();
+  if(post){
+    $('formTitle').textContent='Edit health announcement';
+    Object.entries({postId:post.id,title:post.title,category:post.category,eventDate:post.event_date||'',venue:post.venue||'',startTime:post.start_time||'',endTime:post.end_time||'',slots:post.slots||'',description:post.description||'',requirements:post.requirements||''}).forEach(([id,v])=>$(id).value=v);
+    if(post.image_path)setPv(post.image_path);
+  }
+  openM('formModal');$('title').focus();
+}
+$('newButton').onclick=()=>openForm();
+$('image').onchange=e=>{
+  const f=e.target.files[0];$('imageError').textContent='';if(!f)return;
+  if(!/^image\/(jpeg|png|webp)$/.test(f.type)){$('imageError').textContent='Use a JPG, PNG or WebP image.';e.target.value='';return}
+  if(f.size>2*1024*1024){$('imageError').textContent='Image must be 2 MB or smaller.';e.target.value='';return}
+  if(objectUrl)URL.revokeObjectURL(objectUrl);objectUrl=URL.createObjectURL(f);setPv(objectUrl);
+};
+function previewHtml(o){
+  const when=[dateText(o.event_date),timeRange(o.start_time,o.end_time)].filter(x=>x&&x!=='—').join(' · ');
+  return `<span class="cat">${safe(o.category||'Category')}</span><div class="img">${o.image?`<img src="${safe(o.image)}" alt="">`:`<i class="fas ${icon(o.category)}"></i>`}</div>
+    <h3>${safe(o.title||'Untitled')}</h3>
+    <div class="meta"><div><i class="fas fa-calendar"></i>${safe(when||'Date to be announced')}</div><div><i class="fas fa-location-dot"></i>${safe(o.venue||'Venue to be announced')}</div>${o.slots?`<div><i class="fas fa-id-card"></i>Slots: ${safe(o.slots)}</div>`:''}</div>
+    <p>${safe(o.description||'More details will be announced soon.')}</p>${o.requirements?`<div class="rq"><b>Requirements:</b><br>${safe(o.requirements)}</div>`:''}`;
+}
+$('previewButton').onclick=()=>{
+  const f=new FormData($('announcementForm')),img=$('pvBox').querySelector('img');
+  $('previewContent').innerHTML=previewHtml({category:f.get('category'),title:f.get('title'),event_date:f.get('event_date'),start_time:f.get('start_time'),end_time:f.get('end_time'),venue:f.get('venue'),slots:f.get('slots'),description:f.get('description'),requirements:f.get('requirements'),image:img?img.src:''});
+  openM('previewModal');
+};
+$('announcementForm').addEventListener('submit',async e=>{
+  e.preventDefault();document.querySelectorAll('.err').forEach(x=>x.textContent='');
+  let bad=false;const set=(id,m)=>{$(id).textContent=m;bad=true};
+  if(!$('title').value.trim())set('titleError','Title is required.');
+  if(!$('category').value)set('categoryError','Choose a category.');
+  if(!$('eventDate').value)set('dateError','Event date is required.');
+  if($('startTime').value&&$('endTime').value&&$('endTime').value<=$('startTime').value)set('timeError','End time must be after start time.');
+  if($('slots').value&&Number($('slots').value)<1)set('slotsError','Slots must be 1 or more.');
+  if(bad)return;
+  const btns=e.target.querySelectorAll('button[type=submit]');btns.forEach(b=>b.disabled=true);
+  try{
+    const form=new FormData(e.target);form.append('status',e.submitter.value);
+    const id=$('postId').value,r=await fetch(id?'api/health_announcements/update.php':'api/health_announcements/create.php',{method:'POST',body:form,credentials:'same-origin'}),d=await r.json();
+    if(!r.ok||!d.success){notify(d.message||'Please check the form.','error')}
+    else{closeM('formModal');notify(e.submitter.value==='Published'?'Announcement published':'Draft saved');load()}
+  }catch(err){console.error(err);notify('Could not save. Please try again.','error')}
+  btns.forEach(b=>b.disabled=false);
+});
+
+/* ---- row actions ---- */
+async function statusAction(id,action){
+  const archive=action==='archive',endpoint=archive?'api/health_announcements/delete.php':'api/health_announcements/set_status.php',payload=archive?{id}:{id,action};
+  try{
+    const r=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify(payload)}),d=await r.json();
+    if(!r.ok||!d.success)notify(d.message||'Action failed','error');
+    else{notify({publish:'Announcement published',unpublish:'Announcement unpublished',cancel:'Activity cancelled',archive:'Announcement archived'}[action]);load()}
+  }catch(e){console.error(e);notify('Action failed. Please try again.','error')}
+}
+$('rows').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-action]');if(!b)return;
+  const post=all.find(p=>String(p.id)===b.dataset.id),a=b.dataset.action;if(!post)return;
+  if(a==='edit')openForm(post);
+  else if(a==='view'){$('previewContent').innerHTML=previewHtml({...post,image:post.image_path});openM('previewModal')}
+  else if(a==='cancel')confirmBox('Cancel this activity? Youth will see it marked as cancelled.','Cancel activity',()=>statusAction(post.id,'cancel'));
+  else if(a==='archive')confirmBox('Archive this announcement? It will no longer be shown to youth.','Archive',()=>statusAction(post.id,'archive'));
+  else statusAction(post.id,a);
+});
+
+/* ---- profile fallback (only if the shared scripts did not fill it) ---- */
+setTimeout(async()=>{
+  if($('userFullName').textContent!=='Loading...')return;
+  try{const r=await fetch('api/get_user_profile.php'),d=await r.json();
+    if(d.success){$('userAvatarInitials').textContent=d.user.initials;$('userFullName').textContent=d.user.name;$('userRole').textContent=d.user.role}}catch(e){}
+},1500);
+
+load();
+})();
+</script>
+<script src="js/auth-guard.js" data-roles="admin,sk_official"></script>
+<script src="assets/js/loader.js?v=3"></script>
+<script src="js/admin-common.js"></script>
+<script src="js/admin-sidebar.js"></script>
+</body>
+</html> 

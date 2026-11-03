@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMS OTP Debug & Test</title>
+    <link rel="icon" type="image/x-icon" href="/SKalinga/assets/icons/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/SKalinga/assets/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/SKalinga/assets/icons/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/SKalinga/assets/icons/apple-touch-icon.png">
+    <link rel="manifest" href="/SKalinga/assets/icons/site.webmanifest">
+    <meta name="msapplication-config" content="/SKalinga/assets/icons/browserconfig.xml">
+    <meta name="theme-color" content="#FF6B9D">
+    <link rel="stylesheet" href="assets/css/loader.css?v=3">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            color: #333;
+            font-weight: 500;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        input[type="text"],
+        input[type="tel"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus,
+        input[type="tel"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-send {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-send:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-send:active {
+            transform: translateY(0);
+        }
+        
+        .btn-clear {
+            background: #f0f0f0;
+            color: #333;
+        }
+        
+        .btn-clear:hover {
+            background: #e0e0e0;
+        }
+        
+        .response-section {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #f0f0f0;
+        }
+        
+        .response-title {
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+        
+        .response-box {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 16px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 11px;
+            color: #333;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+            line-height: 1.5;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status-pending {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .note {
+            background: #fff3cd;
+            border: 1px solid #ffeeba;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 20px;
+            color: #856404;
+            font-size: 13px;
+        }
+        
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #0d47a1;
+        }
+    </style>
+</head>
+<body>
+    <script src="assets/js/loader.js?v=3"></script>
+    <div class="container">
+        <h1>🚀 SMS OTP Debug & Test</h1>
+        <p class="subtitle">Test sending OTP to your phone number</p>
+        
+        <div class="info-box">
+            <strong>ℹ️ Info:</strong> Use this page to test the SMS API connection and debug any issues with sending OTP to your phone.
+        </div>
+        
+        <div class="form-group">
+            <label for="phone">📱 Phone Number (11 digits, e.g., 09258604431)</label>
+            <input 
+                type="tel" 
+                id="phone" 
+                placeholder="09258604431" 
+                pattern="\d{11}"
+                maxlength="11"
+                autocomplete="tel"
+            >
+        </div>
+        
+        <div class="form-group">
+            <label for="message">💬 Custom Message (optional)</label>
+            <textarea 
+                id="message" 
+                placeholder="Leave blank for default: Your SKalinga verification code is: [OTP]. Valid for 10 minutes."
+            ></textarea>
+        </div>
+        
+        <div class="button-group">
+            <button class="btn-send" id="sendBtn">Send Test OTP</button>
+            <button class="btn-clear" id="clearBtn">Clear</button>
+        </div>
+        
+        <div class="response-section" id="responseSection" style="display: none;">
+            <div class="response-title">📊 Response Details</div>
+            <div id="statusBadge"></div>
+            <div class="response-box" id="response"></div>
+        </div>
+    </div>
+
+    <script>
+        const phoneInput = document.getElementById('phone');
+        const messageInput = document.getElementById('message');
+        const sendBtn = document.getElementById('sendBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const responseSection = document.getElementById('responseSection');
+        const statusBadge = document.getElementById('statusBadge');
+        const responseBox = document.getElementById('response');
+        
+        // Format phone input as user types
+        phoneInput.addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/\D/g, '').slice(0, 11);
+        });
+        
+        clearBtn.addEventListener('click', () => {
+            phoneInput.value = '';
+            messageInput.value = '';
+            responseSection.style.display = 'none';
+            responseBox.textContent = '';
+            phoneInput.focus();
+        });
+        
+        sendBtn.addEventListener('click', async () => {
+            const phone = phoneInput.value.trim();
+            
+            // Validation
+            if (!phone) {
+                showResponse('error', 'Please enter a phone number');
+                return;
+            }
+            
+            if (phone.length !== 11 || !/^\d{11}$/.test(phone)) {
+                showResponse('error', 'Phone number must be exactly 11 digits');
+                return;
+            }
+            
+            // Start loading
+            sendBtn.disabled = true;
+            sendBtn.textContent = 'Sending...';
+            showResponse('pending', 'Attempting to send OTP...');
+            
+            try {
+                // Test OTP via simple SMS test endpoint (no database required)
+                const response = await fetch('api/sms_test_simple.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        phone: phone
+                    })
+                });
+                
+                const responseText = await response.text();
+                let data;
+                
+                try {
+                    data = JSON.parse(responseText);
+                } catch (parseError) {
+                    showResponse('error', `Failed to parse response:\n\n${responseText}`);
+                    sendBtn.disabled = false;
+                    sendBtn.innerHTML = 'Send Test OTP';
+                    return;
+                }
+                
+                // Display full response
+                const responseDisplay = {
+                    'Status Code': response.status,
+                    'Message': data.message,
+                    'Success': data.success,
+                    'Phone': data.phone,
+                    'Formatted Phone': data.formatted_phone,
+                    'Test OTP': data.test_otp,
+                    'Full Response': JSON.stringify(data, null, 2)
+                };
+                
+                if (data.api_response) {
+                    responseDisplay['API Debug Info'] = JSON.stringify(data.api_response, null, 2);
+                }
+                
+                const status = data.success ? 'success' : (data.api_response?.curl_error ? 'error' : 'error');
+                showResponse(status, JSON.stringify(responseDisplay, null, 2));
+                
+            } catch (error) {
+                showResponse('error', `Network Error:\n${error.message}\n\nStack: ${error.stack}`);
+            } finally {
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = 'Send Test OTP';
+            }
+        });
+        
+        function showResponse(status, message) {
+            responseSection.style.display = 'block';
+            responseBox.textContent = message;
+            
+            // Remove all status classes
+            statusBadge.className = 'status-badge';
+            
+            if (status === 'success') {
+                statusBadge.classList.add('status-success');
+                statusBadge.textContent = '✅ Success - OTP Sent';
+            } else if (status === 'error') {
+                statusBadge.classList.add('status-error');
+                statusBadge.textContent = '❌ Error - Check details below';
+            } else if (status === 'pending') {
+                statusBadge.classList.add('status-pending');
+                statusBadge.textContent = '⏳ Processing...';
+            }
+            
+            // Scroll to response
+            responseSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        
+        // Auto-focus phone input
+        phoneInput.focus();
+    </script>
+</body>
+</html>

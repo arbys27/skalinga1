@@ -1,0 +1,313 @@
+.digital-youth-id-card {
+  --dyid-ink: #18332b;
+  --dyid-muted: #64756e;
+  width: min(100%, 560px);
+  margin: 20px auto;
+  display: block;
+  color: var(--dyid-ink);
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.digital-youth-id-card .dyid-front {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(21, 75, 52, 0.16);
+  border-radius: 18px;
+  color: var(--dyid-ink);
+  text-align: left;
+  background:
+    radial-gradient(ellipse at 80% 78%, rgba(52, 157, 103, 0.08), transparent 38%),
+    linear-gradient(145deg, #fff 0%, #f4faf6 100%);
+  box-shadow: 0 12px 30px rgba(19, 57, 42, 0.12);
+}
+
+.digital-youth-id-card .dyid-front {
+  isolation: isolate;
+}
+
+.digital-youth-id-card .dyid-hologram {
+  position: absolute;
+  z-index: 1;
+  top: 88px;
+  right: 19px;
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.92);
+  border-radius: 50%;
+  color: #225d49;
+  background:
+    repeating-conic-gradient(from 12deg, rgba(255, 255, 255, .72) 0deg 8deg, transparent 8deg 16deg),
+    conic-gradient(#d8f0d8, #b8d9ee, #f4d9f0, #f6eab8, #c2ead8, #d8f0d8);
+  box-shadow: 0 2px 10px rgba(18, 74, 53, 0.2), inset 0 0 0 3px rgba(255, 255, 255, .35);
+  font-size: 0.53rem;
+  font-weight: 900;
+  letter-spacing: .04em;
+  transform: rotate(-12deg);
+}
+
+.digital-youth-id-card .dyid-hologram::before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border: 1px solid rgba(255, 255, 255, .75);
+  border-radius: 50%;
+}
+
+.digital-youth-id-card .dyid-header {
+  display: flex;
+  min-height: 76px;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  background: linear-gradient(112deg, #124a35 0%, #20794e 100%);
+  color: #fff;
+}
+
+.digital-youth-id-card .dyid-logo {
+  width: 46px;
+  height: 46px;
+  flex: 0 0 46px;
+  border: 2px solid rgba(255, 255, 255, 0.72);
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.digital-youth-id-card .dyid-brand {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.digital-youth-id-card .dyid-brand strong {
+  font-size: 0.98rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.digital-youth-id-card .dyid-brand span,
+.digital-youth-id-card .dyid-classification {
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 0.61rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.digital-youth-id-card .dyid-classification {
+  margin-left: auto;
+  padding: 7px 9px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.digital-youth-id-card .dyid-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 124px;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+}
+
+.digital-youth-id-card .dyid-person {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 14px;
+}
+
+.digital-youth-id-card .dyid-details {
+  display: grid;
+  min-width: 0;
+  gap: 7px;
+}
+
+.digital-youth-id-card .dyid-field-label {
+  color: #288254;
+  font-size: 0.59rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.digital-youth-id-card .dyid-name {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--dyid-ink);
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-size: clamp(1.03rem, 4vw, 1.3rem);
+  font-weight: 800;
+  line-height: 1.12;
+}
+
+.digital-youth-id-card .dyid-detail {
+  display: grid;
+  gap: 1px;
+  color: var(--dyid-muted);
+  font-size: 0.67rem;
+  line-height: 1.35;
+}
+
+.digital-youth-id-card .dyid-detail strong {
+  color: var(--dyid-ink);
+  font-size: 0.76rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.digital-youth-id-card .dyid-number-stamp {
+  display: grid;
+  gap: 3px;
+  justify-items: start;
+  width: fit-content;
+  max-width: 100%;
+  margin-top: 1px;
+  padding: 5px 8px;
+  border: 1px solid rgba(31, 108, 71, .16);
+  border-radius: 7px;
+  background: rgba(224, 239, 229, .72);
+}
+
+.digital-youth-id-card .dyid-number-stamp span {
+  color: #547263;
+  font-size: .5rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.digital-youth-id-card .dyid-number-stamp strong {
+  color: #18332b;
+  font-family: "Courier New", monospace;
+  font-size: .81rem;
+  font-weight: 800;
+  letter-spacing: .1em;
+  overflow-wrap: anywhere;
+}
+
+.digital-youth-id-card .dyid-qr-panel {
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  padding: 8px;
+  border: 1px solid rgba(31, 108, 71, 0.12);
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.88);
+  text-align: center;
+}
+
+.digital-youth-id-card .dyid-qr-box {
+  display: grid;
+  width: 96px !important;
+  height: 96px !important;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 7px;
+  background: #fff;
+}
+
+.digital-youth-id-card .dyid-qr-box .qr-code,
+.digital-youth-id-card .dyid-qr-box img,
+.digital-youth-id-card .dyid-qr-box canvas {
+  display: block;
+  width: 90px !important;
+  height: 90px !important;
+  margin: 0;
+  object-fit: contain;
+}
+
+.digital-youth-id-card .dyid-qr-caption {
+  color: var(--dyid-muted);
+  font-size: 0.56rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.digital-youth-id-card .dyid-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 20px;
+  border-top: 1px solid rgba(21, 75, 52, 0.1);
+  background: rgba(232, 243, 236, 0.72);
+  color: #4f6a5d;
+  font-size: 0.55rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.digital-youth-id-card .dyid-request-ref {
+  grid-column: 1 / -1;
+  padding-top: 7px;
+  border-top: 1px dashed rgba(21, 75, 52, 0.18);
+  color: var(--dyid-muted);
+  font-size: 0.68rem;
+}
+
+.digital-youth-id-card .dyid-request-ref strong {
+  color: var(--dyid-ink);
+}
+
+@media (max-width: 420px) {
+  .digital-youth-id-card .dyid-header {
+    gap: 9px;
+    padding: 12px;
+  }
+
+  .digital-youth-id-card .dyid-brand strong {
+    font-size: 0.85rem;
+  }
+
+  .digital-youth-id-card .dyid-brand span,
+  .digital-youth-id-card .dyid-classification {
+    font-size: 0.5rem;
+  }
+
+  .digital-youth-id-card .dyid-main {
+    grid-template-columns: minmax(0, 1fr) 98px;
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .digital-youth-id-card .dyid-person {
+    gap: 9px;
+  }
+
+  .digital-youth-id-card .dyid-photo {
+    width: 62px;
+    height: 80px;
+    flex-basis: 62px;
+  }
+
+  .digital-youth-id-card .dyid-qr-panel {
+    padding: 5px;
+  }
+
+  .digital-youth-id-card .dyid-qr-box {
+    width: 82px !important;
+    height: 82px !important;
+  }
+
+  .digital-youth-id-card .dyid-qr-box .qr-code,
+  .digital-youth-id-card .dyid-qr-box img,
+  .digital-youth-id-card .dyid-qr-box canvas {
+    width: 78px !important;
+    height: 78px !important;
+  }
+
+  .digital-youth-id-card .dyid-footer {
+    padding: 9px 12px;
+    font-size: 0.48rem;
+  }
+
+  .digital-youth-id-card .dyid-hologram {
+    top: 76px;
+    right: 12px;
+    width: 30px;
+    height: 30px;
+  }
+
+}

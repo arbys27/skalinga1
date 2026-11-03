@@ -1,0 +1,3 @@
+-- Intentionally contains no credential updates.
+-- The source migration installs documented test passwords; those accounts are
+-- not created or modified by the PostgreSQL deployment.

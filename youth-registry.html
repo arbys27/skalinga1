@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+    <title>SKalinga - Youth Registry</title>
+    <link rel="icon" type="image/x-icon" href="/SKalinga/assets/icons/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/SKalinga/assets/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/SKalinga/assets/icons/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/SKalinga/assets/icons/apple-touch-icon.png">
+    <link rel="manifest" href="/SKalinga/assets/icons/site.webmanifest">
+    <meta name="msapplication-config" content="/SKalinga/assets/icons/browserconfig.xml">
+    <meta name="theme-color" content="#FF6B9D">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <link rel="stylesheet" href="assets/css/dashboard.css">
+    <link rel="stylesheet" href="assets/css/admin-theme.css">
+    <link rel="stylesheet" href="assets/css/loader.css?v=3">
+    <link rel="stylesheet" href="assets/css/digital-youth-id.css">
+
+    <style>
+.main-content { background: var(--page); }
+        .dashboard-content { padding: 28px 32px 48px; max-width: 1400px; }
+
+        /* ───────── Summary strip ───────── */
+        .summary {
+            display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px;
+            margin-bottom: 22px;
+        }
+        .summary-card {
+            display: flex; align-items: center; gap: 14px;
+            padding: 18px 20px;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+        }
+        .summary-icon {
+            width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
+            display: grid; place-items: center; font-size: 18px;
+        }
+        .summary-card:nth-child(1) .summary-icon { background: #e8f3fc; color: #2b86c5; }
+        .summary-card:nth-child(2) .summary-icon { background: #fde9f0; color: #d63f78; }
+        .summary-card:nth-child(3) .summary-icon { background: #e6f4ec; color: var(--green); }
+        .summary-value { font-size: 26px; font-weight: 700; color: var(--ink); line-height: 1.1; font-variant-numeric: tabular-nums; }
+        .summary-label { font-size: 13px; color: var(--ink-soft); margin-top: 2px; }
+
+        /* ───────── Toolbar ───────── */
+        .search-filter-bar {
+            display: flex; align-items: center; justify-content: space-between; gap: 16px;
+            margin-bottom: 16px; flex-wrap: wrap;
+        }
+        .search-group { position: relative; flex: 1 1 340px; max-width: 480px; }
+        .search-group > i {
+            position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+            color: var(--ink-soft); pointer-events: none;
+        }
+        .search-input {
+            width: 100%; box-sizing: border-box;
+            padding: 13px 16px 13px 44px;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            font: 500 14px 'IBM Plex Sans', sans-serif; color: var(--ink);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .search-input::placeholder { color: #9aa1b2; }
+        .search-input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 4px rgba(93, 173, 226, 0.18); }
+
+        .btn-add-youth {
+            display: inline-flex; align-items: center; gap: 10px;
+            padding: 13px 22px; border: none; border-radius: 12px; cursor: pointer;
+            background: linear-gradient(135deg, var(--pink), #e8508a);
+            color: #fff; font: 600 14px 'IBM Plex Sans', sans-serif;
+            box-shadow: 0 6px 18px rgba(255, 107, 157, 0.32);
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .btn-add-youth:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(255, 107, 157, 0.4); }
+        .btn-add-youth:focus-visible { outline: 3px solid rgba(93, 173, 226, 0.5); outline-offset: 2px; }
+
+        /* ───────── Table ───────── */
+        .table-card {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+        .table-scroll { overflow-x: auto; }
+        .admin-table { width: 100%; border-collapse: collapse; margin: 0; background: transparent; box-shadow: none; }
+        .admin-table thead th {
+            padding: 14px 20px; text-align: left;
+            background: #f8f9fc; color: var(--ink-soft);
+            font-size: 12px; font-weight: 600; letter-spacing: 0.04em;
+            border-bottom: 1px solid var(--line);
+            white-space: nowrap;
+        }
+        .admin-table tbody td {
+            padding: 14px 20px; color: var(--ink); font-size: 14px;
+            border-bottom: 1px solid var(--line); vertical-align: middle;
+        }
+        .admin-table tbody tr:last-child td { border-bottom: none; }
+        .admin-table tbody tr { transition: background 0.15s; }
+        .admin-table tbody tr:hover { background: #f8fafe; }
+
+        .member-id {
+            display: inline-block; padding: 4px 10px; border-radius: 8px;
+            background: #f0f3f9; color: #3b4660;
+            font: 600 12.5px 'JetBrains Mono', monospace;
+        }
+        .person { display: flex; align-items: center; gap: 12px; }
+        .person-avatar {
+            width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+            display: grid; place-items: center;
+            color: #fff; font-size: 13px; font-weight: 700;
+        }
+        .person-name { font-weight: 600; }
+        .person-sub { font-size: 12px; color: var(--ink-soft); margin-top: 1px; }
+        .address-column { max-width: 320px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--ink-soft); }
+
+        .action-buttons { white-space: nowrap; text-align: right; }
+        .action-btn {
+            width: 34px; height: 34px; margin-left: 6px;
+            border: none; border-radius: 10px; cursor: pointer; font-size: 14px;
+            transition: transform 0.15s, background 0.15s;
+        }
+        .action-btn:hover { transform: translateY(-2px); }
+        .action-btn:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+        .btn-view   { background: #e8f3fc; color: #2b86c5; }
+        .btn-edit   { background: #fff4e0; color: #c47d0a; }
+        .btn-delete { background: #fdeaea; color: #d33f3f; }
+        .btn-view:hover   { background: #d5e9f8; }
+        .btn-edit:hover   { background: #ffeacc; }
+        .btn-delete:hover { background: #fbd7d7; }
+
+        .state-row td { padding: 56px 20px !important; text-align: center; color: var(--ink-soft); }
+        .state-row i { display: block; font-size: 34px; margin-bottom: 12px; color: #c4cadb; }
+        .state-row strong { display: block; color: var(--ink); font-size: 16px; margin-bottom: 4px; }
+        .skeleton-bar {
+            height: 14px; border-radius: 7px;
+            background: linear-gradient(90deg, #eef1f7 25%, #f7f8fc 50%, #eef1f7 75%);
+            background-size: 200% 100%; animation: shimmer 1.2s infinite linear;
+        }
+        @keyframes shimmer { to { background-position: -200% 0; } }
+
+        /* ───────── Modals ───────── */
+        .modal {
+            display: none; position: fixed; inset: 0; z-index: 5000;
+            align-items: center; justify-content: center; padding: 20px;
+            background: rgba(20, 26, 40, 0.55); backdrop-filter: blur(4px);
+        }
+        .modal-content {
+            position: relative; width: 100%; max-width: 560px; max-height: 92vh; overflow-y: auto;
+            box-sizing: border-box; padding: 32px;
+            background: var(--surface); border-radius: 20px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+            animation: pop 0.25s ease-out;
+        }
+        @keyframes pop { from { opacity: 0; transform: translateY(16px) scale(0.98); } to { opacity: 1; transform: none; } }
+        .modal-content h2 { margin: 0 0 20px; font-size: 21px; color: var(--ink); }
+        .modal-content h3 { margin: 8px 0 14px; font-size: 16px; color: var(--ink); }
+        .close-modal {
+            position: absolute; top: 16px; right: 16px;
+            width: 34px; height: 34px; border-radius: 50%;
+            display: grid; place-items: center; cursor: pointer;
+            background: #f0f3f9; color: var(--ink-soft); font-size: 20px; line-height: 1;
+            transition: background 0.15s;
+        }
+        .close-modal:hover { background: #e3e8f2; color: var(--ink); }
+
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #3b4660; }
+        .form-group input[type="text"], .form-group input[type="date"], .form-group input[type="number"],
+        .form-group input[type="tel"], .form-group input[type="email"], .form-group input[type="password"],
+        .form-group select {
+            width: 100%; box-sizing: border-box; padding: 12px 14px;
+            background: #fbfcfe; border: 1px solid var(--line); border-radius: 10px;
+            font: 14px 'IBM Plex Sans', sans-serif; color: var(--ink);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none; border-color: var(--blue); background: #fff; box-shadow: 0 0 0 4px rgba(93, 173, 226, 0.16);
+        }
+        .form-group input[readonly] { background: #f0f3f9; color: var(--ink-soft); }
+        .form-group.privacy { display: flex; gap: 10px; align-items: flex-start; }
+        .form-group.privacy label { margin: 0; font-weight: 400; color: var(--ink-soft); line-height: 1.5; }
+        .form-group.privacy input { margin-top: 3px; }
+        .password-warning { display: none; margin-top: 6px; color: #d33f3f; font-size: 12px; }
+        .password-warning.show { display: block; }
+
+        .btn-submit {
+            width: 100%; padding: 14px; border: none; border-radius: 12px; cursor: pointer;
+            background: linear-gradient(135deg, var(--blue), #3f93cc);
+            color: #fff; font: 600 15px 'IBM Plex Sans', sans-serif;
+            transition: transform 0.15s, opacity 0.15s;
+        }
+        .btn-submit:hover:not(:disabled) { transform: translateY(-2px); }
+        .btn-submit:disabled { opacity: 0.45; cursor: not-allowed; }
+
+        .detail-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px;
+            padding: 18px; margin-bottom: 24px;
+            background: #f8f9fc; border: 1px solid var(--line); border-radius: 14px;
+        }
+        .detail-grid .full { grid-column: 1 / -1; }
+        .detail-grid dt { font-size: 12px; color: var(--ink-soft); margin-bottom: 2px; }
+        .detail-grid dd { margin: 0; font-size: 14px; font-weight: 600; color: var(--ink); word-break: break-word; }
+        @keyframes slideInRight  { from { transform: translateX(400px); opacity: 0; } to { transform: none; opacity: 1; } }
+        @keyframes slideOutRight { from { transform: none; opacity: 1; } to { transform: translateX(400px); opacity: 0; } }
+
+        /* ───────── Responsive ───────── */
+        @media (max-width: 900px) {
+            .dashboard-content { padding: 20px 16px 40px; }
+            .summary { grid-template-columns: 1fr; }
+            .btn-add-youth { width: 100%; justify-content: center; }
+            .search-group { max-width: none; }
+        }
+        @media (max-width: 560px) {
+            .form-row, .detail-grid { grid-template-columns: 1fr; }
+            .modal-content { padding: 24px 20px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .btn-add-youth, .action-btn { transition: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="adminSidebar"></aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="top-header">
+            <div class="header-left">
+                <h2>Youth Registry</h2>
+                <p id="dashboard-datetime">Loading date and time...</p>
+            </div>
+            <div class="header-right">
+                <div class="user-profile-card">
+                    <div class="user-avatar-new" id="userAvatar">AD</div>
+                    <div class="user-details">
+                        <h4 id="userFullName">Admin</h4>
+                        <span class="user-role-badge" id="userRole">Staff</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="dashboard-content">
+
+            <!-- Summary -->
+            <div class="summary">
+                <div class="summary-card">
+                    <div class="summary-icon"><i class="fas fa-users"></i></div>
+                    <div>
+                        <div class="summary-value" id="statTotal">0</div>
+                        <div class="summary-label">Registered members</div>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon"><i class="fas fa-user-plus"></i></div>
+                    <div>
+                        <div class="summary-value" id="statNew">0</div>
+                        <div class="summary-label">Added this month</div>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon"><i class="fas fa-filter"></i></div>
+                    <div>
+                        <div class="summary-value" id="statShown">0</div>
+                        <div class="summary-label">Matching your search</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Toolbar -->
+            <div class="search-filter-bar">
+                <div class="search-group">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" class="search-input" placeholder="Search by name, ID, or contact number" aria-label="Search members">
+                </div>
+                <button class="btn-add-youth" id="addYouthBtn">
+                    <i class="fas fa-plus"></i> Register youth
+                </button>
+            </div>
+
+            <!-- Table -->
+            <div class="table-card">
+                <div class="table-scroll">
+                    <table class="admin-table" id="youthTable">
+                        <thead>
+                            <tr>
+                                <th>Member ID</th>
+                                <th>Full name</th>
+                                <th>Contact number</th>
+                                <th>Full address</th>
+                                <th style="text-align:right;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="youthTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+</div>
+
+<!-- Add/Edit Youth Modal -->
+<div class="modal" id="addYouthModal">
+    <div class="modal-content">
+        <span class="close-modal" id="closeAddModal" role="button" aria-label="Close">×</span>
+        <h2 id="modalTitle">Register new youth member</h2>
+
+        <form id="addYouthForm">
+            <input type="hidden" id="editId">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="firstName">First name *</label>
+                    <input type="text" id="firstName" placeholder="Juan" required>
+                </div>
+                <div class="form-group">
+                    <label for="lastName">Last name *</label>
+                    <input type="text" id="lastName" placeholder="Dela Cruz" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="birthday">Birthday *</label>
+                    <input type="date" id="birthday" required>
+                </div>
+                <div class="form-group">
+                    <label for="age">Age</label>
+                    <input type="number" id="age" min="13" max="35" placeholder="Auto-calculated" readonly>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="gender">Gender *</label>
+                <select id="gender" required>
+                    <option value="" disabled selected>Select gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="address">Full address *</label>
+                <input type="text" id="address" placeholder="1111 Avocado St. Garcia Subd. Brgy. San Antonio, Binan, Laguna" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="contact">Contact number *</label>
+                    <input type="tel" id="contact" placeholder="09123456789" pattern="[0-9]{11}" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email address *</label>
+                    <input type="email" id="email" placeholder="juan@example.com" required>
+                </div>
+            </div>
+
+            <div class="form-row" id="passwordRow">
+                <div class="form-group">
+                    <label for="password">Create password *</label>
+                    <input type="password" id="password" placeholder="At least 8 characters" minlength="8">
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm password *</label>
+                    <input type="password" id="confirmPassword" placeholder="Re-type password">
+                </div>
+            </div>
+            <small id="passwordWarning" class="password-warning" style="margin:-8px 0 14px;">⚠ Passwords do not match</small>
+
+            <div class="form-group privacy">
+                <input type="checkbox" id="privacyConsent" required>
+                <label for="privacyConsent">
+                    I agree to the <a href="#" target="_blank">Data Privacy Policy</a> and consent to processing of personal information.
+                </label>
+            </div>
+
+            <button type="submit" class="btn-submit" id="submitBtn" disabled>Register youth member</button>
+        </form>
+    </div>
+</div>
+
+<!-- Digital Youth ID Preview Modal -->
+<div class="modal" id="idPreviewModal">
+    <div class="modal-content">
+        <span class="close-modal" id="closeIdPreview" role="button" aria-label="Close">×</span>
+        <h2>Digital Youth ID generated</h2>
+        <p style="margin:-8px 0 18px;color:var(--ink-soft);">Print or save this ID for the member.</p>
+
+        <div class="digital-youth-id-card">
+         <section class="dyid-front" aria-label="Front of SKalinga membership ID">
+            <div class="dyid-header">
+                <img src="assets/images/sklogo.jpg" alt="SK Logo" class="dyid-logo" />
+                <div class="dyid-brand">
+                    <span>SKalinga Youth Services</span>
+                    <strong>SK San Antonio</strong>
+                </div>
+                <span class="dyid-classification">Member ID</span>
+            </div>
+            <div class="dyid-main">
+                <div class="dyid-person">
+                    <div class="dyid-details">
+                        <span class="dyid-field-label">Youth Member</span>
+                        <h4 class="dyid-name" id="previewName">New Member</h4>
+                        <span class="dyid-number-stamp"><span>Member number</span><strong id="previewId">SK-XXXX-XXXX</strong></span>
+                        <span class="dyid-detail">Date issued<strong id="previewDate"></strong></span>
+                    </div>
+                </div>
+                <div class="dyid-qr-panel">
+                    <div id="previewQRImg" class="dyid-qr-box"></div>
+                    <span class="dyid-qr-caption">Member reference only — not proof of identity</span>
+                </div>
+            </div>
+            <div class="dyid-footer">
+                <span>Personal identification</span>
+                <span>Present to SK staff</span>
+            </div>
+            <span class="dyid-hologram" aria-hidden="true">SK</span>
+         </section>
+        </div>
+    </div>
+</div>
+
+<!-- View Youth Detail Modal -->
+<div class="modal" id="viewYouthModal">
+    <div class="modal-content" style="max-width:640px;">
+        <span class="close-modal" id="closeViewModal" role="button" aria-label="Close">×</span>
+        <h2>Youth member details</h2>
+
+        <div id="viewPersonalInfo"></div>
+
+        <h3>Digital Youth ID</h3>
+        <div class="digital-youth-id-card">
+         <section class="dyid-front" aria-label="Front of SKalinga membership ID">
+            <div class="dyid-header">
+                <img src="assets/images/sklogo.jpg" alt="SK Logo" class="dyid-logo" />
+                <div class="dyid-brand">
+                    <span>SKalinga Youth Services</span>
+                    <strong>SK San Antonio</strong>
+                </div>
+                <span class="dyid-classification">Member ID</span>
+            </div>
+            <div class="dyid-main">
+                <div class="dyid-person">
+                    <div class="dyid-details">
+                        <span class="dyid-field-label">Youth Member</span>
+                        <h4 class="dyid-name" id="viewName"></h4>
+                        <span class="dyid-number-stamp"><span>Member number</span><strong id="viewId"></strong></span>
+                        <span class="dyid-detail">Date issued<strong id="viewDate"></strong></span>
+                    </div>
+                </div>
+                <div class="dyid-qr-panel">
+                    <div id="viewQRImg" class="dyid-qr-box"></div>
+                    <span class="dyid-qr-caption">Member reference only — not proof of identity</span>
+                </div>
+            </div>
+            <div class="dyid-footer">
+                <span>Personal identification</span>
+                <span>Present to SK staff</span>
+            </div>
+            <span class="dyid-hologram" aria-hidden="true">SK</span>
+         </section>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Notification Container -->
+<div id="toastContainer"></div>
+
+<!-- Confirmation Modal -->
+<div class="modal" id="confirmationModal">
+    <div class="modal-content" style="max-width: 420px;">
+        <h2 style="color: #E74C3C;"><i class="fas fa-exclamation-triangle" style="margin-right: 8px;"></i> Confirm action</h2>
+        <p id="confirmMessage" style="color: var(--ink-soft); margin: 0 0 28px; font-size: 15px; line-height: 1.5;"></p>
+        <div style="display: flex; gap: 12px; justify-content: flex-end;">
+            <button id="confirmCancelBtn" class="btn-add-youth" style="background: #95A5A6; box-shadow:none; padding: 10px 22px;">Cancel</button>
+            <button id="confirmOkBtn" class="btn-add-youth" style="background: linear-gradient(135deg, #E74C3C, #C0392B); box-shadow:none; padding: 10px 22px;"><i class="fas fa-trash"></i> Delete</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script>
+// ────────────────────────────────────────────────
+// Helpers
+// ────────────────────────────────────────────────
+const AVATAR_COLORS = ['#5DADE2', '#FF6B9D', '#27AE60', '#F39C12', '#8E7CC3', '#E67E73', '#3FB6A8'];
+function avatarColor(seed) {
+    let h = 0;
+    for (const ch of String(seed)) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+    return AVATAR_COLORS[h % AVATAR_COLORS.length];
+}
+
+// ────────────────────────────────────────────────
+// Toast Notification
+// ────────────────────────────────────────────────
+// ────────────────────────────────────────────────
+// Confirmation Modal
+// ────────────────────────────────────────────────
+function showConfirm(message, onConfirm) {
+    const confirmModal = document.getElementById('confirmationModal');
+    document.getElementById('confirmMessage').textContent = message;
+    confirmModal.style.display = 'flex';
+
+    document.getElementById('confirmOkBtn').onclick = () => {
+        confirmModal.style.display = 'none';
+        if (onConfirm) onConfirm();
+    };
+    document.getElementById('confirmCancelBtn').onclick = () => {
+        confirmModal.style.display = 'none';
+    };
+}
+
+// ────────────────────────────────────────────────
+// Session Check & Admin Info
+// ────────────────────────────────────────────────
+let adminInfo = null;
+
+async function checkAdminSession() {
+    try {
+        const response = await fetch('api/check_admin_session.php');
+        const data = await response.json();
+
+        if (!data.authenticated) {
+            window.location.href = 'login.html';
+            return;
+        }
+        adminInfo = data.admin;
+        loadAdminProfile();
+    } catch (error) {
+        console.error('Session check error:', error);
+        window.location.href = 'login.html';
+    }
+}
+
+function loadAdminProfile() {
+    if (!adminInfo) return;
+    const initials = adminInfo.username.substring(0, 2).toUpperCase();
+    const roleDisplay = adminInfo.role === 'superadmin' ? 'Super Admin' : 'Staff Admin';
+    document.getElementById('userAvatar').textContent = initials;
+    document.getElementById('userFullName').textContent = adminInfo.username.charAt(0).toUpperCase() + adminInfo.username.slice(1);
+    document.getElementById('userRole').textContent = roleDisplay;
+}
+checkAdminSession();
+
+// ────────────────────────────────────────────────
+// Live Date & Time
+// ────────────────────────────────────────────────
+function updateDashboardDateTime() {
+    const el = document.getElementById('dashboard-datetime');
+    if (!el) return;
+    const now = new Date();
+    const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    let hour = now.getHours();
+    let min = now.getMinutes();
+    let ampm = 'AM';
+    if (hour >= 12) { ampm = 'PM'; if (hour > 12) hour -= 12; }
+    if (hour === 0) hour = 12;
+    min = min < 10 ? '0' + min : min;
+    el.textContent = `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()} • ${hour}:${min} ${ampm}`;
+}
+setInterval(updateDashboardDateTime, 1000);
+updateDashboardDateTime();
+
+// ────────────────────────────────────────────────
+// Data Management
+// ────────────────────────────────────────────────
+let youthData = [];
+
+function showLoadingRows() {
+    const tbody = document.getElementById('youthTableBody');
+    tbody.innerHTML = Array.from({ length: 6 }, () => `
+        <tr>
+            <td><div class="skeleton-bar" style="width:90px"></div></td>
+            <td><div class="skeleton-bar" style="width:160px"></div></td>
+            <td><div class="skeleton-bar" style="width:110px"></div></td>
+            <td><div class="skeleton-bar" style="width:240px"></div></td>
+            <td></td>
+        </tr>`).join('');
+}
+
+async function loadYouthData() {
+    showLoadingRows();
+    try {
+        const response = await fetch('api/get_youth.php');
+        const data = await response.json();
+
+        if (data.success) {
+            youthData = data.data;
+            updateSummary();
+            filterTable();
+        } else {
+            showAlert('Error loading youth data: ' + (data.message || 'Unknown error'), 'error');
+        }
+    } catch (error) {
+        console.error('Load error:', error);
+        showAlert('Failed to load youth data', 'error');
+    }
+}
+
+function updateSummary() {
+    document.getElementById('statTotal').textContent = youthData.length;
+
+    // "Added this month" only works if the API returns a created_at / date_registered field
+    const now = new Date();
+    const added = youthData.filter(y => {
+        const raw = y.created_at || y.date_registered || y.registered_at;
+        if (!raw) return false;
+        const d = new Date(raw);
+        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    }).length;
+    document.getElementById('statNew').textContent = added;
+}
+
+function renderYouthTable(filtered = youthData) {
+    const tbody = document.getElementById('youthTableBody');
+    document.getElementById('statShown').textContent = filtered.length;
+
+    if (!filtered.length) {
+        const searching = document.getElementById('searchInput').value.trim() !== '';
+        tbody.innerHTML = `
+            <tr class="state-row"><td colspan="5">
+                <i class="fas ${searching ? 'fa-search' : 'fa-user-friends'}"></i>
+                <strong>${searching ? 'No members match your search' : 'No youth members yet'}</strong>
+                ${searching ? 'Try a different name, ID, or number.' : 'Select “Register youth” to add the first member.'}
+            </td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = '';
+    filtered.forEach(youth => {
+        const fullName = `${youth.firstname || ''} ${youth.lastname || ''}`.trim();
+        const initials = ((youth.firstname || '?')[0] + (youth.lastname || '')[0 ] || '').toUpperCase();
+        const id = esc(youth.member_id);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><span class="member-id">${id}</span></td>
+            <td>
+                <div class="person">
+                    <div class="person-avatar" style="background:${avatarColor(youth.member_id)}">${esc(initials)}</div>
+                    <div>
+                        <div class="person-name">${esc(fullName)}</div>
+                        <div class="person-sub">${youth.age ? esc(youth.age) + ' yrs' : ''}${youth.age && youth.gender ? ' • ' : ''}${esc(youth.gender || '')}</div>
+                    </div>
+                </div>
+            </td>
+            <td>${esc(youth.phone || 'N/A')}</td>
+            <td class="address-column" title="${esc(youth.address || 'N/A')}">${esc(youth.address || 'N/A')}</td>
+            <td class="action-buttons">
+                <button class="action-btn btn-view" onclick="viewYouth('${id}')" title="View details &amp; ID" aria-label="View ${esc(fullName)}"><i class="fas fa-eye"></i></button>
+                <button class="action-btn btn-edit" onclick="editYouth('${id}')" title="Edit member" aria-label="Edit ${esc(fullName)}"><i class="fas fa-pen"></i></button>
+                <button class="action-btn btn-delete" onclick="deleteYouth('${id}')" title="Delete member" aria-label="Delete ${esc(fullName)}"><i class="fas fa-trash"></i></button>
+            </td>`;
+        tbody.appendChild(tr);
+    });
+}
+
+// ────────────────────────────────────────────────
+// Search
+// ────────────────────────────────────────────────
+function filterTable() {
+    const search = document.getElementById('searchInput').value.toLowerCase().trim();
+    const filtered = youthData.filter(y =>
+        `${y.firstname} ${y.lastname} ${y.member_id} ${y.phone || ''}`.toLowerCase().includes(search)
+    );
+    renderYouthTable(filtered);
+}
+document.getElementById('searchInput').addEventListener('input', filterTable);
+
+// ────────────────────────────────────────────────
+// Modal Controls
+// ────────────────────────────────────────────────
+const addModal  = document.getElementById('addYouthModal');
+const idPreview = document.getElementById('idPreviewModal');
+const viewModal = document.getElementById('viewYouthModal');
+const passwordRow = document.getElementById('passwordRow');
+
+document.getElementById('addYouthBtn').onclick = () => {
+    document.getElementById('modalTitle').textContent = 'Register new youth member';
+    document.getElementById('submitBtn').textContent = 'Register youth member';
+    document.getElementById('editId').value = '';
+    passwordRow.style.display = '';          // show password fields again after an edit
+    form.reset();
+    validateForm();
+    addModal.style.display = 'flex';
+};
+
+document.getElementById('closeAddModal').onclick = () => addModal.style.display = 'none';
+document.getElementById('closeIdPreview').onclick = () => idPreview.style.display = 'none';
+document.getElementById('closeViewModal').onclick = () => viewModal.style.display = 'none';
+
+window.onclick = e => {
+    if (e.target.classList.contains('modal')) e.target.style.display = 'none';
+};
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+});
+
+// ────────────────────────────────────────────────
+// Form Validation & Age Calculation
+// ────────────────────────────────────────────────
+const form = document.getElementById('addYouthForm');
+const password = document.getElementById('password');
+const confirmPassword = document.getElementById('confirmPassword');
+const privacy = document.getElementById('privacyConsent');
+const submitBtn = document.getElementById('submitBtn');
+const warning = document.getElementById('passwordWarning');
+
+function validateForm() {
+    const isEdit = !!document.getElementById('editId').value;
+    const match = password.value === confirmPassword.value && password.value.length >= 8;
+    const passwordOk = isEdit || match;      // passwords are not required when editing
+
+    warning.classList.toggle('show', !isEdit && confirmPassword.value && !match);
+    submitBtn.disabled = !privacy.checked || !passwordOk || !form.checkValidity();
+}
+
+password.addEventListener('input', validateForm);
+confirmPassword.addEventListener('input', validateForm);
+privacy.addEventListener('change', validateForm);
+form.querySelectorAll('input, select').forEach(el => el.addEventListener('input', validateForm));
+
+document.getElementById('birthday').addEventListener('change', function () {
+    if (!this.value) return;
+    const birth = new Date(this.value);
+    const today = new Date();
+    let age = today.getFullYear() - birth.getFullYear();
+    const m = today.getMonth() - birth.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+    document.getElementById('age').value = age;
+    validateForm();
+});
+
+// ────────────────────────────────────────────────
+// Register / Edit Submit
+// ────────────────────────────────────────────────
+form.addEventListener('submit', async e => {
+    e.preventDefault();
+
+    const formData = new FormData();
+    const isEdit = document.getElementById('editId').value;
+    const fullAddress = document.getElementById('address').value.trim();
+
+    formData.append('firstname', document.getElementById('firstName').value.trim());
+    formData.append('lastname', document.getElementById('lastName').value.trim());
+    formData.append('birthday', document.getElementById('birthday').value);
+    formData.append('age', document.getElementById('age').value);
+    formData.append('gender', document.getElementById('gender').value);
+    formData.append('contact', document.getElementById('contact').value.trim());
+    formData.append('address', fullAddress);
+
+    const brgyMatch = fullAddress.match(/Brgy\.?\s*([^,]+)/i) || fullAddress.match(/Barangay\s*([^,]+)/i);
+    if (brgyMatch && brgyMatch[1]) formData.append('barangay', brgyMatch[1].trim());
+
+    let endpoint;
+    if (isEdit) {
+        formData.append('member_id', isEdit);
+        endpoint = 'api/update_youth.php';
+    } else {
+        formData.append('email', document.getElementById('email').value.trim());
+        formData.append('password', password.value);
+        endpoint = 'api/add_youth.php';
+    }
+
+    submitBtn.disabled = true;
+    try {
+        const csrfResponse = await fetch('api/csrf_token.php', { credentials: 'same-origin', cache: 'no-store' });
+        const csrfData = await csrfResponse.json();
+        if (!csrfResponse.ok || !csrfData.success || !csrfData.csrf_token) {
+            throw new Error('Unable to prepare a secure request.');
+        }
+        formData.append('csrf_token', csrfData.csrf_token);
+        const response = await fetch(endpoint, { method: 'POST', body: formData });
+        const data = await response.json();
+
+        if (data.success) {
+            showAlert(isEdit ? 'Youth member updated successfully!' : 'Youth member registered successfully!', 'success');
+            addModal.style.display = 'none';
+            form.reset();
+            validateForm();
+            loadYouthData();
+
+            if (!isEdit) {
+                showIdPreview({
+                    firstname: data.data.firstname,
+                    lastname: data.data.lastname,
+                    member_id: data.data.member_id
+                });
+            }
+        } else {
+            showAlert('Error: ' + (data.message || 'Unknown error'), 'error');
+            validateForm();
+        }
+    } catch (error) {
+        console.error('Submit error:', error);
+        showAlert(isEdit ? 'Failed to update youth member' : 'Failed to register youth member', 'error');
+        validateForm();
+    }
+});
+
+// ────────────────────────────────────────────────
+// Edit Youth
+// ────────────────────────────────────────────────
+function editYouth(member_id) {
+    const youth = youthData.find(y => y.member_id === member_id);
+    if (!youth) { showAlert('Member not found', 'error'); return; }
+
+    document.getElementById('modalTitle').textContent = 'Edit youth member';
+    document.getElementById('submitBtn').textContent = 'Save changes';
+    document.getElementById('editId').value = youth.member_id;
+
+    document.getElementById('firstName').value = youth.firstname || '';
+    document.getElementById('lastName').value = youth.lastname || '';
+    document.getElementById('birthday').value = youth.birthday || '';
+    document.getElementById('age').value = youth.age || '';
+    document.getElementById('gender').value = youth.gender || '';
+    document.getElementById('address').value = youth.address || '';
+    document.getElementById('contact').value = youth.phone || '';
+    document.getElementById('email').value = youth.email || '';
+    password.value = '';
+    confirmPassword.value = '';
+
+    passwordRow.style.display = 'none';
+    privacy.checked = true;     // consent was already given at registration
+
+    validateForm();
+    addModal.style.display = 'flex';
+}
+
+// ────────────────────────────────────────────────
+// Delete Youth
+// ────────────────────────────────────────────────
+function deleteYouth(member_id) {
+    showConfirm('Are you sure you want to delete this youth member? This cannot be undone.', async () => {
+        const formData = new FormData();
+        formData.append('member_id', member_id);
+
+        try {
+            const response = await fetch('api/delete_youth.php', { method: 'POST', body: formData });
+            const data = await response.json();
+
+            if (data.success) {
+                showAlert('Youth member deleted successfully.', 'success');
+                loadYouthData();
+            } else {
+                showAlert('Error: ' + (data.message || 'Unknown error'), 'error');
+            }
+        } catch (error) {
+            console.error('Delete error:', error);
+            showAlert('Failed to delete youth member', 'error');
+        }
+    });
+}
+
+// ────────────────────────────────────────────────
+// View Youth
+// ────────────────────────────────────────────────
+function renderQR(containerId, youth) {
+    const box = document.getElementById(containerId);
+    box.replaceChildren();
+    if (!window.QRCode || !youth.member_id) {
+        box.textContent = 'QR unavailable';
+        return;
+    }
+    new QRCode(box, {
+        text: String(youth.member_id),
+        width: 128,
+        height: 128,
+        correctLevel: QRCode.CorrectLevel.M
+    });
+}
+
+function viewYouth(member_id) {
+    const youth = youthData.find(y => y.member_id === member_id);
+    if (!youth) { showAlert('Member not found', 'error'); return; }
+
+    const birthday = youth.birthday ? new Date(youth.birthday).toLocaleDateString('en-US') : 'N/A';
+    document.getElementById('viewPersonalInfo').innerHTML = `
+        <dl class="detail-grid">
+            <div><dt>Member ID</dt><dd>${esc(youth.member_id)}</dd></div>
+            <div><dt>Full name</dt><dd>${esc(youth.firstname)} ${esc(youth.lastname)}</dd></div>
+            <div><dt>Birthday</dt><dd>${esc(birthday)}</dd></div>
+            <div><dt>Age</dt><dd>${esc(youth.age || 'N/A')}</dd></div>
+            <div><dt>Gender</dt><dd>${esc(youth.gender || 'N/A')}</dd></div>
+            <div><dt>Contact</dt><dd>${esc(youth.phone || 'N/A')}</dd></div>
+            <div class="full"><dt>Email</dt><dd>${esc(youth.email || 'N/A')}</dd></div>
+            <div class="full"><dt>Full address</dt><dd>${esc(youth.address || 'N/A')}</dd></div>
+            <div class="full"><dt>Barangay</dt><dd>${esc(youth.barangay || 'N/A')}</dd></div>
+        </dl>`;
+
+    document.getElementById('viewName').textContent = `${youth.firstname} ${youth.lastname}`;
+    document.getElementById('viewId').textContent = youth.member_id;
+    document.getElementById('viewDate').textContent = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    renderQR('viewQRImg', youth);
+
+    viewModal.style.display = 'flex';
+}
+
+// ────────────────────────────────────────────────
+// Show ID Preview
+// ────────────────────────────────────────────────
+function showIdPreview(youth) {
+    document.getElementById('previewName').textContent = `${youth.firstname} ${youth.lastname}`;
+    document.getElementById('previewId').textContent = youth.member_id;
+    document.getElementById('previewDate').textContent = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    renderQR('previewQRImg', youth);
+
+    idPreview.style.display = 'flex';
+}
+
+// ────────────────────────────────────────────────
+// Logout Confirmation
+// ────────────────────────────────────────────────
+// ────────────────────────────────────────────────
+// Initial Load
+// ────────────────────────────────────────────────
+loadYouthData();
+</script>
+
+<script src="js/auth-guard.js" data-roles="admin,sk_official"></script>
+<script src="assets/js/loader.js?v=3"></script>
+<script src="js/admin-common.js"></script>
+<script src="js/admin-sidebar.js"></script>
+</body>
+</html>

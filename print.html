@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SKalinga - Print Services</title>
+<link rel="icon" type="image/x-icon" href="/SKalinga/assets/icons/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/SKalinga/assets/icons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/SKalinga/assets/icons/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/SKalinga/assets/icons/apple-touch-icon.png">
+<link rel="manifest" href="/SKalinga/assets/icons/site.webmanifest">
+<meta name="msapplication-config" content="/SKalinga/assets/icons/browserconfig.xml">
+<meta name="theme-color" content="#FF6B9D">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/loader.css?v=3">
+<link rel="stylesheet" href="assets/css/digital-youth-id.css">
+<link rel="stylesheet" href="assets/css/skalinga-ui.css?v=20261021-3">
+<style>
+.pr{--g:#228B57;--gd:#0F4D31;--mint:#A8E6CF;--pk:#FF6B9D;--pkd:#E04F7E;--ink:#16303F;--mu:#5F7788;--ln:#E3ECE7;
+ --h:"Bricolage Grotesque",system-ui,sans-serif;--b:"Plus Jakarta Sans",system-ui,sans-serif;
+ width:min(1180px,100% - 32px);margin:0 auto;padding:16px 0 110px;font-family:var(--b);color:var(--ink)}
+.pr *{box-sizing:border-box}
+.pr :focus-visible,.pr-modal :focus-visible{outline:3px solid var(--pkd);outline-offset:3px}
+.pr .ic{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* hero */
+.pr-hero{position:relative;overflow:hidden;border-radius:28px;padding:clamp(24px,4vw,40px);color:#fff;background:linear-gradient(140deg,var(--g),var(--gd))}
+.pr-hero::after{content:"";position:absolute;right:-80px;top:-90px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,var(--pk),rgba(255,107,157,0) 68%);opacity:.7}
+.pr-hero>*{position:relative;z-index:1}
+.pr-hero h1{margin:0 0 8px;font:800 clamp(30px,5vw,46px)/1.05 var(--h);letter-spacing:-.04em}
+.pr-hero p{margin:0;max-width:56ch;color:rgba(255,255,255,.88)}
+.pr-steps{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.pr-steps span{display:inline-flex;align-items:center;gap:8px;padding:7px 13px;border-radius:999px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);font-size:13px;font-weight:600}
+.pr-steps b{display:grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--pk);color:var(--ink);font-size:11px}
+
+/* layout */
+.pr-grid{display:grid;gap:18px;margin-top:18px}
+@media(min-width:960px){.pr-grid{grid-template-columns:1.5fr 1fr;align-items:start}.pr-side{position:sticky;top:96px}}
+.pr-card{background:#fff;border:1px solid var(--ln);border-radius:24px;padding:clamp(18px,3vw,28px);box-shadow:0 4px 20px rgba(34,139,87,.07)}
+.pr-card h2{margin:0 0 4px;font:700 22px var(--h);letter-spacing:-.03em}
+.pr-card .hint{margin:0 0 20px;color:var(--mu);font-size:14px}
+.pr-sec{margin-top:24px}
+.pr-lbl{display:block;margin:0 0 8px;font-weight:700;font-size:13.5px}
+.pr-in{width:100%;min-height:52px;padding:0 16px;border:1.5px solid var(--ln);border-radius:16px;background:#fff;font:inherit;color:var(--ink)}
+.pr-in:focus{outline:none;border-color:var(--g);box-shadow:0 0 0 4px rgba(34,139,87,.15)}
+
+/* dropzone */
+.pr-drop{display:grid;place-items:center;gap:6px;min-height:170px;padding:22px;border:2px dashed #b9d9c8;border-radius:22px;background:#f4fbf7;text-align:center;cursor:pointer;transition:border-color .15s,background .15s}
+.pr-drop:hover,.pr-drop.over{border-color:var(--g);background:#e9f7ef}
+.pr-drop .big{display:grid;place-items:center;width:54px;height:54px;border-radius:18px;background:#fff;color:var(--g);box-shadow:0 4px 14px rgba(34,139,87,.15)}
+.pr-drop .big .ic{width:26px;height:26px}
+.pr-drop strong{font-size:15px}.pr-drop small{color:var(--mu)}
+.pr-drop input{position:absolute;width:1px;height:1px;opacity:0}
+.pr-drop:focus-within{outline:3px solid var(--pkd);outline-offset:3px}
+.pr-file{display:none;align-items:center;gap:12px;padding:14px;border:1.5px solid var(--g);border-radius:18px;background:#f4fbf7}
+.pr-file.on{display:flex}
+.pr-file .ic{color:var(--g);width:26px;height:26px}
+.pr-file div{min-width:0;flex:1}.pr-file b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pr-file small{color:var(--mu)}
+.pr-x{width:44px;height:44px;border:0;border-radius:50%;background:#fff;color:var(--mu);cursor:pointer;display:grid;place-items:center}
+.pr-x:hover{color:var(--pkd)}
+
+/* option chips */
+.pr-opts{display:grid;gap:10px;grid-template-columns:repeat(2,1fr)}
+.pr-opts.three{grid-template-columns:repeat(3,1fr)}
+.pr-opt{position:relative}
+.pr-opt input{position:absolute;inset:0;opacity:0;cursor:pointer;margin:0}
+.pr-opt span{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:64px;padding:10px;border:1.5px solid var(--ln);border-radius:18px;background:#fff;font-weight:700;font-size:14px;text-align:center;transition:all .15s}
+.pr-opt small{font-weight:500;color:var(--mu);font-size:12px}
+.pr-opt input:checked+span{border-color:var(--g);background:#e9f7ef;box-shadow:0 0 0 3px rgba(34,139,87,.15)}
+.pr-opt input:focus-visible+span{outline:3px solid var(--pkd);outline-offset:2px}
+.pr-opt .dot{width:14px;height:14px;border-radius:50%;border:1px solid var(--ln)}
+
+/* stepper */
+.pr-step{display:inline-flex;align-items:center;border:1.5px solid var(--ln);border-radius:18px;overflow:hidden}
+.pr-step button{width:52px;height:52px;border:0;background:#f4fbf7;color:var(--g);font-size:22px;font-weight:700;cursor:pointer}
+.pr-step button:hover{background:#e9f7ef}
+.pr-step input{width:72px;height:52px;border:0;text-align:center;font:700 17px var(--b);-moz-appearance:textfield}
+.pr-step input::-webkit-outer-spin-button,.pr-step input::-webkit-inner-spin-button{-webkit-appearance:none}
+.pr-step input:focus{outline:none;background:#fffafc}
+
+.pr-go{width:100%;min-height:56px;margin-top:26px;border:0;border-radius:18px;background:var(--pk);color:var(--ink);font:700 16px var(--b);cursor:pointer;box-shadow:0 10px 26px rgba(255,107,157,.38);transition:transform .15s,background .15s}
+.pr-go:hover:not(:disabled){background:#ff82ae}.pr-go:active:not(:disabled){transform:scale(.98)}.pr-go:disabled{opacity:.65;cursor:wait}
+
+/* summary + history */
+.pr-sum{background:linear-gradient(160deg,#fff,#e9f7ef);}
+.pr-row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px dashed var(--ln);font-size:14px}
+.pr-row:last-child{border:0}.pr-row span{color:var(--mu)}.pr-row b{text-align:right;overflow-wrap:anywhere}
+.pr-note{display:flex;gap:10px;margin-top:14px;padding:12px 14px;border-radius:16px;background:#fff0f5;color:#8a2a4d;font-size:13px}
+.pr-note .ic{color:var(--pkd);margin-top:1px}
+.pr-modal,.pr-drawer,.pr-toasts{--g:#228B57;--gd:#0F4D31;--pk:#FF6B9D;--pkd:#E04F7E;--ink:#16303F;--mu:#5F7788;--ln:#E3ECE7;--h:"Bricolage Grotesque",system-ui,sans-serif;--b:"Plus Jakarta Sans",system-ui,sans-serif}
+.pr-modal .ic,.pr-drawer .ic,.pr-toasts .ic{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.pr-modal *,.pr-drawer *{box-sizing:border-box}
+.pr-modal :focus-visible,.pr-drawer :focus-visible{outline:3px solid var(--pkd);outline-offset:3px}
+.pr-hbtn{display:inline-flex;align-items:center;gap:9px;min-height:48px;margin-top:18px;padding:0 20px;border:1px solid rgba(255,255,255,.45);border-radius:999px;background:rgba(255,255,255,.16);color:#fff;font:700 14px var(--b);cursor:pointer;backdrop-filter:blur(8px);transition:background .15s,color .15s}
+.pr-hbtn:hover{background:#fff;color:var(--gd)}
+.pr-hbtn .cnt{display:grid;place-items:center;min-width:24px;height:24px;padding:0 7px;border-radius:999px;background:var(--pk);color:var(--ink);font-size:12px}
+.pr-hbtn .cnt[hidden]{display:none}
+.pr-hbtn.dark{margin:0;border-color:var(--ln);background:#f1f6f3;color:var(--ink);backdrop-filter:none}
+.pr-hbtn.dark:hover{background:var(--g);color:#fff}
+.pr-hcard{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:18px}
+.pr-hcard strong{display:block}.pr-hcard span{color:var(--mu);font-size:13px}
+.pr-scrim{position:fixed;inset:0;z-index:8000;background:rgba(15,77,49,.5);backdrop-filter:blur(6px);opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s}
+.pr-scrim.on{opacity:1;visibility:visible}
+.pr-drawer{position:fixed;z-index:8100;top:0;right:0;bottom:0;display:flex;flex-direction:column;width:min(440px,100%);background:#fff;color:var(--ink);font-family:var(--b);box-shadow:-20px 0 60px rgba(22,48,63,.25);transform:translateX(100%);visibility:hidden;transition:transform .3s cubic-bezier(.22,1,.36,1),visibility .3s}
+.pr-drawer.on{transform:none;visibility:visible}
+.pr-dh{display:flex;justify-content:space-between;gap:12px;padding:22px 22px 16px;border-bottom:1px solid var(--ln)}
+.pr-dh h2{margin:0 0 4px;font:800 24px var(--h);letter-spacing:-.03em}
+.pr-dh p{margin:0;color:var(--mu);font-size:14px}
+.pr-dh .pr-x{flex:none;border:1px solid var(--ln)}
+.pr-dbody{flex:1;overflow-y:auto;padding:6px 22px}
+.pr-df{padding:16px 22px calc(16px + env(safe-area-inset-bottom));border-top:1px solid var(--ln)}
+.pr-df .pr-go{margin:0}
+.pr-item{display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:center;padding:14px 0;border-top:1px solid var(--ln)}
+.pr-item:first-child{border:0}
+.pr-item .ico{display:grid;place-items:center;width:44px;height:44px;border-radius:14px;background:#e9f7ef;color:var(--g)}
+.pr-item h3{margin:0;font:700 15px var(--b);overflow-wrap:anywhere}
+.pr-item p{margin:2px 0 0;color:var(--mu);font-size:12.5px}
+.st{display:inline-block;padding:5px 11px;border-radius:999px;font-size:12px;font-weight:700;background:#fff4d6;color:#7a5600;white-space:nowrap}
+.st.approved,.st.ready,.st.ready-for-pickup,.st.printed,.st.completed{background:#dff5e8;color:#0F4D31}
+.st.rejected,.st.cancelled{background:#ffe3ec;color:#a02350}
+.pr-empty{padding:28px 8px;text-align:center;color:var(--mu);font-size:14px}
+.sk{height:64px;margin:8px 0;border-radius:16px;background:linear-gradient(90deg,#e9f7ef,#fff,#e9f7ef);background-size:200% 100%;animation:sh 1.5s infinite}
+@keyframes sh{to{background-position:-200% 0}}
+
+/* toast + modal */
+.pr-toasts{position:fixed;z-index:10000;right:20px;bottom:20px;display:grid;gap:10px;width:min(380px,calc(100% - 32px))}
+.pr-toast{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:18px;background:#fff;border:1px solid var(--ln);box-shadow:0 14px 40px rgba(22,48,63,.2);font:600 14px/1.45 var(--b);animation:up .25s ease-out}
+.pr-toast.success .ic{color:var(--g)}.pr-toast.error .ic{color:var(--pkd)}.pr-toast.info .ic{color:#2F8FCB}
+.pr-toast span{flex:1}
+@keyframes up{from{opacity:0;transform:translateY(10px)}}
+.pr-modal{position:fixed;inset:0;z-index:9000;display:grid;place-items:center;padding:20px;background:rgba(15,77,49,.6);backdrop-filter:blur(8px);overflow-y:auto}
+.pr-modal[hidden]{display:none}
+.pr-box{position:relative;width:min(100%,560px);max-height:92vh;overflow-y:auto;padding:26px;border-radius:28px;background:#fff;font-family:var(--b);color:var(--ink);animation:up .25s ease-out}
+.pr-box h2{margin:0 40px 6px 0;font:800 24px/1.1 var(--h);letter-spacing:-.03em}
+.pr-box>p{margin:0 0 18px;color:var(--mu);font-size:14px}
+.pr-box .pr-x{position:absolute;top:14px;right:14px;border:1px solid var(--ln)}
+.pr-done{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+.pr-done a,.pr-done button{flex:1;min-width:150px;min-height:48px;display:inline-flex;align-items:center;justify-content:center;border-radius:16px;font:700 14px var(--b);text-decoration:none;cursor:pointer;border:0}
+.pr-done a{background:var(--g);color:#fff}.pr-done button{background:#f1f6f3;color:var(--ink)}
+@media(prefers-reduced-motion:reduce){.pr *,.pr-modal *,.pr-toast{animation:none!important;transition:none!important}}
+@media(max-width:520px){.pr-opts.three{grid-template-columns:1fr}.pr-item{grid-template-columns:44px 1fr}.pr-item .st{grid-column:2;justify-self:start}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<symbol id="p-up" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></symbol>
+<symbol id="p-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></symbol>
+<symbol id="p-x" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+<symbol id="p-hist" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+<symbol id="p-ok" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></symbol>
+<symbol id="p-err" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></symbol>
+<symbol id="p-prn" viewBox="0 0 24 24"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/></symbol>
+<symbol id="p-id" viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="3"/><circle cx="9" cy="11" r="2"/><path d="M5.5 16a3.8 3.8 0 0 1 7 0M15 10h3M15 14h3"/></symbol>
+</svg>
+
+<main class="pr">
+  <header class="pr-hero">
+    <h1>Print services</h1>
+    <p>Upload your document, choose how you want it printed, then pick it up at the SK Office with your Digital Youth ID.</p>
+    <div class="pr-steps"><span><b>1</b>Upload</span><span><b>2</b>Choose options</span><span><b>3</b>Show your ID at the office</span></div>
+    <button class="pr-hbtn" id="openHistory" type="button" aria-haspopup="dialog"><svg class="ic"><use href="#p-hist"/></svg>View my print history<span class="cnt" id="histCount" hidden></span></button>
+  </header>
+
+  <div class="pr-grid">
+    <section class="pr-card" aria-labelledby="formTitle" id="uploadSection">
+      <h2 id="formTitle">New print request</h2>
+      <p class="hint">Fields marked by the form are required before you can send.</p>
+      <form id="printForm" novalidate>
+        <div>
+          <label class="pr-lbl" for="documentTitle">Document title</label>
+          <input class="pr-in" type="text" id="documentTitle" name="document_title" placeholder="e.g., My resume, Project report" maxlength="120" required>
+        </div>
+
+        <div class="pr-sec">
+          <span class="pr-lbl" id="fileLbl">Document file</span>
+          <label class="pr-drop" id="drop" style="position:relative">
+            <span class="big"><svg class="ic"><use href="#p-up"/></svg></span>
+            <strong>Tap to choose a file, or drop it here</strong>
+            <small>PDF, Word, JPG, PNG or TXT, up to 10 MB</small>
+            <input type="file" id="document" name="document" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt" aria-labelledby="fileLbl" required>
+          </label>
+          <div class="pr-file" id="fileChip"><svg class="ic"><use href="#p-file"/></svg><div><b id="fileName"></b><small id="fileSize"></small></div><button class="pr-x" id="fileClear" type="button" aria-label="Remove file"><svg class="ic"><use href="#p-x"/></svg></button></div>
+        </div>
+
+        <div class="pr-sec">
+          <span class="pr-lbl" id="ptLbl">Print type</span>
+          <div class="pr-opts" role="radiogroup" aria-labelledby="ptLbl">
+            <label class="pr-opt"><input type="radio" name="print_type" value="Black &amp; White" checked><span>Black &amp; white<small>Documents, reports</small></span></label>
+            <label class="pr-opt"><input type="radio" name="print_type" value="Colored"><span>Colored<small>Photos, posters</small></span></label>
+          </div>
+        </div>
+
+        <div class="pr-sec">
+          <span class="pr-lbl" id="psLbl">Paper size</span>
+          <div class="pr-opts three" role="radiogroup" aria-labelledby="psLbl">
+            <label class="pr-opt"><input type="radio" name="paper_size" value="A4" checked><span>A4<small>210 × 297 mm</small></span></label>
+            <label class="pr-opt"><input type="radio" name="paper_size" value="Short"><span>Short bond<small>8.5 × 11 in</small></span></label>
+            <label class="pr-opt"><input type="radio" name="paper_size" value="Long"><span>Long bond<small>8.5 × 13 in</small></span></label>
+          </div>
+        </div>
+
+        <div class="pr-sec">
+          <label class="pr-lbl" for="copies">Number of copies</label>
+          <div class="pr-step"><button type="button" id="minus" aria-label="Fewer copies">−</button><input type="number" id="copies" name="copies" min="1" max="100" value="1" inputmode="numeric" required><button type="button" id="plus" aria-label="More copies">+</button></div>
+        </div>
+
+        <button type="submit" class="pr-go" id="submitPrintBtn">Send for printing</button>
+      </form>
+    </section>
+
+    <aside class="pr-side">
+      <section class="pr-card pr-sum" aria-labelledby="sumTitle">
+        <h2 id="sumTitle">Your request</h2>
+        <p class="hint">A quick check before you send.</p>
+        <div class="pr-row"><span>Title</span><b id="sTitle">Not set</b></div>
+        <div class="pr-row"><span>File</span><b id="sFile">None chosen</b></div>
+        <div class="pr-row"><span>Type</span><b id="sType">Black &amp; white</b></div>
+        <div class="pr-row"><span>Paper</span><b id="sPaper">A4</b></div>
+        <div class="pr-row"><span>Copies</span><b id="sCopies">1</b></div>
+        <div class="pr-note"><svg class="ic"><use href="#p-id"/></svg><span>Print requests are saved to your account so you can check their status here.</span></div>
+      </section>
+
+      <section class="pr-card pr-hcard">
+        <div><strong>Already sent a request?</strong><span>Check its status any time.</span></div>
+        <button class="pr-hbtn dark" id="openHistory2" type="button" aria-haspopup="dialog"><svg class="ic"><use href="#p-hist"/></svg>View history</button>
+      </section>
+    </aside>
+  </div>
+</main>
+
+<div class="pr-scrim" id="scrim"></div>
+<aside class="pr-drawer" id="historyDrawer" role="dialog" aria-modal="true" aria-labelledby="histTitle">
+  <header class="pr-dh">
+    <div><h2 id="histTitle">Print history</h2><p>Everything you have sent to the SK Office.</p></div>
+    <button class="pr-x" id="closeHistory" type="button" aria-label="Close history"><svg class="ic"><use href="#p-x"/></svg></button>
+  </header>
+  <div class="pr-dbody" id="printList" aria-live="polite"><div class="sk"></div><div class="sk"></div></div>
+  <footer class="pr-df"><button class="pr-go" id="newFromHistory" type="button">New print request</button></footer>
+</aside>
+
+<div class="pr-toasts" id="toastContainer" aria-live="polite"></div>
+
+<div class="pr-modal" id="digitalIdModal" hidden>
+  <div class="pr-box" role="dialog" aria-modal="true" aria-labelledby="printIdTitle">
+    <button class="pr-x" id="closeModal" type="button" aria-label="Close digital ID"><svg class="ic"><use href="#p-x"/></svg></button>
+    <h2 id="printIdTitle">Digital Youth ID reference</h2>
+    <p>This permanent QR is a member reference only and does not prove identity.</p>
+    <div class="digital-youth-id-card">
+     <section class="dyid-front" aria-label="Front of SKalinga membership ID">
+      <div class="dyid-header">
+        <img src="assets/images/sklogo.jpg" alt="SK logo" class="dyid-logo">
+        <div class="dyid-brand"><span>SKalinga Youth Services</span><strong>SK San Antonio</strong></div>
+        <span class="dyid-classification">Member ID</span>
+      </div>
+      <div class="dyid-main">
+        <div class="dyid-person">
+          <div class="dyid-details">
+            <span class="dyid-field-label">Youth Member</span>
+            <h4 class="dyid-name" id="userFullName">Loading...</h4>
+            <span class="dyid-number-stamp"><span>Member number</span><strong id="userMemberId">SK-XXXX-XXXX</strong></span>
+            <span class="dyid-detail">Date issued<strong id="userIssuedDate">Loading...</strong></span>
+          </div>
+        </div>
+        <div class="dyid-qr-panel">
+          <div class="dyid-qr-box" id="userQRCode" role="img" aria-label="Member reference QR code"></div>
+          <span class="dyid-qr-caption">Reference only — not proof of identity</span>
+        </div>
+      </div>
+      <div class="dyid-footer"><span>Personal identification</span><span>Present to SK staff</span></div>
+      <span class="dyid-hologram" aria-hidden="true">SK</span>
+     </section>
+    </div>
+    <div class="pr-done"><button type="button" id="again">Close</button><a href="#" id="seeList">See my requests</a></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+const slug=s=>String(s||'pending').toLowerCase().trim().replace(/\s+/g,'-');
+let currentUser={},csrfToken='';
+
+function showToast(message,type='info',duration=4500){
+  const t=document.createElement('div');t.className='pr-toast '+type;
+  const icon={success:'p-ok',error:'p-err',info:'p-err'}[type]||'p-err';
+  t.innerHTML=`<svg class="ic"><use href="#${icon}"/></svg><span></span><button class="pr-x" type="button" aria-label="Dismiss" style="width:32px;height:32px"><svg class="ic" style="width:16px;height:16px"><use href="#p-x"/></svg></button>`;
+  t.querySelector('span').textContent=message;
+  t.querySelector('button').onclick=()=>t.remove();
+  $('toastContainer').appendChild(t);
+  if(duration>0)setTimeout(()=>t.remove(),duration);
+}
+
+/* ---- live summary ---- */
+const form=$('printForm'),fileIn=$('document'),drop=$('drop');
+const val=n=>form.querySelector(`[name="${n}"]:checked`)?.value||'';
+const fmt=b=>b>1048576?(b/1048576).toFixed(1)+' MB':Math.max(1,Math.round(b/1024))+' KB';
+function sync(){
+  const f=fileIn.files[0];
+  $('sTitle').textContent=$('documentTitle').value.trim()||'Not set';
+  $('sFile').textContent=f?f.name:'None chosen';
+  $('sType').textContent=val('print_type');$('sPaper').textContent=({Short:'Short bond',Long:'Long bond'})[val('paper_size')]||val('paper_size');
+  $('sCopies').textContent=$('copies').value||'1';
+  drop.style.display=f?'none':'';$('fileChip').classList.toggle('on',!!f);
+  if(f){$('fileName').textContent=f.name;$('fileSize').textContent=fmt(f.size)}
+}
+form.addEventListener('input',sync);form.addEventListener('change',sync);
+$('fileClear').onclick=()=>{fileIn.value='';sync()};
+['dragenter','dragover'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.add('over')}));
+['dragleave','drop'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.remove('over')}));
+drop.addEventListener('drop',ev=>{if(ev.dataTransfer.files.length){fileIn.files=ev.dataTransfer.files;sync()}});
+const step=d=>{const c=$('copies');c.value=Math.min(100,Math.max(1,(+c.value||1)+d));sync()};
+$('minus').onclick=()=>step(-1);$('plus').onclick=()=>step(1);
+
+/* ---- modal ---- */
+const modal=$('digitalIdModal');
+const closeM=()=>{modal.hidden=true};
+$('closeModal').onclick=closeM;$('again').onclick=()=>{closeM();$('documentTitle').focus()};$('seeList').onclick=e=>{e.preventDefault();closeM();openH()};
+modal.addEventListener('click',e=>{if(e.target===modal)closeM()});
+addEventListener('keydown',e=>{if(e.key==='Escape'){closeM();closeH()}});
+
+/* ---- history drawer ---- */
+const drawer=$('historyDrawer'),scrim=$('scrim');let lastFocus=null;
+function openH(){lastFocus=document.activeElement;drawer.classList.add('on');scrim.classList.add('on');document.body.style.overflow='hidden';$('closeHistory').focus();loadPrintHistory()}
+function closeH(){if(!drawer.classList.contains('on'))return;drawer.classList.remove('on');scrim.classList.remove('on');document.body.style.overflow='';if(lastFocus)lastFocus.focus()}
+$('openHistory').onclick=openH;$('openHistory2').onclick=openH;$('closeHistory').onclick=closeH;scrim.onclick=closeH;
+$('newFromHistory').onclick=()=>{closeH();$('documentTitle').focus()};
+
+/* ---- profile ---- */
+async function loadUserProfile(){
+  try{const r=await fetch('api/get_user_profile.php?role=youth'),d=await r.json();
+    if(d.success&&d.user){
+      currentUser=d.user;
+      const memberId=String(currentUser.member_id||'');
+      $('userQRCode').replaceChildren();
+      if(window.QRCode&&memberId){
+        new QRCode($('userQRCode'),{text:memberId,width:78,height:78,correctLevel:QRCode.CorrectLevel.M});
+      }else{
+        $('userQRCode').textContent='QR unavailable';
+      }
+      $('userFullName').textContent=`${currentUser.firstname||''} ${currentUser.lastname||''}`.trim()||'Youth member';
+      $('userMemberId').textContent=memberId||'SK-XXXX-XXXX';
+      $('userIssuedDate').textContent=new Date().toLocaleDateString();
+    }else console.error('Failed to load user profile:',d.error)}
+  catch(e){console.error('Error loading user profile:',e)}
+}
+async function getCsrfToken(){
+  if(csrfToken)return csrfToken;
+  const response=await fetch('api/csrf_token.php',{credentials:'same-origin',cache:'no-store'});
+  const data=await response.json();
+  if(!response.ok||!data.success||!data.csrf_token)throw new Error(data.message||'Unable to prepare a secure request.');
+  csrfToken=data.csrf_token;
+  return csrfToken;
+}
+/* ---- submit ---- */
+form.addEventListener('submit',async e=>{
+  e.preventDefault();
+  const file=fileIn.files[0],title=$('documentTitle').value.trim();
+  if(!title){showToast('Give your document a title.','error');$('documentTitle').focus();return}
+  if(!file){showToast('Please select a file to print.','error');return}
+  const ok=['application/pdf','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document','image/jpeg','image/png','text/plain'];
+  if(!ok.includes(file.type)){showToast('Only PDF, Word, JPG, PNG and TXT files are allowed.','error');return}
+  if(file.size>10*1024*1024){showToast('File size exceeds the 10 MB limit.','error');return}
+  const btn=$('submitPrintBtn');btn.disabled=true;btn.textContent='Uploading...';
+  try{
+    const fd=new FormData();
+    fd.append('document',file);fd.append('document_title',title);
+    fd.append('print_type',val('print_type'));fd.append('paper_size',val('paper_size'));fd.append('copies',$('copies').value);
+    const csrf=await getCsrfToken();
+    const r=await fetch('api/upload_print_request.php',{method:'POST',credentials:'same-origin',headers:{'X-CSRF-Token':csrf},body:fd}),res=await r.json();
+    if(res.success){
+      form.reset();sync();
+      showToast('"'+((res.data&&res.data.document_title)||title)+'" was uploaded.','success',6000);
+      modal.hidden=false;
+      loadPrintHistory();
+    }else showToast(res.error||'Failed to upload document.','error');
+  }catch(err){console.error('Upload error:',err);showToast('Error uploading file. Please try again.','error')}
+  finally{btn.disabled=false;btn.textContent='Send for printing'}
+});
+
+getCsrfToken().catch(error=>console.error('CSRF token loading failed:',error));
+
+/* ---- history ---- */
+async function loadPrintHistory(){
+  try{const r=await fetch('api/get_user_print_requests.php',{credentials:'include'}),d=await r.json();
+    if(d.success)renderPrintHistory(d.data||[]);else throw new Error(d.error)}
+  catch(e){console.error('Error loading print history:',e);$('printList').innerHTML='<p class="pr-empty">We could not load your requests. Please refresh the page.</p>'}
+}
+function renderPrintHistory(list){
+  const box=$('printList'),c=$('histCount');c.hidden=!list.length;c.textContent=list.length;
+  if(!list.length){box.innerHTML='<p class="pr-empty">No print requests yet. Your first one will show up here.</p>';return}
+  box.innerHTML=list.map(i=>{
+    const when=new Date(i.created_at).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    return `<article class="pr-item"><span class="ico"><svg class="ic"><use href="#p-prn"/></svg></span><div><h3>${esc(i.document_title)}</h3><p>${esc(i.print_type)} · ${esc(i.paper_size)} · ${esc(i.copies)} ${Number(i.copies)===1?'copy':'copies'}</p><p>${esc(when)}</p></div><span class="st ${esc(slug(i.status))}">${esc(i.status)}</span></article>`}).join('');
+}
+
+document.addEventListener('DOMContentLoaded',()=>{sync();loadUserProfile();loadPrintHistory()});
+</script>
+<script src="js/auth-guard.js" data-roles="youth"></script>
+<script src="js/youth-nav.js?v=20261021-3"></script>
+<script src="assets/js/loader.js?v=3"></script>
+</body>
+</html>

@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+    <title>SKalinga - Admin Home</title>
+    <link rel="icon" type="image/x-icon" href="/SKalinga/assets/icons/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/SKalinga/assets/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/SKalinga/assets/icons/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/SKalinga/assets/icons/apple-touch-icon.png">
+    <link rel="manifest" href="/SKalinga/assets/icons/site.webmanifest">
+    <meta name="msapplication-config" content="/SKalinga/assets/icons/browserconfig.xml">
+    <meta name="theme-color" content="#FF6B9D">
+    <link rel="preload" as="image" href="assets/images/sk-home-bg.webp" type="image/webp" media="(min-width: 901px)">
+    <!-- Chart.js and dashboard-charts.js removed: this page is now a homescreen, not analytics -->
+    <script defer src="js/dashboard-data.js"></script>
+
+    <link rel="stylesheet" href="assets/css/dashboard.css">
+    <link rel="stylesheet" href="assets/css/admin-theme.css">
+    <link rel="stylesheet" href="assets/css/loader.css?v=3">
+
+    <style>
+        :root {
+            --glass: rgba(90, 8, 48, 0.68);
+            --glass-border: rgba(255, 255, 255, 0.28);
+            --text: #fff;
+            --muted: #b8c3d6;
+            --sidebar-w: 280px;
+        }
+
+        html, body { height: 100%; margin: 0; }
+        body {
+            position: relative;
+            isolation: isolate;
+            font-family: 'IBM Plex Sans', sans-serif;
+            background: #c42660 !important;
+            overflow: hidden;
+        }
+
+        /* Keep the dashboard full-width and make the sidebar an off-canvas drawer. */
+        .app-container { display: block !important; height: 100vh; height: 100dvh; position: relative; z-index: 1; }
+        .wallpaper {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            background-color: #c42660;
+            background-image: url('assets/images/sk-home-bg.jpg');
+            background-image: image-set(url('assets/images/sk-home-bg.webp') type('image/webp'), url('assets/images/sk-home-bg.jpg') type('image/jpeg'));
+            background-size: cover;
+            background-position: center;
+        }
+
+        .sidebar {
+            position: fixed !important;
+            top: 0; left: 0; bottom: 0;
+            width: var(--sidebar-w);
+            border-right: 1px solid rgba(255,255,255,.25);
+            z-index: 1200;
+            box-sizing: border-box;
+            transform: translateX(-104%);
+            visibility: hidden;
+            transition: transform .38s cubic-bezier(.32,.72,0,1), visibility 0s linear .38s;
+            overflow-y: auto;
+            box-shadow: none;
+            animation: none;
+        }
+        body.sidebar-open .sidebar {
+            transform: none;
+            visibility: visible;
+            transition: transform .38s cubic-bezier(.32,.72,0,1), visibility 0s;
+            box-shadow: 0 0 60px rgba(40,0,20,.5);
+        }
+        .sidebar-backdrop {
+            position: fixed; inset: 0;
+            background: rgba(40, 0, 20, 0.42);
+            backdrop-filter: blur(4px);
+            opacity: 0; pointer-events: none;
+            visibility: hidden;
+            transition: opacity .3s ease, visibility 0s linear .3s;
+            z-index: 1100;
+            display: block;
+        }
+        body.sidebar-open .sidebar-backdrop {
+            opacity: 1;
+            pointer-events: auto;
+            visibility: visible;
+            transition-delay: 0s;
+        }
+
+        .main-content { margin: 0 !important; width: 100% !important; height: 100vh; height: 100dvh; padding: 0 !important; }
+
+        /* ───────── Home screen ───────── */
+        .home {
+            position: relative;
+            height: 100vh;
+            height: 100dvh;
+            box-sizing: border-box;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
+            grid-template-rows: auto minmax(0, 1fr) auto;
+            grid-template-areas:
+                "pills clock"
+                "hero quick"
+                "user quick";
+            align-items: center;
+            gap: 20px clamp(24px, 4vw, 64px);
+            padding: 24px;
+            overflow-x: hidden;
+            overflow-y: auto;
+            color: var(--text);
+            background:
+                radial-gradient(ellipse at 18% 12%, rgba(55, 83, 127, 0.4), transparent 42%),
+                radial-gradient(ellipse at 86% 88%, rgba(69, 45, 86, 0.22), transparent 36%),
+                linear-gradient(135deg, #17243a 0%, #101827 56%, #0c1320 100%);
+        }
+
+        /* Burger */
+        .burger {
+            position: fixed; top: 20px; left: 20px; z-index: 1300;
+            width: 46px; height: 46px;
+            display: grid; place-items: center;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            color: #fff; cursor: pointer;
+            backdrop-filter: blur(12px);
+            transform: none;
+            transition: background .2s, transform .38s cubic-bezier(.32,.72,0,1);
+        }
+        .burger:hover { background: rgba(40, 46, 64, 0.85); }
+        .burger:focus-visible { outline: 2px solid #FF6B9D; outline-offset: 2px; }
+        .burger svg { width: 22px; height: 22px; }
+        .burger .icon-open { overflow: visible; }
+        .burger .icon-open line { transform-box: fill-box; transform-origin: center; transition: transform .25s ease, opacity .25s ease; }
+        .burger .icon-open line:nth-child(2) { transform-origin: center; }
+        body.sidebar-open .burger { transform: translateX(min(calc(var(--sidebar-w) + 16px), calc(100vw - 66px))); }
+        body.sidebar-open .burger .icon-open line:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+        body.sidebar-open .burger .icon-open line:nth-child(2) { opacity: 0; }
+        body.sidebar-open .burger .icon-open line:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+        .brand-lockup {
+            position: absolute;
+            top: 22px;
+            left: 82px;
+            z-index: 5;
+            color: #fff;
+            text-shadow: 0 1px 5px rgba(40, 0, 20, .75);
+        }
+        .brand-lockup h1 { margin: 0; font-size: 18px; line-height: 1.2; font-weight: 700; }
+        .brand-lockup p { margin: 3px 0 0; font-size: 12px; font-weight: 500; }
+
+        .home-stack {
+            position: absolute;
+            top: 18%;
+            right: 2vw;
+            width: clamp(340px, 30vw, 440px);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            transition: transform .3s ease, opacity .3s ease;
+        }
+        body.sidebar-open .home-stack { transform: translateX(8px); opacity: .92; }
+
+        /* Summary pills */
+        .pills {
+            position: absolute;
+            top: 3%;
+            left: 50%;
+            display: flex; gap: 10px; z-index: 5;
+            flex-wrap: wrap;
+            justify-content: center;
+            transform: translateX(-50%);
+        }
+        .pill {
+            display: flex; align-items: center; gap: 10px;
+            padding: 9px 14px;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            backdrop-filter: blur(16px) saturate(140%);
+            font-size: 12px; font-weight: 600; letter-spacing: 0.04em;
+            color: #fff; white-space: nowrap;
+        }
+        .pill b { font-size: 17px; color: #fff; font-weight: 700; }
+
+        /* Clock card */
+        .clock-card {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 18px 22px 16px;
+            text-align: left;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+            backdrop-filter: blur(16px) saturate(140%);
+        }
+        .clock-time { font-family: 'IBM Plex Sans', sans-serif; font-weight: 700; font-size: clamp(34px, 4.2vw, 52px); line-height: 1; letter-spacing: 0.01em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .clock-date { margin-top: 10px; font-size: 15px; font-weight: 500; }
+        .clock-zone {
+            display: inline-flex; align-items: center; gap: 8px;
+            margin-top: 12px; padding: 6px 14px;
+            background: rgba(40,0,20,.35);
+            border: 1px solid rgba(255,255,255,.28);
+            border-radius: 16px;
+            color: #fff; font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+        }
+        .clock-zone::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #A8E6CF; }
+
+        /* Quick access */
+        .quick {
+            align-self: center;
+            width: 100%;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .quick-title {
+            text-align: left; font-size: 13px; font-weight: 700; letter-spacing: 0.06em; color: #fff;
+            margin-bottom: 2px; padding: 9px 14px; background: var(--glass);
+            border: 1px solid var(--glass-border); border-radius: 16px;
+            backdrop-filter: blur(16px) saturate(140%);
+        }
+        .quick--grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+        .quick--grid .quick-title { grid-column: 1 / -1; }
+        .quick--grid .quick-link { min-height: 48px; gap: 9px; font-size: 13px; }
+        .quick-link {
+            position: relative;
+            display: flex; align-items: center; gap: 14px;
+            min-width: 0;
+            padding: 8px 10px;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            color: #fff; text-decoration: none; font-weight: 600; font-size: 15px;
+            backdrop-filter: blur(16px) saturate(140%);
+            transition: transform 0.2s, border-color 0.2s, background 0.2s;
+        }
+        .quick-link:hover { transform: translateX(3px); border-color: rgba(255,255,255,.6); background: rgba(90,8,48,.8); }
+        body .home .quick-link:hover { border-color: rgba(255,255,255,.6) !important; background: rgba(90,8,48,.8) !important; }
+        .quick-link:focus-visible { outline: 2px solid #FF6B9D; outline-offset: 2px; }
+        .quick-icon {
+            width: 34px; height: 34px; border-radius: 12px; flex-shrink: 0;
+            display: grid; place-items: center;
+            background: rgba(255,255,255,0.1);
+        }
+        .quick-icon svg { width: 18px; height: 18px; }
+        .quick--grid .quick-icon { width: 30px; height: 30px; }
+        .quick-link .nav-badge, .quick-link .count {
+            margin-left: auto;
+            min-width: 22px; padding: 2px 7px; border-radius: 999px;
+            background: #FF6B9D; color: #3d0922; font-size: 12px; font-weight: 700; text-align: center;
+        }
+        .quick-link .nav-badge[hidden] { display: none; }
+
+        body::before { display: none; }
+        body .main-content { background: transparent !important; }
+        body .home {
+            display: block;
+            height: 100vh;
+            height: 100dvh;
+            padding: 0;
+            overflow: hidden;
+            color: #fff !important;
+            background: transparent !important;
+        }
+        body .home .pill,
+        body .home .clock-card,
+        body .home .quick-link {
+            background: rgba(90, 8, 48, .68) !important;
+            border: 1px solid rgba(255,255,255,.28) !important;
+            color: #fff !important;
+            box-shadow: none !important;
+        }
+        body .home .pill,
+        body .home .pill b,
+        body .home .clock-time,
+        body .home .clock-date,
+        body .home .clock-zone,
+        body .home .quick-title,
+        body .home .quick-link {
+            color: #fff !important;
+        }
+        body .home #userFullName { font-family: 'IBM Plex Sans', sans-serif !important; }
+        body .home .clock-card .clock-zone {
+            background: rgba(40,0,20,.72) !important;
+            border-color: rgba(255,255,255,.35) !important;
+            color: #fff !important;
+            white-space: nowrap;
+        }
+        body .home .quick-icon { background: rgba(255,255,255,.12) !important; color: #fff !important; }
+
+        /* Hidden data hooks (keeps dashboard-data.js bindings working) */
+        .data-hooks { display: none; }
+
+        /* Hide the old floating action button on this screen */
+        .fab { display: none !important; }
+
+        /* ───────── Responsive ───────── */
+        @media (max-width: 900px) {
+            body { min-height: 100%; height: auto; overflow-x: hidden; overflow-y: auto; background: #ba2356 !important; }
+            .app-container, .main-content { height: auto; min-height: 100vh; min-height: 100dvh; }
+            .wallpaper {
+                background-color: transparent;
+                background-image: url('assets/images/sk-home-bg.jpg');
+                background-image: url('assets/images/sk-home-bg-mobile.webp');
+                background-size: 100% auto;
+                background-position: top center;
+                background-repeat: no-repeat;
+            }
+            .wallpaper::after {
+                content: '';
+                position: absolute;
+                inset: 0 0 auto;
+                height: 56vw;
+                background: linear-gradient(to bottom, transparent 72%, #ba2356 100%);
+            }
+            .home {
+                height: auto; min-height: 100vh; min-height: 100dvh;
+                overflow: visible;
+                padding: calc(56vw + 56px) 16px 24px;
+            }
+            body .home {
+                height: auto; min-height: 100vh; min-height: 100dvh;
+                overflow: visible;
+                padding: calc(56vw + 56px) 16px 24px;
+            }
+            .pills {
+                position: relative;
+                top: auto; left: auto;
+                transform: none;
+                margin: 0 auto 18px;
+            }
+            .home-stack {
+                position: relative; top: auto; right: auto; width: 100%;
+                transform: none; margin: 0; gap: 14px;
+            }
+            body.sidebar-open .home-stack { transform: none; }
+            .clock-card { padding: 18px; }
+            .clock-time { font-size: clamp(34px, 8.8vw, 52px); }
+            .clock-zone { font-size: 10px; }
+            .pills { gap: 8px; }
+            .pill { flex: 1 1 150px; }
+            .brand-lockup { top: 22px; left: 78px; }
+            .burger { top: 16px; left: 16px; }
+            body.sidebar-open .burger { transform: translateX(min(calc(var(--sidebar-w) + 12px), calc(100vw - 62px))); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .sidebar { opacity: 0; transition: opacity .12s ease, visibility 0s linear .12s; }
+            body.sidebar-open .sidebar { opacity: 1; transition: opacity .12s ease, visibility 0s; }
+            .sidebar-backdrop { transition: opacity .12s ease, visibility 0s linear .12s; }
+            .burger, .burger .icon-open line, .home-stack, .quick-link { transition: opacity .12s ease, background-color .12s ease; }
+            body.sidebar-open .burger, body.sidebar-open .home-stack { transform: none; }
+        }
+    </style>
+</head>
+<body class="is-loading">
+    <div class="app-container">
+        <div class="wallpaper" aria-hidden="true"></div>
+
+        <!-- Sidebar (hidden by default, opens with the burger button) -->
+        <aside class="sidebar" id="adminSidebar" inert></aside>
+
+        <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+        <!-- Main: homescreen -->
+        <main class="main-content">
+            <section class="home">
+
+                <button class="burger" id="burgerBtn" aria-label="Open navigation" aria-controls="adminSidebar" aria-expanded="false">
+                    <svg class="icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+
+                <div class="brand-lockup">
+                    <h1>SKalinga Admin</h1>
+                    <p>Sangguniang Kabataan, Barangay San Antonio</p>
+                </div>
+
+                <!-- Summary pills (live numbers from dashboard-data.js) -->
+                <div class="pills">
+                    <div class="pill"><b data-bind="youth_pending">0</b> Pending registrations</div>
+                    <div class="pill"><b data-bind="incidents_open">0</b> Open incidents</div>
+                </div>
+
+                <div class="home-stack">
+                    <!-- Live clock -->
+                    <div class="clock-card" role="timer" aria-live="off">
+                        <div class="clock-time" id="clockTime">--:--:--</div>
+                        <div class="clock-date" id="clockDate">Loading date...</div>
+                        <div class="clock-zone">PHILIPPINE STANDARD TIME</div>
+                    </div>
+
+                    <!-- Quick access -->
+                    <nav class="quick" aria-label="Quick access">
+                        <div class="quick-title">Quick access</div>
+
+                    <a class="quick-link" href="youth-registry.html">
+                        <span class="quick-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span>
+                        Youth Registry
+                    </a>
+                    <a class="quick-link" href="dashboard-events.html">
+                        <span class="quick-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></span>
+                        Events
+                        <span class="nav-badge" data-bind="nav_events" hidden></span>
+                    </a>
+                    <a class="quick-link" href="dashboard-resources.html">
+                        <span class="quick-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg></span>
+                        Resources
+                    </a>
+                    <a class="quick-link" href="dashboard-printing.html">
+                        <span class="quick-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg></span>
+                        Printing
+                        <span class="nav-badge" data-bind="nav_printing" hidden></span>
+                    </a>
+                    <a class="quick-link" href="dashboard-incidents.html">
+                        <span class="quick-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg></span>
+                        Incidents
+                        <span class="nav-badge" data-bind="nav_incidents" hidden></span>
+                    </a>
+                    </nav>
+                </div>
+
+                <!-- Optional: keeps any other data-bind targets from erroring in dashboard-data.js -->
+                <div class="data-hooks" aria-hidden="true">
+                    <span id="userAvatar">AD</span><span id="userFullName">Admin</span><span id="userRole">Staff</span>
+                    <span data-bind="youth_active"></span><span data-bind="masterlist_total"></span><span data-bind="masterlist_claimed"></span>
+                    <span data-bind="events_ongoing"></span><span data-bind="events_upcoming"></span><span data-bind="health_upcoming"></span>
+                    <span data-bind="loans_overdue"></span><span data-bind="loans_active"></span><span data-bind="print_pending"></span><span data-bind="print_finished_today"></span>
+                    <span data-bind="incidents_week"></span><span data-bind="disclosure_drafts"></span><span data-bind="health_published"></span><span data-bind="disclosure_published"></span>
+                    <div data-list="attention"></div><div data-list="activity"></div><table><tbody data-list="registrations"></tbody></table>
+                </div>
+            </section>
+        </main>
+    </div>
+<script>
+// ────────────────────────────────────────────────
+// Sidebar toggle (hidden by default on the dashboard)
+// ────────────────────────────────────────────────
+(function () {
+    const body = document.body;
+    const burger = document.getElementById('burgerBtn');
+    const backdrop = document.getElementById('sidebarBackdrop');
+    const sidebar = document.getElementById('adminSidebar');
+    const quick = document.querySelector('.quick');
+
+    if (quick) {
+        quick.classList.toggle('quick--grid', quick.querySelectorAll('.quick-link').length > 4);
+    }
+
+    function setSidebar(open) {
+        const wasOpen = body.classList.contains('sidebar-open');
+        body.classList.toggle('sidebar-open', open);
+        sidebar.toggleAttribute('inert', !open);
+        burger.setAttribute('aria-expanded', String(open));
+        burger.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation');
+        if (open) {
+            window.requestAnimationFrame(() => sidebar.querySelector('.nav-item')?.focus());
+        } else if (wasOpen) {
+            burger.focus();
+        }
+    }
+
+    burger.addEventListener('click', () => setSidebar(!body.classList.contains('sidebar-open')));
+    backdrop.addEventListener('click', () => setSidebar(false));
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && body.classList.contains('sidebar-open')) setSidebar(false);
+    });
+    sidebar.addEventListener('click', event => {
+        const link = event.target.closest('a.nav-item');
+        if (!link || link.getAttribute('href') === '#' || event.defaultPrevented ||
+            event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey ||
+            (link.target && link.target !== '_self') || link.hasAttribute('download')) return;
+
+        event.preventDefault();
+        const destination = link.href;
+        setSidebar(false);
+        window.setTimeout(() => window.location.assign(destination), 380);
+    });
+})();
+
+// ────────────────────────────────────────────────
+// Live clock (Philippine Standard Time)
+// ────────────────────────────────────────────────
+function updateClock() {
+    const now = new Date();
+    document.getElementById('clockTime').textContent = now.toLocaleTimeString('en-US', {
+        timeZone: 'Asia/Manila', hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true
+    });
+    document.getElementById('clockDate').textContent = now.toLocaleDateString('en-US', {
+        timeZone: 'Asia/Manila', weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
+    });
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ────────────────────────────────────────────────
+// Admin Session & Profile
+// ────────────────────────────────────────────────
+let adminInfo = null;
+
+async function loadAdminProfile() {
+    try {
+        const response = await fetch('api/check_admin_session.php');
+        const data = await response.json();
+
+        if (!data.authenticated) {
+            window.location.href = 'login.html';
+            return;
+        }
+        adminInfo = data.admin;
+        updateUserProfile();
+    } catch (error) {
+        console.error('Profile load error:', error);
+    }
+}
+
+function updateUserProfile() {
+    if (!adminInfo) return;
+    const initials = adminInfo.username.substring(0, 2).toUpperCase();
+    const roleDisplay = adminInfo.role === 'superadmin' ? 'Super Admin' : 'Staff Admin';
+    document.getElementById('userAvatar').textContent = initials;
+    document.getElementById('userFullName').textContent = adminInfo.username.charAt(0).toUpperCase() + adminInfo.username.slice(1);
+    document.getElementById('userRole').textContent = roleDisplay;
+}
+loadAdminProfile();
+
+// ────────────────────────────────────────────────
+// Logout confirmation
+// ────────────────────────────────────────────────
+</script>
+
+<script src="js/auth-guard.js" data-roles="admin,sk_official"></script>
+<script src="assets/js/loader.js?v=3"></script>
+<script src="js/admin-common.js"></script>
+<script src="js/admin-sidebar.js"></script>
+</body>
+</html>

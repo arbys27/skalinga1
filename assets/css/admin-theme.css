@@ -1,0 +1,505 @@
+:root {
+    --pink: #FF6B9D;
+    --pink-d: #e8508a;
+    --blue: #5DADE2;
+    --blue-d: #3f93cc;
+    --green: #228B57;
+    --ink: #1b2233;
+    --ink-2: #4a5368;
+    --ink-3: #8089a0;
+    --line: #e9ecf3;
+    --surface: #fff;
+    --page: #f5f7fc;
+    --r: 18px;
+    --ink-soft: var(--ink-2);
+    --radius: var(--r);
+    --accent-pink: var(--pink);
+}
+
+html,
+body {
+    font-family: 'IBM Plex Sans', sans-serif;
+}
+
+body {
+    background: var(--page) !important;
+    color: var(--ink);
+}
+
+button {
+    font-family: 'IBM Plex Sans', sans-serif;
+}
+
+.main-content,
+.dashboard-content {
+    background-color: var(--page);
+}
+
+.sidebar {
+    background: linear-gradient(180deg, var(--pink), var(--pink-d)) !important;
+    color: #fff !important;
+}
+
+.sidebar .logo-section {
+    background: rgba(255, 255, 255, .08) !important;
+    border-color: rgba(255, 255, 255, .2) !important;
+}
+
+.sidebar .nav-group-title {
+    color: rgba(255, 255, 255, .7) !important;
+}
+
+.sidebar .nav-item,
+.sidebar .nav-item:visited {
+    color: #fff !important;
+    background: transparent !important;
+}
+
+.sidebar .nav-item:hover {
+    color: #fff !important;
+    background: rgba(255, 255, 255, .15) !important;
+}
+
+.sidebar .nav-item.active,
+.sidebar .nav-item.active:hover {
+    color: var(--pink-d) !important;
+    background: #fff !important;
+    box-shadow: 0 6px 16px rgba(160, 30, 80, .22) !important;
+}
+
+.sidebar .nav-item::before {
+    background: rgba(255, 255, 255, .4) !important;
+}
+
+.sidebar .nav-item.active::before {
+    background: var(--pink) !important;
+}
+
+.sidebar .nav-icon {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+}
+
+.sidebar .nav-badge {
+    margin-left: auto;
+}
+
+.card,
+.admin-card,
+.table-card,
+.summary-card,
+.maintenance-container,
+.health-table-wrap,
+.masterlist-card {
+    background: var(--surface) !important;
+    border: 1px solid var(--line) !important;
+    border-radius: var(--r) !important;
+}
+
+.user-profile-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 16px 8px 8px;
+    background: var(--surface) !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 14px !important;
+    box-shadow: 0 2px 10px rgba(27, 34, 51, .05) !important;
+    transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+
+.user-profile-card:hover {
+    transform: translateY(-1px);
+    border-color: rgba(93, 173, 226, .35) !important;
+    box-shadow: 0 5px 16px rgba(27, 34, 51, .08) !important;
+}
+
+.user-avatar-new {
+    display: grid;
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    place-items: center;
+    border-radius: 11px;
+    background: linear-gradient(135deg, var(--pink), var(--blue)) !important;
+    color: #fff !important;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+#userFullName {
+    margin: 0;
+    color: var(--ink) !important;
+    font: 700 14px 'IBM Plex Sans', sans-serif !important;
+}
+
+.user-role-badge {
+    display: inline-flex;
+    width: fit-content;
+    padding: 2px 9px;
+    border-radius: 20px;
+    background: #e6f4ec !important;
+    color: var(--green) !important;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+select,
+textarea {
+    background-color: #f8f9fd !important;
+    border-color: var(--line) !important;
+    color: var(--ink) !important;
+    font-family: 'IBM Plex Sans', sans-serif !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none !important;
+    border-color: var(--blue) !important;
+    box-shadow: 0 0 0 4px rgba(93, 173, 226, .18) !important;
+}
+
+.btn-add-youth,
+.primary-btn,
+.btn-add-event,
+.health-btn.primary,
+.btn.primary,
+.masterlist-button:not(.secondary) {
+    border: 0 !important;
+    border-radius: 999px !important;
+    background: linear-gradient(135deg, var(--pink), var(--pink-d)) !important;
+    color: #fff !important;
+}
+
+.btn.secondary,
+.health-btn.secondary,
+.health-btn.success,
+.masterlist-button.secondary,
+.btn-submit,
+button[type="submit"] {
+    background: linear-gradient(135deg, var(--blue), var(--blue-d)) !important;
+    color: #fff !important;
+}
+
+.btn.danger,
+.delete-btn,
+.health-btn.danger {
+    background: #e74c3c !important;
+    color: #fff !important;
+}
+
+.admin-table,
+.health-table,
+.document-table {
+    border-collapse: separate !important;
+    border-spacing: 0 4px !important;
+}
+
+.admin-table,
+.health-table,
+.document-table {
+    width: 100%;
+    background: transparent !important;
+}
+
+table:not([data-list]) {
+    border-collapse: separate !important;
+    border-spacing: 0 4px !important;
+    background: transparent !important;
+}
+
+table:not([data-list]) thead th {
+    padding: 14px 20px;
+    background: #f8f9fc !important;
+    color: var(--ink-2) !important;
+    text-align: left;
+    white-space: nowrap;
+    border-bottom: 1px solid var(--line) !important;
+}
+
+table:not([data-list]) tbody tr {
+    background: var(--surface) !important;
+}
+
+table:not([data-list]) tbody tr:hover {
+    background: #f8fafe !important;
+}
+
+table:not([data-list]) tbody td {
+    padding: 14px 20px;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--line) !important;
+}
+
+.admin-table thead th,
+.health-table thead th,
+.document-table thead th {
+    padding: 14px 20px;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.admin-table thead th,
+.health-table thead th,
+.document-table thead th {
+    background: #f8f9fc !important;
+    color: var(--ink-2) !important;
+    border-bottom-color: var(--line) !important;
+}
+
+.admin-table tbody tr,
+.health-table tbody tr,
+.document-table tbody tr {
+    background: var(--surface) !important;
+}
+
+.admin-table tbody tr:hover,
+.health-table tbody tr:hover,
+.document-table tbody tr:hover {
+    background: #f8fafe !important;
+}
+
+.admin-table tbody td,
+.health-table tbody td,
+.document-table tbody td {
+    padding: 14px 20px;
+    vertical-align: middle;
+    border-bottom-color: var(--line) !important;
+}
+
+.member-id {
+    border-radius: 999px !important;
+    background: #f0f3f9 !important;
+    color: #3b4660 !important;
+}
+
+.action-btn {
+    background: #f1f5fb !important;
+    color: var(--ink-2) !important;
+    border: 0 !important;
+    border-radius: 10px !important;
+}
+
+.action-btn.btn-view {
+    background: #e8f3fc !important;
+    color: #2b86c5 !important;
+}
+
+.action-btn.btn-edit {
+    background: #fff4e0 !important;
+    color: #c47d0a !important;
+}
+
+.action-btn.btn-delete {
+    background: #fdeaea !important;
+    color: #d33f3f !important;
+}
+
+#confirmCancelBtn {
+    background: #f0f2f7 !important;
+    color: var(--ink) !important;
+}
+
+#confirmOkBtn {
+    background: #e74c3c !important;
+    color: #fff !important;
+}
+
+.modal-content,
+.modal-card {
+    background: var(--surface) !important;
+    border: 1px solid var(--line) !important;
+    border-radius: var(--r) !important;
+}
+
+.admin-toast-container,
+#toastContainer {
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    left: auto !important;
+    z-index: 11000 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    pointer-events: none !important;
+}
+
+.admin-toast-container .toast,
+#toastContainer .toast {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    min-width: 280px !important;
+    max-width: min(420px, calc(100vw - 40px)) !important;
+    padding: 16px 20px !important;
+    pointer-events: auto;
+    background: var(--surface) !important;
+    border: 1px solid var(--line) !important;
+    border-left: 4px solid var(--blue) !important;
+    border-radius: 12px !important;
+    color: var(--ink) !important;
+    box-shadow: 0 8px 24px rgba(27, 34, 51, .14) !important;
+}
+
+#toastContainer .toast.success {
+    border-left-color: var(--green) !important;
+}
+
+#toastContainer .toast.error {
+    border-left-color: #e74c3c !important;
+}
+
+#toastContainer .toast.warning {
+    border-left-color: #f39c12 !important;
+}
+
+#toastContainer .toast-icon {
+    flex: 0 0 auto !important;
+    color: var(--pink-d) !important;
+}
+
+#toastContainer .toast-message {
+    flex: 1 !important;
+    color: var(--ink) !important;
+}
+
+#toastContainer .toast.removing {
+    opacity: 0 !important;
+    transform: translateX(20px) !important;
+    transition: opacity .3s ease, transform .3s ease !important;
+}
+
+.admin-logout-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 12000;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    background: rgba(27, 34, 51, .5);
+    backdrop-filter: blur(3px);
+}
+
+.admin-logout-card {
+    width: min(400px, 100%);
+    padding: 32px;
+    border-radius: var(--r);
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: 0 20px 60px rgba(27, 34, 51, .24);
+    text-align: center;
+    animation: admin-modal-enter .2s ease-out;
+}
+
+body .home {
+    color: var(--ink) !important;
+    background: var(--page) !important;
+}
+
+body .home .pill,
+body .home .clock-card,
+body .home .quick-link,
+body .home .user-chip {
+    background: var(--surface) !important;
+    border-color: var(--line) !important;
+    color: var(--ink) !important;
+    box-shadow: 0 4px 16px rgba(27, 34, 51, .06) !important;
+}
+
+body .home .pill,
+body .home .pill b,
+body .home .clock-time,
+body .home .clock-date,
+body .home .quick-title,
+body .home .quick-link,
+body .home .user-chip h4,
+body .home .hero-text,
+body .home .hero-text h1,
+body .home .hero-text p {
+    color: var(--ink) !important;
+    font-family: 'IBM Plex Sans', sans-serif !important;
+}
+
+body .home .quick-icon {
+    background: #f1f5fb !important;
+    color: var(--pink-d) !important;
+}
+
+body .home .clock-zone {
+    background: #f1f5fb !important;
+    border-color: var(--line) !important;
+    color: var(--ink-2) !important;
+}
+
+body .home .clock-zone::before {
+    background: var(--green) !important;
+}
+
+.admin-logout-card h2 {
+    margin: 0 0 8px;
+    font-size: 21px;
+}
+
+.admin-logout-card p {
+    margin: 0 0 24px;
+    color: var(--ink-2);
+    line-height: 1.6;
+}
+
+.admin-logout-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.admin-logout-actions button {
+    min-width: 100px;
+    padding: 12px 20px;
+    border: 0;
+    border-radius: 999px;
+    font: 600 14px 'IBM Plex Sans', sans-serif;
+    cursor: pointer;
+}
+
+.admin-logout-cancel {
+    background: #f0f2f7;
+    color: var(--ink);
+}
+
+.admin-logout-confirm {
+    background: linear-gradient(135deg, var(--pink), var(--pink-d));
+    color: #fff;
+}
+
+@keyframes admin-modal-enter {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 900px) {
+    .admin-toast-container,
+    #toastContainer {
+        top: 10px !important;
+        right: 10px !important;
+        left: 10px !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .admin-logout-card {
+        animation: none;
+    }
+}

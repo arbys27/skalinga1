@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loader System - Integration Examples</title>
+    <link rel="icon" type="image/x-icon" href="/SKalinga/assets/icons/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/SKalinga/assets/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/SKalinga/assets/icons/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/SKalinga/assets/icons/apple-touch-icon.png">
+    <link rel="manifest" href="/SKalinga/assets/icons/site.webmanifest">
+    <meta name="msapplication-config" content="/SKalinga/assets/icons/browserconfig.xml">
+    <meta name="theme-color" content="#FF6B9D">
+    
+    <!-- Loader CSS (Add to all your pages) -->
+    <link rel="stylesheet" href="assets/css/loader.css?v=3">
+    
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            margin: 0;
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #228B57;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 16px;
+        }
+
+        .section {
+            margin-bottom: 48px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #5DADE2;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #228B57 0%, #1a6b43 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(34, 139, 87, 0.3);
+        }
+
+        .btn-secondary {
+            background: #5DADE2;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(93, 173, 226, 0.3);
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 193, 7, 0.3);
+        }
+
+        .code-block {
+            background: #f5f5f5;
+            border-left: 4px solid #228B57;
+            padding: 16px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .demo-form {
+            background: #f9f9f9;
+            padding: 24px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            margin-top: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #228B57;
+            box-shadow: 0 0 0 3px rgba(34, 139, 87, 0.1);
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #5DADE2;
+            padding: 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            color: #1565c0;
+            font-size: 14px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status.active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #eee;
+            margin: 40px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🎨 SKalinga Loader System</h1>
+    <p class="subtitle">Professional Loading Animation - Integration Examples & Demo</p>
+
+    <!-- Status Section -->
+    <div class="section">
+        <div class="section-title">Status</div>
+        <span class="status active">✓ Loader Initialized</span>
+        <div style="margin-top: 16px; color: #666; font-size: 14px;">
+            Active Requests: <strong id="request-count">0</strong> | 
+            Loader Visible: <strong id="loader-status">No</strong>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Manual Controls -->
+    <div class="section">
+        <div class="section-title">1️⃣ Manual Controls</div>
+        <p style="color: #666; margin-bottom: 20px;">Test loader show/hide manually:</p>
+
+        <div class="button-group">
+            <button class="btn-primary" onclick="testShowLoader()">Show Loader</button>
+            <button class="btn-secondary" onclick="window.Loader.hide()">Hide Loader</button>
+            <button class="btn-warning" onclick="testShowCustomMessage()">Custom Message</button>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Animation Switcher -->
+    <div class="section">
+        <div class="section-title">2️⃣ Switch Animations</div>
+        <p style="color: #666; margin-bottom: 20px;">Click to change animation style:</p>
+
+        <div class="button-group">
+            <button class="btn-primary" onclick="switchAnimation('spinner')">🔄 Spinner</button>
+            <button class="btn-secondary" onclick="switchAnimation('shield')">🛡️ Shield</button>
+            <button class="btn-warning" onclick="switchAnimation('dots')">⚫ Dots</button>
+            <button class="btn-primary" onclick="switchAnimation('svg')">📦 SVG</button>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Fetch API Examples -->
+    <div class="section">
+        <div class="section-title">3️⃣ Fetch API Examples</div>
+        <p style="color: #666; margin-bottom: 20px;">Auto-loader on fetch requests (already integrated!):</p>
+
+        <div class="button-group">
+            <button class="btn-primary" onclick="testFetchSuccess()">✓ Successful Request</button>
+            <button class="btn-secondary" onclick="testFetchSlow()">⏱️ Slow Request (2s)</button>
+            <button class="btn-warning" onclick="testFetchError()">✕ Error Request</button>
+        </div>
+
+        <div class="code-block">
+// Auto-loader triggers on fetch calls!
+fetch('api/get_youth.php')
+  .then(response => response.json())
+  .then(data => {
+    console.log('Data:', data);
+    // Loader auto-hides here
+  });
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Form Submission Demo -->
+    <div class="section">
+        <div class="section-title">4️⃣ Form Submission Demo</div>
+        <p style="color: #666; margin-bottom: 20px;">Auto-loader on form submit:</p>
+
+        <form class="demo-form" onsubmit="handleFormSubmit(event)">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Enter username" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="Enter email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="message">Message</label>
+                <input type="text" id="message" placeholder="Enter message" required>
+            </div>
+
+            <button type="submit" class="btn-primary" style="width: 100%;">
+                Submit Form
+            </button>
+        </form>
+
+        <div class="code-block" style="margin-top: 20px;">
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  // Loader auto-shows!
+  
+  const response = await fetch('api/submit.php', {
+    method: 'POST',
+    body: new FormData(form)
+  });
+  
+  const data = await response.json();
+  // Loader auto-hides!
+});
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Configuration -->
+    <div class="section">
+        <div class="section-title">5️⃣ Configuration</div>
+        <p style="color: #666; margin-bottom: 20px;">Customize loader behavior:</p>
+
+        <div class="button-group">
+            <button class="btn-secondary" onclick="configureLoaderFast()">⚡ Fast Mode</button>
+            <button class="btn-secondary" onclick="configureLoaderSlow()">🐌 Slow Mode</button>
+            <button class="btn-secondary" onclick="configureLoaderWithProgress()">📊 With Progress</button>
+        </div>
+
+        <div class="code-block">
+window.Loader.setConfig({
+  animation: 'spinner',
+  fadeOutDelay: 300,
+  minShowTime: 300,
+  autoShowDelay: 500,
+  showProgressBar: false
+});
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Debug Info -->
+    <div class="section">
+        <div class="section-title">🔍 Debug Info</div>
+
+        <div class="info-box">
+            Open browser console (F12) to see detailed [Loader] log messages
+        </div>
+
+        <div class="button-group">
+            <button class="btn-secondary" onclick="showDebugInfo()">Show Debug Info</button>
+            <button class="btn-warning" onclick="testMultipleFetches()">Test Multiple Fetches</button>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Integration Tips -->
+    <div class="section">
+        <div class="section-title">✅ Integration Checklist</div>
+
+        <ol style="color: #666; line-height: 1.8;">
+            <li>Add <code style="background: #f0f0f0; padding: 2px 6px; border-radius: 3px;">&lt;link rel="stylesheet" href="assets/css/loader.css?v=3"&gt;</code> to page head</li>
+            <li>Add <code style="background: #f0f0f0; padding: 2px 6px; border-radius: 3px;">&lt;script src="assets/js/loader.js?v=3"&gt;&lt;/script&gt;</code> before closing body tag</li>
+            <li>Loader will auto-show on fetch API calls</li>
+            <li>Loader will auto-show on form submissions</li>
+            <li>Loader will auto-hide when requests complete</li>
+            <li>Customize animation and messages as needed</li>
+            <li>Use <code style="background: #f0f0f0; padding: 2px 6px; border-radius: 3px;">window.Loader.show()</code> and <code style="background: #f0f0f0; padding: 2px 6px; border-radius: 3px;">window.Loader.hide()</code> for manual control</li>
+        </ol>
+    </div>
+</div>
+
+<script src="assets/js/loader.js?v=3"></script>
+
+<script>
+// Update status every 200ms
+setInterval(() => {
+    document.getElementById('loader-status').textContent = window.Loader.isLoading() ? 'Yes' : 'No';
+    document.getElementById('request-count').textContent = window.Loader.getActiveRequests();
+}, 200);
+
+// ─────────────────────────────────────────────────────────────
+// Test Functions
+// ─────────────────────────────────────────────────────────────
+
+function testShowLoader() {
+    window.Loader.setAnimation('spinner');
+    window.Loader.show('Loading demonstration...');
+    setTimeout(() => window.Loader.hide(), 3000);
+}
+
+function testShowCustomMessage() {
+    window.Loader.setAnimation('shield');
+    window.Loader.show('Processing important data...');
+    setTimeout(() => window.Loader.hide(), 3000);
+}
+
+function switchAnimation(type) {
+    window.Loader.setAnimation(type);
+    window.Loader.show(`Switched to ${type} animation...`);
+    setTimeout(() => window.Loader.hide(), 2500);
+}
+
+// Simulate successful fetch
+async function testFetchSuccess() {
+    try {
+        const response = await fetch('api/check_admin_session.php');
+        const data = await response.json();
+        console.log('✓ Fetch successful:', data);
+        alert('✓ Request completed! Check console for response.');
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+// Simulate slow fetch
+async function testFetchSlow() {
+    try {
+        const response = await fetch('api/get_youth.php');
+        const data = await response.json();
+        console.log('✓ Slow fetch completed:', data);
+        alert('✓ Slow request completed! Loader stayed visible.');
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+// Simulate error fetch
+async function testFetchError() {
+    try {
+        const response = await fetch('api/invalid_endpoint.php');
+        const data = await response.json();
+    } catch (error) {
+        console.log('✓ Error handled gracefully:', error.message);
+        alert('✓ Error fetch handled! Loader hides on errors too.');
+    }
+}
+
+// Handle form submission
+async function handleFormSubmit(event) {
+    event.preventDefault();
+    
+    console.log('Form submitted! Loader should be visible.');
+    
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    const form = event.target;
+    console.log('Form data:', {
+        username: form.username.value,
+        email: form.email.value,
+        message: form.message.value
+    });
+    
+    alert('✓ Form processed! Loader auto-hid when fetch completed.');
+    form.reset();
+}
+
+// Configuration examples
+function configureLoaderFast() {
+    window.Loader.setConfig({
+        autoShowDelay: 200,
+        minShowTime: 100,
+        fadeOutDelay: 100
+    });
+    window.Loader.show('⚡ Fast mode configured!');
+    setTimeout(() => window.Loader.hide(), 1500);
+}
+
+function configureLoaderSlow() {
+    window.Loader.setConfig({
+        autoShowDelay: 1000,
+        minShowTime: 800,
+        fadeOutDelay: 500
+    });
+    window.Loader.show('🐌 Slow mode configured!');
+    setTimeout(() => window.Loader.hide(), 2000);
+}
+
+function configureLoaderWithProgress() {
+    window.Loader.setConfig({
+        showProgressBar: true
+    });
+    window.Loader.show('📊 Progress bar enabled!');
+    setTimeout(() => window.Loader.hide(), 2500);
+}
+
+// Debug info
+function showDebugInfo() {
+    const config = window.Loader.getConfig();
+    console.group('🔍 Loader Debug Info');
+    console.log('Configuration:', config);
+    console.log('Is Loading:', window.Loader.isLoading());
+    console.log('Active Requests:', window.Loader.getActiveRequests());
+    console.group();
+    alert('Check console (F12) for debug information!');
+}
+
+// Test multiple simultaneous fetches
+async function testMultipleFetches() {
+    console.log('Starting 3 simultaneous fetches...');
+    
+    try {
+        const [res1, res2, res3] = await Promise.all([
+            fetch('api/check_admin_session.php'),
+            fetch('api/get_youth.php'),
+            fetch('api/get_events.php')
+        ]);
+        
+        const [data1, data2, data3] = await Promise.all([
+            res1.json(),
+            res2.json(),
+            res3.json()
+        ]);
+        
+        console.log('All fetches completed!');
+        alert('✓ Multiple fetches handled! Loader hid only after all completed.');
+    } catch (error) {
+        console.error('Multi-fetch error:', error);
+    }
+}
+
+// Show initial message
+console.log('%c🎨 SKalinga Loader System', 'color: #228B57; font-size: 16px; font-weight: bold;');
+console.log('%cDocumentation: See LOADER_INTEGRATION_GUIDE.md', 'color: #5DADE2; font-size: 12px;');
+console.log('%cAvailable at: window.Loader', 'color: #5DADE2; font-size: 12px;');
+</script>
+
+</body>
+</html>

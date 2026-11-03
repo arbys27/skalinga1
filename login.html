@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SKalinga | Sign In</title>
+<link rel="icon" type="image/x-icon" href="/SKalinga/assets/icons/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/SKalinga/assets/icons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/SKalinga/assets/icons/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/SKalinga/assets/icons/apple-touch-icon.png">
+<link rel="manifest" href="/SKalinga/assets/icons/site.webmanifest">
+<meta name="msapplication-config" content="/SKalinga/assets/icons/browserconfig.xml">
+<meta name="theme-color" content="#FF6B9D">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/skalinga-ui.css">
+<link rel="stylesheet" href="assets/css/loader.css?v=3">
+</head>
+<body class="auth-page">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<symbol id="u" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+<symbol id="k" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="3"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
+<symbol id="m" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m3 8 9 6 9-6"/></symbol>
+<symbol id="cal" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+<symbol id="box" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 8 9 5 9-5M3 8v9l9 5 9-5V8M12 13v9"/></symbol>
+<symbol id="hrt" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"/></symbol>
+<symbol id="prn" viewBox="0 0 24 24"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/></symbol>
+<symbol id="eye" viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></symbol>
+<symbol id="hm" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-6v-7h-4v7H4a1 1 0 0 1-1-1V10Z"/></symbol>
+</svg>
+
+<div class="shell youth-auth">
+  <aside class="brand youth-auth-brand">
+    <div class="top">
+      <div class="logos"><img src="assets/images/logosanantonio.jpg" alt="San Antonio logo"><img src="assets/images/sklogo.jpg" alt="SK San Antonio logo"><span>SKalinga</span></div>
+      <a class="home" href="index.php"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#hm"/></svg> Home</a>
+    </div>
+    <div class="pitch">
+      <h2>Kabataan na kumikilos.</h2>
+      <p>Sign in to join events, borrow equipment, request prints and keep your Digital ID close.</p>
+      <div class="chips">
+        <span class="chip"><svg fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><use href="#cal"/></svg>Events</span>
+        <span class="chip"><svg fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><use href="#box"/></svg>Borrow</span>
+        <span class="chip"><svg fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><use href="#prn"/></svg>Print</span>
+        <span class="chip"><svg fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><use href="#hrt"/></svg>Health</span>
+      </div>
+    </div>
+    <div class="tagline">#YanAngSKko SKSanAntonio!</div>
+  </aside>
+
+  <main class="panel youth-auth-panel">
+    <div class="card youth-auth-card">
+      <section class="login-view view" id="loginView">
+        <h1>Welcome back</h1>
+        <p class="sub">Sign in to your SKalinga youth account.</p>
+        <form id="loginForm">
+          <div class="field">
+            <label for="identifier">Email address or mobile number</label>
+            <div class="inp"><svg><use href="#u"/></svg><input id="identifier" name="identifier" type="text" autocomplete="username" placeholder="Enter Email or Mobile Number" required autofocus></div>
+          </div>
+          <div class="field">
+            <label for="password">Password</label>
+            <div class="inp password-wrap"><svg><use href="#k"/></svg><input id="password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required><button type="button" class="toggle" id="togglePassword" aria-label="Show password"><svg><use href="#eye"/></svg></button></div>
+          </div>
+          <button class="submit" id="submitButton" type="submit">Sign in</button>
+          <p class="message" id="message" role="alert"></p>
+        </form>
+        <div class="links"><button type="button" class="text-link" id="forgotPasswordLink">Forgot password?</button><span>New here? <a href="youth-register.html">Activate a youth account</a></span></div>
+      </section>
+
+      <section class="reset-view view" id="resetView" hidden>
+        <h1>Reset password</h1>
+        <p class="reset-copy">Recover access to your youth account using the email address registered to it.</p>
+        <form id="requestResetForm">
+          <div class="field"><label for="resetEmail">Email address</label><div class="inp"><svg><use href="#m"/></svg><input id="resetEmail" name="email" type="email" autocomplete="email" placeholder="name@example.com" required></div></div>
+          <button class="submit" id="requestResetButton" type="submit">Send OTP</button>
+          <p class="message" id="requestResetMessage" role="status" aria-live="polite"></p>
+        </form>
+        <form id="completeResetForm" hidden>
+          <div class="field"><label for="resetOtp">6-digit OTP</label><div class="inp"><svg><use href="#k"/></svg><input id="resetOtp" name="otp_code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="000000" required></div></div>
+          <div class="field"><label for="newPassword">New password</label><div class="inp"><svg><use href="#k"/></svg><input id="newPassword" name="password" type="password" autocomplete="new-password" minlength="8" placeholder="At least 8 characters" required></div></div>
+          <div class="field"><label for="confirmPassword">Confirm new password</label><div class="inp"><svg><use href="#k"/></svg><input id="confirmPassword" type="password" autocomplete="new-password" minlength="8" placeholder="Repeat the new password" required></div></div>
+          <button class="submit" id="completeResetButton" type="submit">Change password</button>
+          <p class="message" id="completeResetMessage" role="status" aria-live="polite"></p>
+        </form>
+        <div class="links"><button type="button" class="text-link" id="backToLogin">Back to sign in</button></div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const loginView=$('loginView'), resetView=$('resetView'), form=$('loginForm'), message=$('message'), submitButton=$('submitButton');
+const requestResetForm=$('requestResetForm'), completeResetForm=$('completeResetForm');
+const requestResetMessage=$('requestResetMessage'), completeResetMessage=$('completeResetMessage');
+const redirect = new URLSearchParams(location.search).get('redirect') || '';
+const say=(el,text,ok)=>{el.textContent=text||'';el.classList.toggle('success',!!ok)};
+const postJSON=(url,body)=>fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(async r=>({ok:r.ok,result:await r.json()}));
+function resetFields(){['resetOtp','newPassword','confirmPassword'].forEach(i=>$(i).value='')}
+
+$('togglePassword').addEventListener('click',()=>{const p=$('password'),show=p.type==='password';p.type=show?'text':'password';$('togglePassword').setAttribute('aria-label',show?'Hide password':'Show password')});
+
+form.addEventListener('submit',async e=>{
+  e.preventDefault(); say(message,''); submitButton.disabled=true; submitButton.textContent='Signing in...';
+  const data=new FormData(form); if(redirect) data.append('redirect',redirect);
+  try{
+    const r=await fetch('api/login.php',{method:'POST',body:data}), result=await r.json();
+    if(!result.success){say(message,result.message||'Unable to sign in.');return}
+    location.href=result.redirect||(result.role==='youth'?'youth-portal.html':'admin-dashboard.html');
+  }catch(err){say(message,'Unable to connect. Please try again.')}
+  finally{submitButton.disabled=false;submitButton.textContent='Sign in'}
+});
+
+$('forgotPasswordLink').addEventListener('click',()=>{loginView.hidden=true;resetView.hidden=false;$('resetEmail').focus()});
+$('backToLogin').addEventListener('click',()=>{
+  resetView.hidden=true;loginView.hidden=false;requestResetForm.hidden=false;completeResetForm.hidden=true;
+  say(requestResetMessage,'');say(completeResetMessage,'');say(message,'');resetFields();$('identifier').focus();
+});
+
+requestResetForm.addEventListener('submit',async e=>{
+  e.preventDefault();const btn=$('requestResetButton');btn.disabled=true;btn.textContent='Sending...';say(requestResetMessage,'');
+  try{
+    const {ok,result}=await postJSON('api/request_password_reset.php',{email:$('resetEmail').value.trim()});
+    if(!ok||!result.success){say(requestResetMessage,result.message||'Unable to send the OTP. Please try again.');return}
+    requestResetForm.hidden=true;completeResetForm.hidden=false;say(completeResetMessage,result.message,true);$('resetOtp').focus();
+  }catch(err){say(requestResetMessage,'Unable to connect. Please try again.')}
+  finally{btn.disabled=false;btn.textContent='Send OTP'}
+});
+
+completeResetForm.addEventListener('submit',async e=>{
+  e.preventDefault();const pw=$('newPassword').value;
+  if(pw!==$('confirmPassword').value){say(completeResetMessage,'The passwords do not match.');return}
+  const btn=$('completeResetButton');btn.disabled=true;btn.textContent='Updating...';say(completeResetMessage,'');
+  try{
+    const {ok,result}=await postJSON('api/reset_password.php',{email:$('resetEmail').value.trim(),otp_code:$('resetOtp').value.trim(),password:pw});
+    if(!ok||!result.success){say(completeResetMessage,result.message||'Unable to reset the password. Please try again.');return}
+    resetView.hidden=true;loginView.hidden=false;requestResetForm.hidden=false;completeResetForm.hidden=true;
+    say(requestResetMessage,'');say(completeResetMessage,'');
+    $('identifier').value=$('resetEmail').value.trim();$('resetEmail').value='';resetFields();$('password').value='';
+    say(message,result.message,true);$('password').focus();
+  }catch(err){say(completeResetMessage,'Unable to connect. Please try again.')}
+  finally{btn.disabled=false;btn.textContent='Change password'}
+});
+
+if(new URLSearchParams(location.search).get('logout')==='1') history.replaceState({},document.title,'login.html');
+fetch('api/me.php').then(r=>r.ok?r.json():null).then(d=>{if(d&&d.authenticated)location.href=d.role==='youth'?'youth-portal.html':'admin-dashboard.html'}).catch(()=>{});
+</script>
+<script src="assets/js/loader.js?v=3"></script>
+</body>
+</html>

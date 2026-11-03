@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SKalinga - My Profile</title>
+    <link rel="icon" type="image/x-icon" href="/SKalinga/assets/icons/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/SKalinga/assets/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/SKalinga/assets/icons/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/SKalinga/assets/icons/apple-touch-icon.png">
+    <link rel="manifest" href="/SKalinga/assets/icons/site.webmanifest">
+    <meta name="msapplication-config" content="/SKalinga/assets/icons/browserconfig.xml">
+    <meta name="theme-color" content="#FF6B9D">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+
+
+    <!-- Professional Loader System -->
+    <link rel="stylesheet" href="assets/css/loader.css?v=3">
+
+    <style>
+        :root {
+            --profile-green: #228B57;
+            --profile-green-deep: #0F4D31;
+            --profile-mint: #A8E6CF;
+            --profile-pink: #FF6B9D;
+            --profile-pink-soft: #FFF1F6;
+            --profile-ink: #16303F;
+            --profile-muted: #5F7788;
+            --profile-surface: #FFFFFF;
+            --profile-paper: #F7FBF9;
+            --profile-line: rgba(22, 48, 63, 0.12);
+            --profile-shadow: 0 18px 40px rgba(34, 139, 87, 0.12);
+        }
+
+        body {
+            min-height: 100%;
+            height: auto;
+            overflow-x: hidden;
+            overflow-y: auto;
+            background:
+                radial-gradient(circle at top left, rgba(168, 230, 207, 0.32), transparent 28%),
+                radial-gradient(circle at bottom right, rgba(255, 107, 157, 0.12), transparent 30%),
+                #F7FBF9;
+        }
+
+        html {
+            min-height: 100%;
+            height: auto;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        .app-container {
+            max-width: 1200px;
+            min-height: 100vh;
+            margin: 0 auto;
+            padding: 32px 20px 48px;
+        }
+
+        .profile-shell {
+            display: grid;
+            gap: 24px;
+        }
+
+        .profile-hero {
+            position: relative;
+            overflow: hidden;
+            padding: clamp(24px, 4vw, 40px);
+            border: 1px solid var(--profile-line);
+            border-radius: 30px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.96), rgba(236, 249, 243, 0.94));
+            box-shadow: var(--profile-shadow);
+        }
+
+        .profile-hero::before {
+            content: "";
+            position: absolute;
+            right: -40px;
+            bottom: -40px;
+            width: 180px;
+            height: 180px;
+            border: 1px solid rgba(34, 139, 87, 0.18);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .profile-hero-grid {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 24px;
+            align-items: center;
+        }
+
+        .profile-meta {
+            min-width: 0;
+        }
+
+        .profile-meta h2 {
+            margin: 0 0 8px;
+            font-family: "Bricolage Grotesque", sans-serif;
+            font-size: clamp(2rem, 3vw, 3rem);
+            line-height: 1.05;
+            letter-spacing: -0.06em;
+            color: var(--profile-ink);
+        }
+
+        .member-id {
+            margin: 0 0 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--profile-muted);
+        }
+
+        .profile-status-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border: 1px solid rgba(34, 139, 87, 0.12);
+            border-radius: 999px;
+            background: rgba(168, 230, 207, 0.14);
+            color: var(--profile-green-deep);
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .status-badge.active {
+            background: linear-gradient(135deg, var(--profile-green), #58A676);
+            border-color: transparent;
+            color: #fff;
+            box-shadow: 0 12px 24px rgba(34, 139, 87, 0.18);
+        }
+
+        .status-badge .icon {
+            width: 14px;
+            height: 14px;
+        }
+
+        .profile-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-width: 158px;
+            min-height: 48px;
+            padding: 12px 16px;
+            border: 0;
+            border-radius: 16px;
+            font-size: 0.92rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+            text-decoration: none;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .action-btn.primary {
+            background: linear-gradient(135deg, var(--profile-pink), #E74F7F);
+            color: #fff;
+            box-shadow: 0 14px 24px rgba(255, 107, 157, 0.24);
+        }
+
+        .action-btn.secondary {
+            background: #EEF4F1;
+            color: var(--profile-ink);
+            border: 1px solid rgba(22, 48, 63, 0.08);
+        }
+
+        .action-btn.danger {
+            background: rgba(255, 107, 157, 0.08);
+            color: var(--profile-pink);
+            border: 1px solid rgba(255, 107, 157, 0.18);
+        }
+
+        .card-panel {
+            background: rgba(255, 255, 255, 0.96);
+            border: 1px solid var(--profile-line);
+            border-radius: 28px;
+            box-shadow: 0 14px 26px rgba(22, 48, 63, 0.05);
+            padding: 24px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .card-header h3 {
+            margin: 0;
+            font-family: "Bricolage Grotesque", sans-serif;
+            font-size: clamp(1.5rem, 2vw, 2rem);
+            letter-spacing: -0.04em;
+            color: var(--profile-ink);
+        }
+
+        .card-header p {
+            margin: 0;
+            color: var(--profile-muted);
+            font-size: 0.88rem;
+            font-weight: 600;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.8fr);
+            gap: 24px;
+        }
+
+        .personal-info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .info-field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 16px;
+            border-radius: 18px;
+            background: linear-gradient(180deg, rgba(247,251,249,0.94), rgba(255,255,255,0.72));
+            border: 1px solid rgba(22, 48, 63, 0.08);
+        }
+
+        .info-field.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .field-label {
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--profile-muted);
+        }
+
+        .field-value {
+            font-size: 1rem;
+            line-height: 1.5;
+            color: var(--profile-ink);
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        .activity-stats {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .stat-card {
+            display: grid;
+            gap: 10px;
+            padding: 18px;
+            border: 1px solid rgba(34, 139, 87, 0.12);
+            border-radius: 22px;
+            background: linear-gradient(180deg, rgba(250,255,252,1), rgba(240,248,244,0.9));
+        }
+
+        .stat-icon-wrap {
+            display: inline-flex;
+            width: 44px;
+            height: 44px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 14px;
+            background: rgba(34, 139, 87, 0.08);
+            color: var(--profile-green);
+        }
+
+        .stat-icon-wrap svg {
+            width: 20px;
+            height: 20px;
+            stroke: currentColor;
+        }
+
+        .stat-value {
+            font-size: clamp(1.8rem, 2.5vw, 2.5rem);
+            font-weight: 800;
+            letter-spacing: -0.06em;
+            color: var(--profile-ink);
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--profile-muted);
+        }
+
+        .activity-timeline {
+            display: grid;
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-top: 1px solid rgba(22, 48, 63, 0.08);
+        }
+
+        .timeline-item:first-child {
+            border-top: 0;
+            padding-top: 0;
+        }
+
+        .timeline-bullet {
+            width: 10px;
+            height: 10px;
+            margin-top: 7px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--profile-green), var(--profile-mint));
+            box-shadow: 0 0 0 5px rgba(34, 139, 87, 0.08);
+        }
+
+        .timeline-item strong {
+            display: block;
+            color: var(--profile-ink);
+            font-size: 0.95rem;
+            margin-bottom: 2px;
+        }
+
+        .timeline-item span {
+            display: block;
+            color: var(--profile-muted);
+            font-size: 0.82rem;
+        }
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            background: rgba(9, 21, 22, 0.4);
+            backdrop-filter: blur(6px);
+        }
+
+        .modal-content {
+            width: min(92vw, 540px);
+            border-radius: 28px;
+            padding: 24px;
+            background: #fff;
+            box-shadow: 0 20px 60px rgba(22, 48, 63, 0.22);
+            border: 1px solid rgba(22, 48, 63, 0.08);
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.6rem;
+            line-height: 1.2;
+            letter-spacing: -0.04em;
+            color: var(--profile-ink);
+        }
+
+        .modal-close {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: 1px solid rgba(22, 48, 63, 0.08);
+            background: #fff;
+            color: var(--profile-ink);
+            cursor: pointer;
+        }
+
+        @media (max-width: 900px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .profile-hero-grid {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .profile-actions {
+                flex-direction: row;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .personal-info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .app-container {
+                padding-left: 14px;
+                padding-right: 14px;
+            }
+
+            .card-panel {
+                padding: 18px;
+            }
+
+            .profile-actions {
+                flex-direction: column;
+            }
+
+            .action-btn {
+                width: 100%;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="assets/css/skalinga-ui.css?v=20261021-3">
+    <link rel="stylesheet" href="assets/css/digital-youth-id.css">
+</head>
+<body>
+    <div class="app-container">
+
+        <!-- Top Navigation -->
+        <nav class="top-nav">
+            <div class="logo-area">
+                <div class="logo-icons-group">
+                    <img src="assets/images/logosanantonio.jpg" alt="San Antonio Logo" class="official-logo">
+                    <img src="assets/images/sklogo.jpg" alt="SK Logo" class="official-logo">
+                </div>
+                <div class="logo-text">
+                    <h1>SKalinga</h1>
+                    <p>Youth Portal</p>
+                </div>
+            </div>
+            <div class="nav-actions">
+                <a href="profile.html" class="user-badge">
+                    <span class="user-name" id="nav-user-name">Loading...</span>
+                </a>
+            </div>
+        </nav>
+
+        <!-- Profile Header Card -->
+        <section class="profile-hero profile-shell">
+            <div class="profile-hero-grid">
+                <div class="profile-meta">
+                    <h2 id="profile-name">Loading...</h2>
+                    <p class="member-id">Member ID: <span id="member-id">Loading...</span></p>
+                    <div class="profile-status-badges">
+                        <div class="status-badge active">
+                            <svg class="icon" aria-hidden="true"><use href="#icon-check"></use></svg>
+                            Active Member
+                        </div>
+                        <div class="status-badge">
+                            <svg class="icon" aria-hidden="true"><use href="#icon-heart"></use></svg>
+                            <span id="profile-age">Loading...</span> years old
+                        </div>
+                        <div class="status-badge">
+                            <svg class="icon" aria-hidden="true"><use href="#icon-pin"></use></svg>
+                            <span id="profile-barangay">Loading...</span>
+                        </div>
+                        <div class="status-badge">
+                            <svg class="icon" aria-hidden="true"><use href="#icon-id"></use></svg>
+                            <span id="profile-gender">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-actions">
+                    <button class="action-btn secondary" id="view-id-btn" type="button">
+                        <svg class="icon" aria-hidden="true"><use href="#icon-id"></use></svg>
+                        Digital ID
+                    </button>
+                    <button class="action-btn danger" type="button" onclick="logout()">
+                        <svg class="icon" aria-hidden="true"><use href="#icon-arrow"></use></svg>
+                        Log out
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Content Grid -->
+        <div class="main-grid">
+            <!-- Personal Information -->
+            <div class="card-panel">
+                <div class="card-header">
+                    <h3>Personal Information</h3>
+                    <p>Resident details and contact information</p>
+                </div>
+                <div class="personal-info-grid">
+                    <div class="info-field">
+                        <label class="field-label">First Name</label>
+                        <div class="field-value" id="first-name">Loading...</div>
+                    </div>
+                    <div class="info-field">
+                        <label class="field-label">Last Name</label>
+                        <div class="field-value" id="last-name">Loading...</div>
+                    </div>
+                    <div class="info-field">
+                        <label class="field-label">Birthday</label>
+                        <div class="field-value" id="birthday">Loading...</div>
+                    </div>
+                    <div class="info-field">
+                        <label class="field-label">Age</label>
+                        <div class="field-value" id="age">Loading...</div>
+                    </div>
+                    <div class="info-field">
+                        <label class="field-label">Gender</label>
+                        <div class="field-value" id="gender">Loading...</div>
+                    </div>
+                    <div class="info-field">
+                        <label class="field-label">Contact Number</label>
+                        <div class="field-value" id="contact">Loading...</div>
+                    </div>
+                    <div class="info-field full-width">
+                        <label class="field-label">Email Address</label>
+                        <div class="field-value" id="email">Loading...</div>
+                    </div>
+                    <div class="info-field full-width">
+                        <label class="field-label">Full Address</label>
+                        <div class="field-value" id="address">Loading...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity Summary -->
+            <div class="card-panel activity-summary">
+                <div class="card-header">
+                    <h3>Activity Summary</h3>
+                    <p>Your engagement with SK programs</p>
+                </div>
+                <div class="activity-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon-wrap">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                        </div>
+                        <div class="stat-value" id="events-joined">0</div>
+                        <div class="stat-label">Events Joined</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon-wrap">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-value" id="borrow-requests">0</div>
+                        <div class="stat-label">Borrow Requests</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon-wrap">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                        </div>
+                        <div class="stat-value" id="reports-submitted">0</div>
+                        <div class="stat-label">Reports Submitted</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon-wrap">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M6 9l6 6 6-6"></path>
+                                <path d="M3 12a9 9 0 1 1 18 0 9 9 0 0 1-18 0z"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-value" id="print-requests">0</div>
+                        <div class="stat-label">Print Requests</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Digital Youth ID Modal -->
+        <div class="modal" id="digital-id-modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Digital Youth ID</h3>
+                    <button class="modal-close" id="close-modal">&times;</button>
+                </div>
+                <div class="digital-youth-id-card">
+                  <section class="dyid-front" aria-label="Front of SKalinga membership ID">
+                    <div class="dyid-header">
+                        <img src="assets/images/sklogo.jpg" alt="SK Logo" class="dyid-logo">
+                        <div class="dyid-brand">
+                            <span>SKalinga Youth Services</span>
+                            <strong>SK San Antonio</strong>
+                        </div>
+                        <span class="dyid-classification">Member ID</span>
+                    </div>
+                    <span class="dyid-hologram" aria-hidden="true">SK</span>
+                    <div class="dyid-main">
+                        <div class="dyid-person">
+                            <div class="dyid-details">
+                                <span class="dyid-field-label">Youth Member</span>
+                                <h4 class="dyid-name" id="id-name">Loading...</h4>
+                                <span class="dyid-number-stamp"><span>Member number</span><strong id="id-member-id">Loading...</strong></span>
+                            </div>
+                        </div>
+                        <div class="dyid-qr-panel">
+                            <div class="dyid-qr-box" id="qr-code" role="img" aria-label="Member reference QR code"></div>
+                            <span class="dyid-qr-caption">Reference only — not proof of identity</span>
+                        </div>
+                    </div>
+                    <div class="dyid-footer">
+                        <span>Personal identification</span>
+                        <span>Present to SK staff</span>
+                    </div>
+                  </section>
+                </div>
+                <button class="action-btn primary full-width" id="download-id">
+                    <svg class="icon" aria-hidden="true"><use href="#icon-arrow"></use></svg>
+                    Download ID Card
+                </button>
+            </div>
+        </div>
+
+
+        <!-- Logout Confirmation Modal -->
+        <div class="modal" id="logoutModal" style="display: none;">
+            <div class="modal-content" style="max-width: 450px;">
+                <div style="text-align: center; padding: 2rem 0;">
+                    <div style="font-size: 3rem; color: var(--accent-pink); margin-bottom: 1rem;">
+                        <svg class="icon" aria-hidden="true"><use href="#icon-arrow"></use></svg>
+                    </div>
+                    <h3 style="font-size: 1.5rem; font-weight: 700; margin: 0 0 1rem 0; color: var(--text-dark);">Confirm Logout?</h3>
+                    <p style="color: var(--text-gray); margin: 0 0 2rem 0; font-size: 0.95rem;">Are you sure you want to log out from your youth account? You will need to log in again to access your profile and borrow resources.</p>
+                    <div style="display: flex; gap: 1rem; justify-content: center;">
+                        <button class="action-btn secondary" id="cancelLogoutBtn" style="min-width: 120px;">
+                            Cancel
+                        </button>
+                        <button class="action-btn danger" id="confirmLogoutBtn" style="min-width: 120px;">
+                            <svg class="icon" aria-hidden="true"><use href="#icon-arrow"></use></svg> Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script>
+        // Global variables
+        let isEditMode = false;
+        let originalData = {};
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadUserProfile();
+            loadActivityStats();
+            setupEventListeners();
+        });
+
+        // Load activity statistics
+        async function loadActivityStats() {
+            try {
+                // Load borrow requests count
+                const borrowResponse = await fetch('api/get_borrow_records.php', {
+                    credentials: 'include'
+                });
+                const borrowData = await borrowResponse.json();
+                if (borrowData.success && borrowData.data) {
+                    document.getElementById('borrow-requests').textContent = borrowData.data.length || 0;
+                } else {
+                    document.getElementById('borrow-requests').textContent = '0';
+                }
+
+                // Load incidents/reports count
+                const incidentsResponse = await fetch('api/get_user_incidents.php', {
+                    credentials: 'include'
+                });
+                const incidentsData = await incidentsResponse.json();
+                if (incidentsData.success && incidentsData.data) {
+                    document.getElementById('reports-submitted').textContent = incidentsData.data.length || 0;
+                } else {
+                    document.getElementById('reports-submitted').textContent = '0';
+                }
+
+                // Load print requests count
+                const printResponse = await fetch('api/get_user_print_requests.php', {
+                    credentials: 'include'
+                });
+                const printData = await printResponse.json();
+                if (printData.success && printData.data) {
+                    document.getElementById('print-requests').textContent = printData.data.length || 0;
+                } else {
+                    document.getElementById('print-requests').textContent = '0';
+                }
+
+                // Load events joined count
+                const eventsResponse = await fetch('api/get_events.php', {
+                    credentials: 'include'
+                });
+                const eventsData = await eventsResponse.json();
+                if (eventsData.success && eventsData.data) {
+                    // Count user events (assuming events returned are user's registered events)
+                    document.getElementById('events-joined').textContent = eventsData.data.length || 0;
+                } else {
+                    document.getElementById('events-joined').textContent = '0';
+                }
+            } catch (error) {
+                console.error('Error loading activity stats:', error);
+                // Set defaults to 0 if error
+                document.getElementById('events-joined').textContent = '0';
+                document.getElementById('borrow-requests').textContent = '0';
+                document.getElementById('reports-submitted').textContent = '0';
+                document.getElementById('print-requests').textContent = '0';
+            }
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            const viewIdBtn = document.getElementById('view-id-btn');
+            if (viewIdBtn) viewIdBtn.addEventListener('click', showDigitalIdModal);
+
+            const closeModal = document.getElementById('close-modal');
+            if (closeModal) closeModal.addEventListener('click', hideDigitalIdModal);
+
+            const digitalIdModal = document.getElementById('digital-id-modal');
+            if (digitalIdModal) {
+                digitalIdModal.addEventListener('click', (e) => {
+                    if (e.target.id === 'digital-id-modal') {
+                        hideDigitalIdModal();
+                    }
+                });
+            }
+
+            const downloadBtn = document.getElementById('download-id');
+            if (downloadBtn) downloadBtn.addEventListener('click', downloadDigitalId);
+            const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
+            const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
+            const logoutModal = document.getElementById('logoutModal');
+
+            if (cancelLogoutBtn) {
+                cancelLogoutBtn.addEventListener('click', cancelLogout);
+            }
+            if (confirmLogoutBtn) {
+                confirmLogoutBtn.addEventListener('click', confirmLogout);
+            }
+
+            if (logoutModal) {
+                logoutModal.addEventListener('click', (e) => {
+                    if (e.target.id === 'logoutModal') {
+                        cancelLogout();
+                    }
+                });
+            }
+        }
+
+        // Load user profile data
+        async function loadUserProfile() {
+            try {
+                const response = await fetch('api/get_user.php', {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    populateProfileData(data);
+                    originalData = { ...data };
+                    updateNavUser(data);
+                    updateQRCode(data.member_id);
+                } else {
+                    alert('Failed to load profile: ' + data.message);
+                    window.location.href = 'login.html';
+                }
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                alert('Error loading profile data');
+                window.location.href = 'login.html';
+            }
+        }
+
+        // Populate profile data
+        function populateProfileData(data) {
+            // Header
+            document.getElementById('profile-name').textContent = `${data.firstname} ${data.lastname}`;
+            document.getElementById('member-id').textContent = data.member_id;
+            document.getElementById('profile-age').textContent = data.age;
+            document.getElementById('profile-barangay').textContent = data.barangay;
+            document.getElementById('profile-gender').textContent = data.gender;
+
+            // Personal info
+            document.getElementById('first-name').textContent = data.firstname;
+            document.getElementById('last-name').textContent = data.lastname;
+            document.getElementById('birthday').textContent = formatDate(data.birthday);
+            document.getElementById('age').textContent = data.age;
+            document.getElementById('gender').textContent = data.gender;
+            document.getElementById('contact').textContent = data.phone || 'Not provided';
+            document.getElementById('email').textContent = data.email;
+            document.getElementById('address').textContent = data.address;
+
+            // Digital ID
+            document.getElementById('id-name').textContent = `${data.firstname} ${data.lastname}`;
+            document.getElementById('id-member-id').textContent = data.member_id;
+        }
+
+        // Update navigation user info
+        function updateNavUser(data) {
+            document.getElementById('nav-user-name').textContent = `${data.firstname} ${data.lastname}`;
+        }
+
+        // Calculate age from birthday
+        function calculateAge(birthday) {
+            if (!birthday) return '';
+            const birthDate = new Date(birthday);
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+
+            return age;
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        // Show digital ID modal
+        function showDigitalIdModal() {
+            document.getElementById('digital-id-modal').style.display = 'flex';
+        }
+
+        // Hide digital ID modal
+        function hideDigitalIdModal() {
+            document.getElementById('digital-id-modal').style.display = 'none';
+        }
+
+        function updateQRCode(memberId) {
+            const box = document.getElementById('qr-code');
+            box.replaceChildren();
+            if (!window.QRCode || !memberId) {
+                box.textContent = 'QR unavailable';
+                return;
+            }
+            new QRCode(box, {
+                text: String(memberId),
+                width: 78,
+                height: 78,
+                correctLevel: QRCode.CorrectLevel.M
+            });
+        }
+
+        // Download digital ID
+        function downloadDigitalId() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+                alert('Could not prepare the ID card for download. Please try again.');
+                return;
+            }
+
+            const cardWidth = 600;
+            const cardHeight = 380;
+            canvas.width = cardWidth;
+            canvas.height = cardHeight;
+
+            const drawCard = (x, fill) => {
+                ctx.save();
+                ctx.shadowColor = 'rgba(19, 57, 42, 0.16)';
+                ctx.shadowBlur = 18;
+                ctx.shadowOffsetY = 8;
+                ctx.fillStyle = fill;
+                ctx.beginPath();
+                ctx.roundRect(x, 4, cardWidth, cardHeight - 12, 22);
+                ctx.fill();
+                ctx.restore();
+                ctx.strokeStyle = 'rgba(21, 75, 52, 0.2)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.roundRect(x + 1, 5, cardWidth - 2, cardHeight - 14, 21);
+                ctx.stroke();
+            };
+
+            const drawHeader = (x, logo) => {
+                const gradient = ctx.createLinearGradient(x, 0, x + cardWidth, 0);
+                gradient.addColorStop(0, '#124a35');
+                gradient.addColorStop(1, '#20794e');
+                ctx.save();
+                ctx.beginPath();
+                ctx.roundRect(x + 2, 6, cardWidth - 4, 88, [20, 20, 0, 0]);
+                ctx.clip();
+                ctx.fillStyle = gradient;
+                ctx.fillRect(x, 0, cardWidth, 96);
+                ctx.restore();
+
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(x + 48, 49, 27, 0, Math.PI * 2);
+                ctx.clip();
+                if (logo) ctx.drawImage(logo, x + 21, 22, 54, 54);
+                else {
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(x + 21, 22, 54, 54);
+                }
+                ctx.restore();
+                ctx.strokeStyle = 'rgba(255,255,255,.82)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(x + 48, 49, 27, 0, Math.PI * 2);
+                ctx.stroke();
+
+                ctx.fillStyle = '#fff';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'top';
+                ctx.font = '800 12px Arial';
+                ctx.fillText('SKALINGA YOUTH SERVICES', x + 88, 24);
+                ctx.font = 'bold 20px Arial';
+                ctx.fillText('SK San Antonio', x + 88, 43);
+                ctx.textAlign = 'right';
+                ctx.font = 'bold 10px Arial';
+                ctx.fillStyle = 'rgba(255,255,255,.9)';
+                ctx.fillText('MEMBER ID', x + 578, 44);
+            };
+
+            const drawHologram = (cx, cy, radius) => {
+                const foil = ctx.createConicGradient(0, cx, cy);
+                foil.addColorStop(0, '#d8f0d8');
+                foil.addColorStop(.2, '#b8d9ee');
+                foil.addColorStop(.4, '#f4d9f0');
+                foil.addColorStop(.6, '#f6eab8');
+                foil.addColorStop(.8, '#c2ead8');
+                foil.addColorStop(1, '#d8f0d8');
+                ctx.fillStyle = foil;
+                ctx.beginPath();
+                ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(255,255,255,.95)';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+                ctx.strokeStyle = 'rgba(34,95,73,.55)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.arc(cx, cy, radius - 5, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.fillStyle = '#225d49';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.font = '900 11px Arial';
+                ctx.fillText('SK', cx, cy);
+            };
+
+            const drawWatermark = (x, logoImage) => {
+                ctx.save();
+                ctx.globalAlpha = .055;
+                if (logoImage) {
+                    ctx.drawImage(logoImage, x + 185, 112, 230, 230);
+                }
+                ctx.restore();
+            };
+
+            const logo = new Image();
+            logo.onload = () => drawFront(logo);
+            logo.onerror = () => {
+                console.warn('Could not load the SK logo for the downloaded ID.');
+                drawFront(null);
+            };
+            logo.src = 'assets/images/sklogo.jpg';
+
+            function drawFront(logoImage) {
+                const x = 0;
+                drawCard(x, '#f7fbf8');
+                drawWatermark(x, logoImage);
+                drawHeader(x, logoImage);
+
+                ctx.fillStyle = '#288254';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'top';
+                ctx.font = 'bold 10px Arial';
+                ctx.fillText('YOUTH MEMBER', x + 30, 116);
+                ctx.fillStyle = '#18332b';
+                ctx.font = 'bold 23px Arial';
+                ctx.fillText(`${originalData.firstname || ''} ${originalData.lastname || ''}`.trim() || 'Youth Member', x + 30, 135, 340);
+
+                ctx.fillStyle = '#547263';
+                ctx.font = 'bold 9px Arial';
+                ctx.fillText('MEMBER NUMBER', x + 30, 191);
+                ctx.fillStyle = '#e0efe5';
+                ctx.beginPath();
+                ctx.roundRect(x + 26, 207, 260, 48, 8);
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(31,108,71,.22)';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                ctx.fillStyle = '#18332b';
+                ctx.font = 'bold 19px Courier New';
+                ctx.fillText(originalData.member_id || 'SK-XXXX-XXXX', x + 39, 220, 236);
+
+                ctx.fillStyle = '#64756e';
+                ctx.font = '11px Arial';
+                ctx.fillText(`Issued ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`, x + 30, 275);
+                ctx.fillStyle = '#e8f1eb';
+                ctx.beginPath();
+                ctx.roundRect(x + 410, 119, 142, 142, 12);
+                ctx.fill();
+                ctx.fillStyle = '#fff';
+                ctx.beginPath();
+                ctx.roundRect(x + 418, 127, 126, 126, 8);
+                ctx.fill();
+
+                const finish = () => {
+                    ctx.fillStyle = '#64756e';
+                    ctx.textAlign = 'center';
+                    ctx.font = 'bold 9px Arial';
+                    ctx.fillText('MEMBER REFERENCE ONLY', x + 481, 269);
+                    ctx.textAlign = 'center';
+                    ctx.fillStyle = '#64756e';
+                    ctx.font = 'bold 12px Arial';
+                    ctx.fillText('NOT FOR', x + 481, 176);
+                    ctx.fillText('VERIFICATION', x + 481, 196);
+                    drawHologram(x + 552, 310, 20);
+                    ctx.fillStyle = '#4f6a5d';
+                    ctx.font = 'bold 8px Arial';
+                    ctx.textAlign = 'left';
+                    ctx.fillText('PERSONAL IDENTIFICATION · PRESENT TO SK STAFF', x + 30, 337);
+                    downloadCanvas();
+                };
+
+                finish();
+            }
+
+            function downloadCanvas() {
+                try {
+                    const link = document.createElement('a');
+                    link.download = `SK-ID-${originalData.member_id || 'unknown'}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    showSuccessMessage('ID Card downloaded successfully!');
+                } catch (error) {
+                    console.error('Could not create the downloaded ID image:', error);
+                    alert('Could not download the ID card. Please try again.');
+                }
+            }
+        }
+
+        // Show email verification modal
+        function showEmailVerification() {
+            const email = document.getElementById('email-input').value.trim();
+            if (!email) {
+                alert('Please enter an email address first.');
+                return;
+            }
+
+            const modal = document.createElement('div');
+            modal.className = 'otp-modal';
+            modal.innerHTML = `
+                <div class="otp-content">
+                        <button class="otp-btn primary" onclick="verifyOtp()">Verify</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            document.getElementById('otp-1').focus();
+            setupOtpInputs();
+        }
+
+        function setupOtpInputs() {
+            const inputs = document.querySelectorAll('.otp-digit');
+            inputs.forEach((input, index) => {
+                input.addEventListener('input', (e) => {
+                    if (e.target.value && index < inputs.length - 1) {
+                        inputs[index + 1].focus();
+                    }
+                });
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                        inputs[index - 1].focus();
+                    }
+                });
+                input.addEventListener('paste', (e) => {
+                    e.preventDefault();
+                    const paste = e.clipboardData.getData('text');
+                    const digits = paste.replace(/\D/g, '').slice(0, 6);
+                    digits.split('').forEach((digit, i) => {
+                        if (inputs[i]) inputs[i].value = digit;
+                    });
+                    if (digits.length === 6) inputs[5].focus();
+                });
+            });
+        }
+
+        function verifyOtp() {
+            const inputs = document.querySelectorAll('.otp-digit');
+            const otp = Array.from(inputs).map(input => input.value).join('');
+            if (otp.length !== 6) {
+                alert('Please enter the complete 6-digit code.');
+                return;
+            }
+            const verifyBtn = document.querySelector('.otp-btn.primary');
+            verifyBtn.textContent = 'Verifying...';
+            verifyBtn.disabled = true;
+            setTimeout(() => {
+                const emailBtn = document.getElementById('verify-email-btn');
+                emailBtn.classList.add('verified');
+                emailBtn.innerHTML = '<svg class="icon" aria-hidden="true"><use href="#icon-check"></use></svg> Verified';
+                emailBtn.disabled = true;
+                closeOtpModal();
+                showSuccessMessage('Email verified successfully!');
+            }, 1500);
+        }
+
+        function closeOtpModal() {
+            const modal = document.querySelector('.otp-modal');
+            if (modal) modal.remove();
+        }
+
+        // Show success message
+        function showSuccessMessage(message) {
+            const successDiv = document.createElement('div');
+            successDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+                color: white;
+                padding: 16px 24px;
+                border-radius: 12px;
+                box-shadow: 0 8px 32px rgba(34, 139, 87, 0.3);
+                z-index: 3000;
+                font-weight: 600;
+                animation: slideIn 0.3s ease-out;
+            `;
+            successDiv.innerHTML = `<svg class="icon" aria-hidden="true"><use href="#icon-check"></use></svg> ${message}`;
+
+            document.body.appendChild(successDiv);
+
+            setTimeout(() => {
+                successDiv.style.animation = 'slideOut 0.3s ease-in';
+                setTimeout(() => {
+                    document.body.removeChild(successDiv);
+                }, 300);
+            }, 3000);
+        }
+
+        // Logout function - show confirmation modal
+        function logout() {
+            const logoutModal = document.getElementById('logoutModal');
+            logoutModal.style.display = 'flex';
+        }
+
+        // Handle logout confirmation
+        function confirmLogout() {
+            const logoutModal = document.getElementById('logoutModal');
+            logoutModal.style.display = 'none';
+            
+            fetch('api/logout.php', {
+                method: 'POST',
+                credentials: 'include'
+            }).then(() => {
+                window.location.href = 'login.html';
+            }).catch(() => {
+                window.location.href = 'login.html';
+            });
+        }
+
+        // Handle logout cancel
+        function cancelLogout() {
+            const logoutModal = document.getElementById('logoutModal');
+            logoutModal.style.display = 'none';
+        }
+
+        // Add slide animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+
+    <!-- Professional Loader System -->
+    <script src="js/auth-guard.js" data-roles="youth"></script>
+    <script src="js/youth-nav.js?v=20261021-3"></script>
+    <script src="assets/js/loader.js?v=3"></script>
+</body>
+</html>

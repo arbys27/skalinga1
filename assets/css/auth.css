@@ -1,0 +1,662 @@
+/* assets/css/auth.css */
+/* ────────────────────────────────────────────────
+   Shared Auth Layout (Login + Register Youth)
+───────────────────────────────────────────────── */
+
+/* Card / Container Base (used in simple login page) */
+.card {
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(14px);
+  border-radius: 24px;
+  width: 100%;
+  max-width: 480px;
+  padding: 40px;
+  box-shadow: 0 12px 48px var(--shadow);
+  border: 1px solid var(--border-light);
+}
+
+/* Two-column layout (Register page) */
+.left-side {
+  flex: 1;
+  min-width: 40%;
+  background: linear-gradient(135deg, rgba(34,139,87,0.15), rgba(93,173,226,0.15));
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  color: #333;
+}
+
+.right-side {
+  flex: 1.3;
+  padding: 48px 40px;
+  background: white;
+}
+
+.logos-row,
+.header-logos {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.logos-row img,
+.header-logos img,
+.official-logo {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+  border-radius: 50%;
+  border: 3px solid white;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+
+.left-side h2 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--primary);
+  margin-bottom: 12px;
+}
+
+.left-side p {
+  font-size: 15px;
+  line-height: 1.5;
+  max-width: 320px;
+  margin-bottom: 32px;
+}
+
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  width: 100%;
+  max-width: 360px;
+}
+
+.image-grid img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 16px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+  border: 2px solid white;
+}
+
+/* Form Elements (shared between login & register) */
+label {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 8px;
+  display: block;
+  color: #333;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 14px 18px;
+  border: 2px solid var(--border-light);
+  border-radius: 12px;
+  font-size: 15px;
+  margin-bottom: 20px;
+  background: rgba(255,255,255,0.9);
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(34,139,87,0.18);
+}
+
+.privacy {
+  margin: 20px 0 28px;
+  font-size: 14px;
+  color: #444;
+  line-height: 1.5;
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  margin-top: 3px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.extra {
+  text-align: center;
+  margin-top: 28px;
+  font-size: 14.5px;
+  color: #555;
+}
+
+.extra a {
+  color: var(--pink);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* Admin-specific link (youth login page) */
+.admin-section {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-light);
+  text-align: center;
+  font-size: 14.5px;
+  color: #555;
+}
+
+.admin-section p {
+  margin-bottom: 12px;
+}
+
+.admin-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--pink);
+  font-weight: 700;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.admin-link:hover {
+  color: #e04f7e;
+}
+
+.admin-link svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  flex-shrink: 0;
+}
+
+/* ────────────────────────────────────────────────
+   Admin Login Page Specific (login-admin.html)
+───────────────────────────────────────────────── */
+
+.login-box {
+  background: var(--card-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 460px;
+  padding: 48px 40px;
+  box-shadow: 0 12px 48px rgba(255, 107, 157, 0.35);
+  border: 1px solid rgba(255, 179, 207, 0.6);
+}
+
+.logo-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  justify-content: center;
+  margin-bottom: 32px;
+}
+
+.logo-img {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid white;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.btn-login {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, var(--pink), var(--pink-dark));
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s;
+  box-shadow: 0 6px 20px rgba(255,107,157,0.3);
+}
+
+.btn-login:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(255,107,157,0.45);
+}
+
+.admin-notice {
+  text-align: center;
+  margin-top: 28px;
+  font-size: 14px;
+  color: #555;
+}
+
+.admin-notice a {
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.admin-notice a:hover {
+  color: var(--pink);
+}
+
+/* ────────────────────────────────────────────────
+   Responsive Adjustments (shared for all auth pages)
+───────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .container {
+    flex-direction: column;
+    max-width: 500px;
+  }
+  .left-side,
+  .right-side {
+    padding: 32px 24px;
+  }
+  .logos-row,
+  .header-logos,
+  .logo-row {
+    gap: 16px;
+  }
+  .logos-row img,
+  .header-logos img,
+  .official-logo,
+  .logo-img {
+    width: 70px;
+    height: 70px;
+  }
+}
+
+@media (max-width: 480px) {
+  .card,
+  .login-box {
+    padding: 32px 24px;
+  }
+}
+
+/* Side-by-side Birthday + Age */
+.form-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 0;
+}
+
+.form-group.half {
+  flex: 1;
+}
+
+.form-group.half label {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.form-group.half input {
+  width: 100%;
+}
+
+.form-group {
+  margin-bottom: 0;
+}
+
+/* Contact and OTP input with verify button */
+.contact-input-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.contact-input-group input {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.btn-verify {
+  width: 100%;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, var(--pink), var(--pink-dark));
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s;
+  box-shadow: 0 6px 20px rgba(255,107,157,0.3);
+}
+
+.btn-verify:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(255,107,157,0.45);
+}
+
+.btn-verify:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-verify:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* Icon-only verify button */
+.btn-icon-verify {
+  width: auto;
+  padding: 12px 20px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s;
+  box-shadow: 0 6px 20px rgba(34,139,87,0.3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.btn-icon-verify:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(34,139,87,0.45);
+  background: #1a6d47;
+}
+
+.btn-icon-verify:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-icon-verify:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* Status Messages for OTP */
+.status-message {
+  display: none;
+  font-size: 13px;
+  margin-top: 6px;
+  margin-bottom: 20px;
+  font-weight: 500;
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+.status-message.success {
+  display: block;
+  color: #2e7d32;
+  background: #e8f5e9;
+  border-left: 3px solid #2e7d32;
+}
+
+.status-message.error {
+  display: block;
+  color: #d32f2f;
+  background: #ffebee;
+  border-left: 3px solid #d32f2f;
+}
+
+/* OTP Section */
+#otp-section {
+  margin-bottom: 20px;
+}
+
+/* Password fields spacing */
+input[type="password"] {
+  margin-bottom: 8px;
+}
+
+.password-warning {
+  display: none;
+  color: #d32f2f;
+  font-size: 13px;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+input.error {
+  border: 2px solid #d32f2f;
+  animation: shake 0.3s;
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  50% { transform: translateX(3px); }
+  75% { transform: translateX(-3px); }
+  100% { transform: translateX(0); }
+}
+
+/* ────────────────────────────────────────────────
+   Password Reset Form Styles
+───────────────────────────────────────────────── */
+
+#form-reset {
+  animation: slideIn 0.3s ease-out;
+}
+
+#form-login {
+  animation: slideOut 0.3s ease-in reverse;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOut {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+}
+
+.reset-step {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.step-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.step-description {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 24px;
+}
+
+/* OTP Input Group */
+.otp-input-group {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.otp-input-field {
+  width: 50px !important;
+  height: 50px !important;
+  padding: 0 !important;
+  margin-bottom: 0 !important;
+  text-align: center;
+  font-size: 24px;
+  font-weight: 600;
+  border: 2px solid var(--border-light) !important;
+  border-radius: 10px;
+  background: white !important;
+}
+
+.otp-input-field:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 4px rgba(34,139,87,0.18) !important;
+}
+
+.otp-input-field::placeholder {
+  color: #ccc;
+}
+
+/* Resend Section */
+.resend-section {
+  text-align: center;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-light);
+}
+
+.btn-secondary {
+  padding: 12px 24px;
+  background: transparent;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  background: rgba(34,139,87,0.1);
+  transform: translateY(-2px);
+}
+
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Reset Footer */
+.reset-footer {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.reset-footer a {
+  font-size: 14px;
+  color: var(--primary);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.reset-footer a:hover {
+  color: #1a6d47;
+  text-decoration: underline;
+}
+
+/* Success State */
+#reset-success {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+#reset-success h2 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+#reset-success p {
+  font-size: 15px;
+  color: var(--text-gray);
+  margin-bottom: 2rem;
+}
+
+/* Button Styles */
+.btn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, var(--primary-green), #1a6d47);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s;
+  box-shadow: 0 6px 20px rgba(34,139,87,0.3);
+  margin-top: 8px;
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(34,139,87,0.45);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* Error Message */
+.error-message {
+  color: #d32f2f;
+  font-size: 14px;
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #ffebee;
+  border-radius: 8px;
+  border-left: 4px solid #d32f2f;
+  display: none;
+}
+
+.error-message.show {
+  display: block;
+}
+
+/* Success Message */
+.success-message {
+  color: #2e7d32;
+  font-size: 14px;
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #e8f5e9;
+  border-radius: 8px;
+  border-left: 4px solid #2e7d32;
+  display: none;
+}
+
+.success-message.show {
+  display: block;
+}

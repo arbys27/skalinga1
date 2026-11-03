@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SKalinga - Incidents</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/x-icon" href="/SKalinga/assets/icons/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/SKalinga/assets/icons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/SKalinga/assets/icons/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/SKalinga/assets/icons/apple-touch-icon.png">
+<link rel="manifest" href="/SKalinga/assets/icons/site.webmanifest">
+<meta name="msapplication-config" content="/SKalinga/assets/icons/browserconfig.xml">
+<meta name="theme-color" content="#FF6B9D">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="assets/css/dashboard.css">
+<link rel="stylesheet" href="assets/css/admin-theme.css">
+<link rel="stylesheet" href="assets/css/loader.css?v=3">
+<style>
+/* layout fix: let the content column shrink so wide tables scroll inside their card */
+.main-content{min-width:0}
+.dashboard-content{min-width:0;max-width:100%}
+.tw{min-width:0;max-width:100%}
+.im,.im-modal{--g:#228B57;--gd:#0F4D31;--mint:#A8E6CF;--pk:#FF6B9D;--pkd:#E04F7E;--ink:#16303F;--mu:#5F7788;--ln:#E3ECE7;--mono:"JetBrains Mono",ui-monospace,monospace}
+.im *,.im-modal *{box-sizing:border-box}
+.im [hidden],.im-modal [hidden]{display:none!important}
+.im :focus-visible,.im-modal :focus-visible{outline:3px solid var(--pkd);outline-offset:2px}
+.mono{font-family:var(--mono);font-size:.92em}
+
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:18px}
+@media(min-width:900px){.stats{grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}}
+.stat{display:flex;align-items:center;gap:14px;padding:16px 18px;border:1px solid var(--ln);border-radius:20px;background:#fff;box-shadow:0 2px 12px rgba(34,139,87,.06)}
+.stat .si{display:grid;place-items:center;width:46px;height:46px;border-radius:15px;background:#e9f7ef;color:var(--g);font-size:18px;flex:none}
+.stat.pink .si{background:#ffe9f1;color:var(--pkd)}.stat.amber .si{background:#fff4d6;color:#a86a00}.stat.sky .si{background:#e3f1fb;color:#14537e}
+.stat b{display:block;font-size:26px;line-height:1;letter-spacing:-.03em;color:var(--ink)}
+.stat span{display:block;margin-top:4px;color:var(--mu);font-size:12.5px;font-weight:600}
+
+.bar{display:grid;gap:12px;margin-bottom:14px}
+@media(min-width:900px){.bar{grid-template-columns:minmax(0,1fr) auto auto;align-items:center}}
+.find{position:relative;display:block;max-width:460px}
+.find i{position:absolute;left:16px;top:50%;margin-top:-7px;color:var(--mu);font-size:14px;pointer-events:none}
+.find input,.sel{width:100%;min-height:46px;border:1.5px solid var(--ln);border-radius:14px;background:#fff;font:inherit;color:var(--ink)}
+.find input{padding:0 16px 0 42px}.sel{padding:0 14px;min-width:170px;cursor:pointer}
+.find input:focus,.sel:focus{outline:none;border-color:var(--g);box-shadow:0 0 0 4px rgba(34,139,87,.14)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 20px;border:0;border-radius:14px;font:600 14px inherit;font-family:inherit;cursor:pointer;transition:transform .15s,background .15s}
+.btn:active{transform:scale(.97)}
+.btn.pink{background:var(--pk);color:var(--ink);box-shadow:0 8px 20px rgba(255,107,157,.35)}.btn.pink:hover{background:#ff82ae}
+.btn.green{background:var(--g);color:#fff}.btn.green:hover{background:var(--gd)}
+.btn.soft{background:#f1f6f3;color:var(--ink)}.btn.soft:hover{background:#e3ece7}
+.btn.red{background:#d64545;color:#fff}.btn.red:hover{background:#b93636}
+.btn:disabled{opacity:.6;cursor:wait}
+.spin i{animation:sp .8s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
+.chips{display:flex;gap:8px;overflow-x:auto;margin-bottom:14px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 14px;border:1.5px solid var(--ln);border-radius:999px;background:#fff;color:var(--ink);font:600 13px inherit;font-family:inherit;cursor:pointer}
+.chip em{font-style:normal;min-width:22px;padding:1px 7px;border-radius:999px;background:#eef3f0;color:var(--mu);font-size:11.5px;text-align:center}
+.chip[aria-pressed="true"]{border-color:var(--g);background:var(--g);color:#fff}.chip[aria-pressed="true"] em{background:rgba(255,255,255,.22);color:#fff}
+
+.tw{border:1px solid var(--ln);border-radius:20px;background:#fff;overflow:hidden;box-shadow:0 2px 12px rgba(34,139,87,.06)}
+.tw .scroll{overflow-x:auto}
+table.it{width:100%;border-collapse:collapse;font-size:14px}
+.it th{padding:13px 16px;background:#f4fbf7;color:var(--mu);font-size:11.5px;font-weight:700;letter-spacing:.06em;text-align:left;text-transform:uppercase;white-space:nowrap;border-bottom:1px solid var(--ln)}
+.it td{padding:14px 16px;border-bottom:1px solid #eef3f0;color:var(--ink);vertical-align:middle}
+.it tbody tr:last-child td{border-bottom:0}.it tbody tr:hover{background:#fafdfb}
+.it tr.emg td:first-child{box-shadow:inset 4px 0 0 var(--pkd)}
+.who{display:flex;align-items:center;gap:12px}
+.av{display:grid;place-items:center;width:40px;height:40px;border-radius:13px;background:#e9f7ef;color:var(--g);font-weight:700;flex:none}
+.who b{display:block;font-weight:600}.who span{color:var(--mu);font-size:12.5px}
+.cat{text-transform:capitalize;font-weight:600}
+.loc{max-width:200px;color:var(--mu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap;text-transform:capitalize}
+.pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.pill.pending{background:#fff4d6;color:#7a5600}.pill.in_review{background:#e3f1fb;color:#14537e}.pill.under_action{background:#e0f7f1;color:#0b6b57}
+.pill.resolved{background:#dff5e8;color:var(--gd)}.pill.closed{background:#eceff1;color:#4a5961}
+.pill.low{background:#dff5e8;color:var(--gd)}.pill.medium{background:#e3f1fb;color:#14537e}.pill.high{background:#fff0d1;color:#8a4b00}
+.pill.emergency{background:var(--pkd);color:#fff}.pill.emergency::before{background:#fff;animation:pu 1.2s infinite}
+@keyframes pu{50%{opacity:.25}}
+.ab{display:flex;gap:6px}
+.ib{display:grid;place-items:center;width:38px;height:38px;border:0;border-radius:12px;background:#f1f6f3;color:var(--ink);cursor:pointer;transition:background .15s,color .15s}
+.ib:hover{background:var(--g);color:#fff}.ib.del:hover{background:#d64545;color:#fff}
+.empty{padding:44px 20px;text-align:center;color:var(--mu)}
+.empty i{display:block;margin-bottom:10px;font-size:30px;color:#b9d9c8}
+@media(max-width:860px){
+  .it thead{display:none}
+  .it,.it tbody,.it tr,.it td{display:block;width:100%}
+  .it tr{padding:14px 16px;border-bottom:1px solid var(--ln)}.it tr:last-child{border-bottom:0}
+  .it tr.emg td:first-child{box-shadow:none}.it tr.emg{box-shadow:inset 4px 0 0 var(--pkd)}
+  .it td{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:5px 0;border:0;text-align:right}
+  .it td::before{content:attr(data-l);color:var(--mu);font-size:12px;font-weight:700;text-align:left;flex:none}
+  .it td.nl::before{display:none}.it td.ab-td{justify-content:flex-end;padding-top:10px}.loc{max-width:60%}
+}
+
+.im-modal{position:fixed;inset:0;z-index:9500;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(15,77,49,.55);backdrop-filter:blur(6px);opacity:0;visibility:hidden;transition:opacity .2s,visibility .2s;font-family:inherit}
+.im-modal.on{opacity:1;visibility:visible}
+.box{position:relative;width:min(100%,520px);max-height:92vh;overflow-y:auto;padding:26px;border-radius:24px;background:#fff;color:var(--ink);transform:translateY(12px);transition:transform .25s}
+.im-modal.on .box{transform:none}.box.sm{width:min(100%,420px)}.box.wide{width:min(100%,860px)}
+.box h2{margin:0 44px 6px 0;font-size:22px;letter-spacing:-.02em}
+.box>p.lead{margin:0 0 16px;color:var(--mu);font-size:14px}
+.cl{position:absolute;top:14px;right:14px;display:grid;place-items:center;width:40px;height:40px;border:1px solid var(--ln);border-radius:50%;background:#fff;color:var(--mu);cursor:pointer;z-index:2}.cl:hover{color:var(--pkd)}
+.cols{display:grid;gap:22px;margin-top:14px}
+@media(min-width:780px){.cols{grid-template-columns:1.35fr 1fr}}
+.alert{display:flex;gap:10px;align-items:center;margin:12px 44px 0 0;padding:12px 14px;border-radius:14px;background:#ffe3ec;color:#a02350;font-weight:700;font-size:14px}
+.mem{display:flex;gap:12px;align-items:center;padding:14px;border-radius:18px;background:#f4fbf7;border:1.5px solid #cfe9db;margin-bottom:14px}
+.mem .av{width:48px;height:48px;border-radius:15px;background:var(--g);color:#fff;font-size:19px}
+.mem b{display:block}.mem span{color:var(--mu);font-size:13px}
+.det{margin:0}
+.det div{display:flex;justify-content:space-between;gap:16px;padding:9px 0;border-bottom:1px dashed var(--ln);font-size:14px}
+.det dt{color:var(--mu)}.det dd{margin:0;font-weight:600;text-align:right;overflow-wrap:anywhere}.det a{color:var(--g)}
+.h3{margin:18px 0 8px;font-size:13px;font-weight:700;color:var(--mu);letter-spacing:.06em;text-transform:uppercase}
+.text{margin:0;padding:14px;border-radius:14px;background:#f8faf9;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6;font-size:14.5px}
+.notes{padding:12px 14px;border-left:4px solid var(--g);border-radius:10px;background:#f0f9f4;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px}
+.photos{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
+.photos button{position:relative;aspect-ratio:1;padding:0;border:0;border-radius:14px;overflow:hidden;background:#e9f7ef;cursor:pointer}
+.photos img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .25s}
+.photos button:hover img{transform:scale(1.06)}
+.photos .bad{display:grid;place-items:center;height:100%;color:var(--mu);font-size:12px;padding:6px;text-align:center}
+.upd{padding:18px;border:1.5px solid var(--ln);border-radius:20px;background:#fff;align-self:start}
+.upd h3{margin:0 0 12px;font-size:15px}
+.upd label{display:block;margin:0 0 6px;font-weight:600;font-size:13px}
+.upd select,.upd textarea{width:100%;padding:10px 14px;border:1.5px solid var(--ln);border-radius:12px;background:#fff;font:inherit;color:var(--ink)}
+.upd select{min-height:46px;margin-bottom:12px}.upd textarea{min-height:110px;resize:vertical}
+.upd select:focus,.upd textarea:focus{outline:none;border-color:var(--g);box-shadow:0 0 0 4px rgba(34,139,87,.14)}
+.upd .btn{width:100%;margin-top:12px}
+.fa-end{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+.lb{background:rgba(8,20,14,.95);z-index:10000}
+.lb img{max-width:92vw;max-height:84vh;object-fit:contain;border-radius:12px}
+.lb .nv{position:absolute;top:50%;margin-top:-26px;display:grid;place-items:center;width:52px;height:52px;border:0;border-radius:50%;background:rgba(255,255,255,.16);color:#fff;font-size:18px;cursor:pointer}
+.lb .nv:hover{background:var(--pk);color:var(--ink)}.lb .prev{left:18px}.lb .next{right:18px}
+.lb .cl{top:18px;right:18px;background:rgba(255,255,255,.16);border-color:transparent;color:#fff;width:46px;height:46px}
+.lb .cnt{position:absolute;bottom:20px;left:0;right:0;text-align:center;color:#fff;font-size:13px;font-weight:600}
+#toastContainer{position:fixed;z-index:10001;right:20px;bottom:20px;display:grid;gap:10px;width:min(360px,calc(100% - 40px))}
+.toast{padding:14px 16px;border-radius:14px;background:#fff;border-left:4px solid var(--g);box-shadow:0 12px 32px rgba(22,48,63,.2);font-size:14px;font-weight:600}
+.toast.error{border-color:#d64545}.toast.warning{border-color:#e0a100}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="app-container">
+  <aside class="sidebar" id="adminSidebar"></aside>
+  <main class="main-content">
+    <header class="top-header">
+      <div class="header-left"><h2>Incidents</h2><p id="dashboard-datetime">Loading date and time...</p></div>
+      <div class="header-right"><div class="user-profile-card"><div class="user-avatar-new" id="userAvatarInitials">--</div><div class="user-details"><h4 id="userFullName">Loading...</h4><span class="user-role-badge" id="userRole">Administrator</span></div></div></div>
+    </header>
+
+    <div class="dashboard-content im">
+      <section class="stats" aria-label="Incident summary">
+        <div class="stat sky"><span class="si"><i class="fas fa-flag"></i></span><div><b id="sTotal">0</b><span>Total reports</span></div></div>
+        <div class="stat amber"><span class="si"><i class="fas fa-hourglass-half"></i></span><div><b id="sPending">0</b><span>Pending</span></div></div>
+        <div class="stat pink"><span class="si"><i class="fas fa-triangle-exclamation"></i></span><div><b id="sUrgent">0</b><span>High or emergency, still open</span></div></div>
+        <div class="stat"><span class="si"><i class="fas fa-circle-check"></i></span><div><b id="sDone">0</b><span>Resolved or closed</span></div></div>
+      </section>
+
+      <div class="bar">
+        <label class="find"><span style="position:absolute;width:1px;height:1px;overflow:hidden">Search incidents</span><i class="fas fa-magnifying-glass"></i><input type="search" id="searchInput" placeholder="Search by member name, ID or location" autocomplete="off"></label>
+        <select id="filterUrgency" class="sel" aria-label="Filter by urgency">
+          <option value="">All urgency</option><option value="emergency">Emergency</option><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option>
+        </select>
+        <button class="btn green" id="refreshBtn" type="button"><i class="fas fa-rotate"></i><span>Refresh</span></button>
+      </div>
+
+      <div class="chips" id="statusChips" role="group" aria-label="Filter by status">
+        <button class="chip" type="button" data-s="" aria-pressed="true">All<em id="cAll">0</em></button>
+        <button class="chip" type="button" data-s="pending" aria-pressed="false">Pending<em id="cPending">0</em></button>
+        <button class="chip" type="button" data-s="in_review" aria-pressed="false">In review<em id="cReview">0</em></button>
+        <button class="chip" type="button" data-s="under_action" aria-pressed="false">Under action<em id="cAction">0</em></button>
+        <button class="chip" type="button" data-s="resolved" aria-pressed="false">Resolved<em id="cResolved">0</em></button>
+        <button class="chip" type="button" data-s="closed" aria-pressed="false">Closed<em id="cClosed">0</em></button>
+      </div>
+
+      <div class="tw"><div class="scroll">
+        <table class="it admin-table" id="incidentsTable">
+          <thead><tr><th>ID</th><th>Reported by</th><th>Category</th><th>Location</th><th>Urgency</th><th>Status</th><th>Submitted</th><th>Actions</th></tr></thead>
+          <tbody id="incidentsTableBody"></tbody>
+        </table>
+      </div></div>
+    </div>
+  </main>
+</div>
+
+<!-- Details -->
+<div class="im-modal" id="incidentDetailModal" role="dialog" aria-modal="true" aria-labelledby="detTitle">
+  <div class="box wide">
+    <button class="cl" id="closeDetailModal" type="button" aria-label="Close"><i class="fas fa-xmark"></i></button>
+    <h2 id="detTitle">Incident details</h2>
+    <div id="emgAlert" class="alert" hidden><i class="fas fa-triangle-exclamation"></i>Emergency report. Please respond right away.</div>
+    <div class="cols">
+      <div id="incidentDetailsContent"></div>
+      <div class="upd">
+        <h3>Update status and notes</h3>
+        <label for="statusSelect">Status</label>
+        <select id="statusSelect"><option value="pending">Pending</option><option value="in_review">In review</option><option value="under_action">Under action</option><option value="resolved">Resolved</option><option value="closed">Closed</option></select>
+        <label for="adminNotesInput">Admin notes</label>
+        <textarea id="adminNotesInput" placeholder="Add admin notes..."></textarea>
+        <button id="saveStatusBtn" class="btn pink" type="button"><i class="fas fa-floppy-disk"></i>Save status and notes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div class="im-modal lb" id="photoLightbox" role="dialog" aria-modal="true" aria-label="Photo viewer">
+  <button class="cl" id="closeLightbox" type="button" aria-label="Close photo"><i class="fas fa-xmark"></i></button>
+  <button class="nv prev" id="lbPrev" type="button" aria-label="Previous photo"><i class="fas fa-chevron-left"></i></button>
+  <img id="lightboxImage" src="" alt="Incident photo">
+  <button class="nv next" id="lbNext" type="button" aria-label="Next photo"><i class="fas fa-chevron-right"></i></button>
+  <div class="cnt" id="lbCount"></div>
+</div>
+
+<!-- Confirm -->
+<div class="im-modal" id="confirmationModal" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle">
+  <div class="box sm">
+    <h2 id="confirmTitle">Confirm action</h2><p class="lead" id="confirmMessage"></p>
+    <div class="fa-end"><button id="confirmCancelBtn" class="btn soft" type="button">Cancel</button><button id="confirmOkBtn" class="btn red" type="button"><i class="fas fa-trash"></i>Delete</button></div>
+  </div>
+</div>
+
+<div id="toastContainer" aria-live="polite"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+const safeUrl=u=>{const s=String(u||'').trim();return !!s&&!/^\s*(javascript|data|vbscript):/i.test(s)};
+let incidentsData=[],statusFilter='',current=null,photos=[],photoIdx=0;
+const STATUS_LABEL={pending:'Pending',in_review:'In review',under_action:'Under action',resolved:'Resolved',closed:'Closed'};
+const label=s=>STATUS_LABEL[s]||String(s||'').replace(/_/g,' ');
+const open=i=>i.status!=='resolved'&&i.status!=='closed';
+
+function notify(msg,type='success'){
+  if(typeof showAlert==='function'){showAlert(msg,type);return}
+  const t=document.createElement('div');t.className='toast '+type;t.textContent=msg;$('toastContainer').appendChild(t);setTimeout(()=>t.remove(),4000);
+}
+const openM=id=>{$(id).classList.add('on');document.body.style.overflow='hidden'};
+const closeM=id=>{$(id).classList.remove('on');if(!document.querySelector('.im-modal.on'))document.body.style.overflow=''};
+$('closeDetailModal').onclick=()=>closeM('incidentDetailModal');
+document.querySelectorAll('.im-modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeM(m.id)}));
+addEventListener('keydown',e=>{
+  if(e.key==='Escape'){const top=[...document.querySelectorAll('.im-modal.on')].pop();if(top)closeM(top.id)}
+  if($('photoLightbox').classList.contains('on')){if(e.key==='ArrowLeft')stepPhoto(-1);if(e.key==='ArrowRight')stepPhoto(1)}
+});
+function showConfirm(message,onConfirm){
+  $('confirmMessage').textContent=message;openM('confirmationModal');$('confirmCancelBtn').focus();
+  $('confirmOkBtn').onclick=()=>{closeM('confirmationModal');if(onConfirm)onConfirm()};
+  $('confirmCancelBtn').onclick=()=>closeM('confirmationModal');
+}
+function updateDashboardDateTime(){
+  $('dashboard-datetime').textContent=new Date().toLocaleString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true});
+}
+setInterval(updateDashboardDateTime,30000);updateDashboardDateTime();
+
+/* ---- data ---- */
+async function loadIncidents(){
+  try{
+    const r=await fetch(`api/get_incidents.php?t=${Date.now()}`,{cache:'no-store'}),d=await r.json();
+    if(d.success){incidentsData=d.data||[];filterIncidents()}else notify('Error loading incidents: '+(d.error||'Unknown error'),'error');
+  }catch(e){console.error('Error loading incidents:',e);notify('Failed to load incidents','error')}
+}
+const fullName=i=>`${i.firstname||''} ${i.lastname||''}`.trim()||'Unknown member';
+const dShort=d=>{const x=new Date(d);return isNaN(x)?'—':x.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})};
+
+/* ---- render ---- */
+function renderStats(){
+  const n=s=>incidentsData.filter(i=>i.status===s).length;
+  $('sTotal').textContent=incidentsData.length;$('sPending').textContent=n('pending');
+  $('sUrgent').textContent=incidentsData.filter(i=>open(i)&&(i.urgency==='high'||i.urgency==='emergency')).length;
+  $('sDone').textContent=n('resolved')+n('closed');
+  $('cAll').textContent=incidentsData.length;$('cPending').textContent=n('pending');$('cReview').textContent=n('in_review');
+  $('cAction').textContent=n('under_action');$('cResolved').textContent=n('resolved');$('cClosed').textContent=n('closed');
+}
+function renderIncidentsTable(list){
+  const tb=$('incidentsTableBody');
+  if(!list.length){tb.innerHTML=`<tr><td colspan="8" class="empty nl"><i class="fas fa-flag"></i>No incidents found</td></tr>`;return}
+  tb.innerHTML=list.map(i=>{
+    const name=fullName(i),id=esc(i.id),u=String(i.urgency||'low');
+    return `<tr class="${u==='emergency'&&open(i)?'emg':''}">
+      <td data-l="ID" class="mono" style="font-weight:600">#${id}</td>
+      <td data-l="Reported by" class="nl"><div class="who"><span class="av">${esc(name.charAt(0).toUpperCase())}</span><div><b>${esc(name)}</b><span class="mono">${esc(i.member_id)}</span></div></div></td>
+      <td data-l="Category" class="cat">${esc(String(i.category||'').replace(/_/g,' '))}</td>
+      <td data-l="Location"><div class="loc" title="${esc(i.location)}">${esc(i.location)}</div></td>
+      <td data-l="Urgency"><span class="pill ${esc(u)}">${esc(u)}</span></td>
+      <td data-l="Status"><span class="pill ${esc(i.status)}">${esc(label(i.status))}</span></td>
+      <td data-l="Submitted">${esc(dShort(i.submitted_date))}</td>
+      <td class="ab-td nl"><div class="ab">
+        <button class="ib" type="button" data-act="view" data-id="${id}" aria-label="View details" title="View details"><i class="fas fa-eye"></i></button>
+        <button class="ib del" type="button" data-act="delete" data-id="${id}" aria-label="Delete incident" title="Delete incident"><i class="fas fa-trash"></i></button></div></td></tr>`;
+  }).join('');
+}
+function filterIncidents(){
+  renderStats();
+  const q=$('searchInput').value.toLowerCase().trim(),urg=$('filterUrgency').value;
+  renderIncidentsTable(incidentsData.filter(i=>`${i.id} ${i.firstname} ${i.lastname} ${i.member_id} ${i.location} ${i.category}`.toLowerCase().includes(q)&&(!statusFilter||i.status===statusFilter)&&(!urg||i.urgency===urg)));
+}
+$('searchInput').addEventListener('input',filterIncidents);
+$('filterUrgency').addEventListener('change',filterIncidents);
+$('statusChips').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;statusFilter=b.dataset.s;document.querySelectorAll('.chip').forEach(x=>x.setAttribute('aria-pressed',x===b));filterIncidents()});
+$('incidentsTableBody').addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;({view:viewIncidentDetail,delete:deleteIncident})[b.dataset.act](b.dataset.id)});
+$('refreshBtn').onclick=async()=>{const b=$('refreshBtn');b.classList.add('spin');b.disabled=true;await loadIncidents();b.classList.remove('spin');b.disabled=false};
+
+/* ---- details ---- */
+function parsePhotos(raw){
+  if(!raw)return[];
+  try{const p=JSON.parse(raw);if(Array.isArray(p))return p.filter(safeUrl);if(typeof p==='string')return safeUrl(p)?[p]:[]}catch(e){}
+  return safeUrl(raw)?[raw]:[];
+}
+function viewIncidentDetail(id){
+  const i=incidentsData.find(x=>String(x.id)===String(id));if(!i)return notify('Incident not found','error');
+  current=i;photos=parsePhotos(i.photo_path);
+  const known=i.firstname&&i.firstname!=='Unknown',name=known?fullName(i):`Unknown member (${i.member_id})`;
+  const when=(()=>{const x=new Date(i.submitted_date);return isNaN(x)?'—':x.toLocaleString('en-US',{month:'long',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})})();
+  const tel=String(i.phone||'').replace(/[^\d+]/g,'');
+  $('emgAlert').hidden=!(i.urgency==='emergency'&&open(i));
+  $('incidentDetailsContent').innerHTML=`
+    <div class="mem"><span class="av">${esc((i.firstname||'?').charAt(0).toUpperCase())}</span><div><b>${esc(name)}</b><span class="mono">${esc(i.member_id)}</span></div></div>
+    <dl class="det">
+      <div><dt>Incident ID</dt><dd class="mono">#${esc(i.id)}</dd></div>
+      <div><dt>Contact</dt><dd>${tel?`<a href="tel:${esc(tel)}">${esc(i.phone)}</a>`:'—'}</dd></div>
+      <div><dt>Address</dt><dd>${esc(i.address||'—')}</dd></div>
+      <div><dt>Category</dt><dd style="text-transform:capitalize">${esc(String(i.category||'').replace(/_/g,' '))}</dd></div>
+      <div><dt>Location</dt><dd>${esc(i.location||'—')}</dd></div>
+      <div><dt>Urgency</dt><dd><span class="pill ${esc(i.urgency)}">${esc(i.urgency)}</span></dd></div>
+      <div><dt>Status</dt><dd><span class="pill ${esc(i.status)}">${esc(label(i.status))}</span></dd></div>
+      <div><dt>Submitted</dt><dd>${esc(when)}</dd></div>
+    </dl>
+    <div class="h3">Description</div><p class="text">${esc(i.description||'No description provided.')}</p>
+    ${photos.length?`<div class="h3">Photos (${photos.length})</div><div class="photos">${photos.map((p,n)=>`<button type="button" data-photo="${n}" aria-label="View photo ${n+1}"><img src="${esc(p)}" alt="" loading="lazy"></button>`).join('')}</div>`:''}
+    ${i.admin_notes?`<div class="h3">Admin notes</div><div class="notes">${esc(i.admin_notes)}</div>`:''}`;
+  $('statusSelect').value=i.status;$('adminNotesInput').value=i.admin_notes||'';
+  openM('incidentDetailModal');
+}
+$('incidentDetailsContent').addEventListener('click',e=>{const b=e.target.closest('[data-photo]');if(b)openPhotoLightbox(Number(b.dataset.photo))});
+document.addEventListener('error',e=>{
+  const t=e.target;if(t.tagName==='IMG'&&t.closest('.photos')){const d=document.createElement('div');d.className='bad';d.textContent='Photo unavailable';t.replaceWith(d)}
+},true);
+
+/* ---- lightbox ---- */
+function showPhoto(){
+  $('lightboxImage').src=photos[photoIdx];$('lbCount').textContent=`${photoIdx+1} / ${photos.length}`;
+  $('lbPrev').hidden=$('lbNext').hidden=photos.length<2;
+}
+function openPhotoLightbox(n){photoIdx=n;showPhoto();openM('photoLightbox')}
+function stepPhoto(d){if(photos.length<2)return;photoIdx=(photoIdx+d+photos.length)%photos.length;showPhoto()}
+$('closeLightbox').onclick=()=>closeM('photoLightbox');
+$('lbPrev').onclick=()=>stepPhoto(-1);$('lbNext').onclick=()=>stepPhoto(1);
+
+/* ---- update / delete ---- */
+$('saveStatusBtn').onclick=async()=>{
+  if(!current)return;
+  const b=$('saveStatusBtn');b.disabled=true;
+  try{
+    const r=await fetch('api/update_incident_status.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({incident_id:current.id,status:$('statusSelect').value,admin_notes:$('adminNotesInput').value.trim()})}),d=await r.json();
+    if(d.success){notify('Incident status updated successfully');closeM('incidentDetailModal');loadIncidents()}else notify('Error: '+(d.error||'Failed to update'),'error');
+  }catch(e){console.error('Update error:',e);notify('Error updating incident status','error')}
+  b.disabled=false;
+};
+function deleteIncident(id){
+  showConfirm('Delete this incident report? This cannot be undone.',async()=>{
+    try{
+      const r=await fetch('api/delete_incident.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({incident_id:id})}),d=await r.json();
+      if(d.success){notify('Incident deleted successfully');loadIncidents()}else notify('Error: '+(d.error||'Failed to delete'),'error');
+    }catch(e){console.error('Delete error:',e);notify('Error deleting incident','error')}
+  });
+}
+
+/* ---- profile + init ---- */
+async function loadUserProfile(){
+  try{const r=await fetch('api/get_user_profile.php'),d=await r.json();
+    if(d.success){$('userAvatarInitials').textContent=d.user.initials;$('userFullName').textContent=d.user.name;$('userRole').textContent=d.user.role}
+    else{console.error('Error loading user profile:',d.error);$('userFullName').textContent='Guest User'}}
+  catch(e){console.error('Error fetching user profile:',e);$('userFullName').textContent='Guest User'}
+}
+async function initializePage(){
+  try{await fetch('api/setup_incidents_table.php')}catch(e){console.error('Setup warning (non-critical):',e)}
+  await loadIncidents();
+}
+window.addEventListener('load',loadUserProfile);
+initializePage();
+</script>
+<script src="js/auth-guard.js" data-roles="admin,sk_official"></script>
+<script src="assets/js/loader.js?v=3"></script>
+<script src="js/admin-common.js"></script>
+<script src="js/admin-sidebar.js"></script>
+</body>
+</html>

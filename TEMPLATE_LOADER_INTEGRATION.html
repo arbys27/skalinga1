@@ -1,0 +1,184 @@
+<!-- ═════════════════════════════════════════════════════════════════════════════
+     TEMPLATE - Minimal Integration for Any SKalinga Page
+     
+     Copy this template structure at the START of your HTML file's <head>
+     section and at the END of your <body> section.
+     
+     This ensures the loader CSS is loaded first and the loader JS last.
+     ════════════════════════════════════════════════════════════════════════════ -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Page Title - SKalinga</title>
+    <link rel="icon" type="image/x-icon" href="/SKalinga/assets/icons/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/SKalinga/assets/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/SKalinga/assets/icons/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/SKalinga/assets/icons/apple-touch-icon.png">
+    <link rel="manifest" href="/SKalinga/assets/icons/site.webmanifest">
+    <meta name="msapplication-config" content="/SKalinga/assets/icons/browserconfig.xml">
+    <meta name="theme-color" content="#FF6B9D">
+
+    <!-- Standard Meta Tags -->
+    <meta name="description" content="Your page description">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- ════════════════════════════════════════════════════════════════════════
+         🔴 LOADER CSS - ADD THIS HERE
+         ════════════════════════════════════════════════════════════════════════ -->
+    <link rel="stylesheet" href="assets/css/loader.css?v=3">
+
+    <!-- Your Existing Stylesheets -->
+    <link rel="stylesheet" href="assets/css/dashboard.css">
+    <link rel="stylesheet" href="assets/css/your-custom-styles.css">
+
+    <style>
+        /* Your inline styles here */
+    </style>
+</head>
+<body>
+
+    <!-- Your Page Content Here -->
+
+    <!-- Navigation, Sidebar, Main Content - All Your HTML -->
+
+    <!-- ════════════════════════════════════════════════════════════════════════
+         Scripts Section - Keep in this order!
+         ════════════════════════════════════════════════════════════════════════ -->
+
+    <!-- Your existing scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script src="assets/js/your-custom-js.js"></script>
+
+    <!-- Your inline scripts with fetch calls etc. -->
+    <script>
+        // Your form handlers
+        // Your fetch calls
+        // Your existing JavaScript
+    </script>
+
+    <!-- ════════════════════════════════════════════════════════════════════════
+         🟢 LOADER JS - ADD THIS LAST (BEFORE </body>)
+         ════════════════════════════════════════════════════════════════════════ -->
+    <script src="assets/js/loader.js?v=3"></script>
+
+</body>
+</html>
+
+
+<!-- ═════════════════════════════════════════════════════════════════════════════
+     IMPORTANT NOTES:
+     
+     1. Loader CSS must come in <head>
+     2. Loader JS must come LAST before </body>
+     3. All your existing JavaScript code stays the same
+     4. No changes needed to your fetch() calls or form handlers
+     5. Loader will automatically work with everything
+     
+     ═════════════════════════════════════════════════════════════════════════════ -->
+
+
+<!-- ═════════════════════════════════════════════════════════════════════════════
+     OPTIONAL CUSTOMIZATION:
+     
+     Add any of these AFTER the loader JS to customize per page:
+     ═════════════════════════════════════════════════════════════════════════════ -->
+
+<!-- Example 1: Use Shield Animation for Login Page -->
+<script>
+    // Only in login.html
+    window.Loader.setAnimation('shield');
+</script>
+
+<!-- Example 2: Use Dots Animation for Dashboard -->
+<script>
+    // Only in dashboard-admin.html
+    window.Loader.setAnimation('dots');
+</script>
+
+<!-- Example 3: Configure Custom Timings -->
+<script>
+    // For fast pages
+    window.Loader.setConfig({
+        autoShowDelay: 300,
+        minShowTime: 200,
+        fadeOutDelay: 200
+    });
+</script>
+
+<!-- Example 4: Enable Progress Bar for Slow Operations -->
+<script>
+    // For data-heavy pages
+    window.Loader.setConfig({
+        showProgressBar: true
+    });
+</script>
+
+<!-- Example 5: Custom Manual Control -->
+<script>
+    // Use this if you need manual control for specific operations
+    async function importantOperation() {
+        window.Loader.show('Processing important data...');
+        
+        try {
+            const response = await fetch('api/important.php', {
+                method: 'POST',
+                body: new FormData(form)
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                console.log('Success!');
+                // Loader auto-hides here
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            // Loader auto-hides on error too
+        }
+    }
+</script>
+
+
+<!-- ═════════════════════════════════════════════════════════════════════════════
+     VERIFICATION CHECKLIST:
+     
+     After adding the loader to your page, verify:
+     
+     ☐ Page loads without JavaScript errors
+     ☐ Loader CSS link is in <head>
+     ☐ Loader JS script is before </body>
+     ☐ Loader JS script is AFTER all your other scripts
+     ☐ Try a form submission - loader should appear
+     ☐ Try a fetch call - loader should appear
+     ☐ Loader disappears automatically when done
+     ☐ Open console (F12) - look for [Loader] messages
+     ☐ No console errors
+     ☐ Test on mobile too
+     
+     ═════════════════════════════════════════════════════════════════════════════ -->
+
+
+<!-- ═════════════════════════════════════════════════════════════════════════════
+     COMMON ISSUES & FIXES:
+     
+     Issue: Loader doesn't show
+     Fix: Make sure loader.js is loaded AFTER other scripts
+     
+     Issue: Loader shows but doesn't hide
+     Fix: Check console for errors - usually indicates fetch failed
+     
+     Issue: Loader flickering (appears/disappears too fast)
+     Fix: Expected behavior - minShowTime prevents flickering
+     
+     Issue: Only on mobile loader is visible
+     Fix: CSS not loading - verify path to assets/css/loader.css
+     
+     Issue: Animation looks different
+     Fix: Check if CSS is being overridden - verify specificity
+     
+     ═════════════════════════════════════════════════════════════════════════════ -->

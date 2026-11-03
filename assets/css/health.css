@@ -1,0 +1,49 @@
+.health-nav { padding: 24px 32px; }
+.health-nav .logo-area { display: flex; align-items: center; justify-content: center; gap: 24px; width: 100%; }
+.health-nav .logo-text { text-align: center; }
+.health-nav .logo-text h1 { color: var(--primary-green); font-size: 36px; line-height: 1; }
+.health-nav .logo-text p { color: var(--text-gray); }
+.health-main { max-width: 1180px; margin: 0 auto; padding: 0 24px 64px; }
+.health-filter-bar { background: linear-gradient(135deg, #ffffff 0%, #f5fbff 100%); border-radius: 0 0 24px 24px; padding: 24px 32px; margin-bottom: 28px; box-shadow: 0 8px 32px rgba(34,139,87,.12); }
+.category-chips { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+.category-chips button, .health-toggle button { border: 2px solid rgba(34,139,87,.15); background: linear-gradient(135deg,#fff 0%,#f8fcff 100%); color: #666; border-radius: 12px; padding: 10px 16px; cursor: pointer; font: inherit; font-size: 12px; font-weight: 700; }
+.category-chips button.active, .health-toggle button.active { background: linear-gradient(135deg,#228b57 0%,#1a6b43 100%); color: white; border-color: #228b57; box-shadow: 0 6px 18px rgba(34,139,87,.25); }
+.health-filter-controls { display: flex; width: 100%; gap: 18px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.health-toggle { display: flex; gap: 6px; }
+.health-search { display: flex; align-items: center; gap: 10px; border: 2px solid transparent; border-radius: 16px; padding: 13px 18px; color: #5dade2; background: linear-gradient(135deg,#fff 0%,#f8fcff 100%); min-width: 320px; flex: 1; max-width: 420px; box-shadow: 0 6px 20px rgba(93,173,226,.12); }
+.health-search:focus-within { border-color: #5dade2; box-shadow: 0 10px 30px rgba(93,173,226,.22); }
+.health-search input { border: 0; outline: 0; width: 100%; font: inherit; background: transparent; color: #1a1a2e; }
+.health-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 28px; padding: 12px 8px 40px; }
+.health-card { position: relative; overflow: hidden; background: linear-gradient(135deg,rgba(255,255,255,.98),rgba(255,255,255,.92)); border-radius: 16px; box-shadow: 0 4px 20px rgba(93,173,226,.12); border: 2px solid rgba(255,255,255,.5); }
+.health-card-image { height: 150px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg,#dff4ff,#bfe6fa); color: #4094c5; font-size: 52px; overflow: hidden; }
+.health-card-image img { width: 100%; height: 100%; object-fit: cover; }
+.health-card-body { padding: 22px; }
+.health-category { display: inline-block; color: #228b57; background: #e8f5e9; border-radius: 20px; padding: 6px 11px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; }
+.health-card h2 { color: #20465b; font: 700 20px 'Outfit', sans-serif; margin: 12px 0; }
+.health-meta, .health-slots { color: #607d8b; font-size: 13px; margin: 8px 0; }
+.health-meta i, .health-slots i { color: #5dade2; width: 18px; }
+.health-slots { color: #22734e; font-weight: 700; }
+.health-details-btn { width: 100%; margin-top: 14px; padding: 12px; border: 0; border-radius: 12px; background: linear-gradient(135deg,#228b57 0%,#1a6b43 100%); color: white; cursor: pointer; font-weight: 700; }
+.cancelled-ribbon { position: absolute; top: 14px; right: -34px; transform: rotate(35deg); background: #d9534f; color: white; padding: 5px 38px; font-size: 11px; font-weight: 800; }
+.is-cancelled { opacity: .88; }
+.health-state { margin: 30px 0; }
+.state-message { padding: 50px 20px; text-align: center; color: #607d8b; background: rgba(255,255,255,.72); border-radius: 16px; }
+.error-state { color: #b5413c; }
+.skeleton-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(270px,1fr)); gap: 22px; }
+.skeleton-card { height: 330px; border-radius: 18px; background: linear-gradient(90deg,#e8f5fb 25%,#d4edf8 50%,#e8f5fb 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; }
+@keyframes shimmer { to { background-position: -200% 0; } }
+.health-modal { position: fixed; inset: 0; z-index: 3000; display: grid; place-items: center; padding: 18px; background: rgba(20,54,72,.55); }
+.health-modal[hidden] { display: none; }
+.health-modal-card { position: relative; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; background: white; border-radius: 20px; padding: 30px; }
+.health-modal-close { position: absolute; top: 12px; right: 16px; border: 0; background: transparent; color: #607d8b; font-size: 28px; cursor: pointer; }
+.health-modal-card h2 { color: #20465b; font: 800 30px 'Outfit', sans-serif; margin: 14px 0; }
+.back-btn { top: 24px; left: 24px; width: 48px; height: 48px; background: white; color: #228b57; border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(0,0,0,.15); cursor: pointer; transition: all .25s ease; }
+.back-btn:hover { background: #a8e6cf; color: white; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(168,230,207,.4); }
+.details-description { color: #526b78; line-height: 1.7; white-space: normal; }
+.details-list { display: grid; gap: 14px; margin: 24px 0; }
+.details-list div { display: grid; grid-template-columns: 140px 1fr; gap: 10px; }
+.details-list dt { color: #2477a5; font-weight: 700; }
+.details-list dd { margin: 0; color: #526b78; }
+.details-note, .details-cancelled { padding: 12px 14px; border-radius: 10px; background: #fff5d9; color: #896b1f; font-size: 14px; }
+.details-cancelled { background: #fde8e7; color: #a53e39; margin-bottom: 16px; font-weight: 700; }
+@media (max-width: 600px) { .health-main { padding: 0 14px 40px; } .health-nav { padding: 18px 16px; } .health-nav .logo-area { gap: 12px; } .health-nav .official-logo { width: 52px; height: 52px; } .health-nav .logo-text h1 { font-size: 28px; } .health-search { min-width: 100%; max-width: none; } .details-list div { grid-template-columns: 1fr; gap: 3px; } .health-modal-card { padding: 24px 18px; } .health-grid { grid-template-columns: 1fr; padding-left: 0; padding-right: 0; } .health-filter-bar { padding: 20px 16px; } }

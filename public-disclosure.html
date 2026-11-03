@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SKalinga - Public Disclosure Board</title>
+  <link rel="icon" type="image/x-icon" href="/SKalinga/assets/icons/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/SKalinga/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/SKalinga/assets/icons/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/SKalinga/assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/SKalinga/assets/icons/site.webmanifest">
+  <meta name="msapplication-config" content="/SKalinga/assets/icons/browserconfig.xml">
+  <meta name="theme-color" content="#FF6B9D">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/skalinga-ui.css?v=20261021-3">
+  <link rel="stylesheet" href="assets/css/loader.css?v=3">
+</head>
+<body>
+  <div class="app-container">
+    <main class="disclosure-page">
+      <a class="disclosure-back" href="youth-portal.html"><svg class="icon" aria-hidden="true"><use href="#icon-arrow"></use></svg> Back to youth portal</a>
+      <section class="disclosure-hero card-soft">
+        <h1>SK Full Public Disclosure Board</h1>
+        <p>View official SK reports, budget updates, memoranda, resolutions, and other transparency documents published by the Sangguniang Kabataan.</p>
+      </section>
+      <div class="disclosure-toolbar">
+        <h2>Published documents</h2>
+        <select id="categoryFilter" aria-label="Filter documents by category">
+          <option value="">All categories</option>
+          <option>Budget and Finance</option>
+          <option>Programs and Projects</option>
+          <option>Memos and Resolutions</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div id="disclosureState" class="disclosure-state">Loading published documents...</div>
+      <div id="disclosureGrid" class="disclosure-grid" hidden></div>
+    </main>
+  </div>
+  <script>
+    const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+    const iconFor = mime => mime === 'application/pdf' ? 'file' : mime && mime.startsWith('image/') ? 'file' : 'file';
+    const dateFor = value => value ? new Date(value.replace(' ','T')).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}) : '';
+    let documents = [];
+    function render() {
+      const category = document.getElementById('categoryFilter').value;
+      const rows = documents.filter(row => !category || row.category === category);
+      const state = document.getElementById('disclosureState'), grid = document.getElementById('disclosureGrid');
+      state.hidden = rows.length > 0; grid.hidden = rows.length === 0;
+      state.textContent = documents.length ? 'No documents found in this category.' : 'No public disclosure documents have been published yet.';
+      grid.innerHTML = rows.map(row => `<article class="disclosure-card"><div class="disclosure-card-top"><div class="disclosure-file-icon"><svg class="icon" aria-hidden="true"><use href="#icon-${iconFor(row.mime_type)}"></use></svg></div><span class="disclosure-category">${esc(row.category)}</span></div><h3>${esc(row.title)}</h3><p>${esc(row.description || row.original_name)}</p><div class="disclosure-card-footer"><span class="disclosure-date">${dateFor(row.created_at)}</span><a class="view-document" href="${esc(row.file_path)}" target="_blank" rel="noopener"><svg class="icon" aria-hidden="true"><use href="#icon-arrow"></use></svg> View document</a></div></article>`).join('');
+    }
+    async function loadDocuments() {
+      try { const response = await fetch('api/public_disclosures/list.php', {credentials:'include'}); const data = await response.json(); if (!response.ok || !data.success) throw new Error(data.message || 'Unable to load documents'); documents = data.data || []; render(); }
+      catch (error) { document.getElementById('disclosureState').textContent = error.message; console.error(error); }
+    }
+    document.getElementById('categoryFilter').addEventListener('change', render);
+    loadDocuments();
+  </script>
+  <script src="js/auth-guard.js" data-roles="youth"></script>
+  <script src="js/youth-nav.js?v=20261021-3"></script>
+  <script src="assets/js/loader.js?v=3"></script>
+</body>
+</html>

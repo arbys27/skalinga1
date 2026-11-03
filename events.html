@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SKalinga - Announcements &amp; Updates</title>
+<link rel="icon" type="image/x-icon" href="/SKalinga/assets/icons/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/SKalinga/assets/icons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/SKalinga/assets/icons/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/SKalinga/assets/icons/apple-touch-icon.png">
+<link rel="manifest" href="/SKalinga/assets/icons/site.webmanifest">
+<meta name="msapplication-config" content="/SKalinga/assets/icons/browserconfig.xml">
+<meta name="theme-color" content="#FF6B9D">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/skalinga-ui.css?v=20261021-3">
+<link rel="stylesheet" href="assets/css/loader.css?v=3">
+<style>
+.an,.an-modal{--g:#228B57;--gd:#0F4D31;--pk:#FF6B9D;--pkd:#E04F7E;--ink:#16303F;--mu:#5F7788;--ln:#E3ECE7;--h:"Bricolage Grotesque",system-ui,sans-serif;--b:"Plus Jakarta Sans",system-ui,sans-serif;font-family:var(--b);color:var(--ink)}
+.an{width:min(1180px,100% - 32px);margin:0 auto;padding:16px 0 110px}
+.an *,.an-modal *{box-sizing:border-box}
+.an :focus-visible,.an-modal :focus-visible{outline:3px solid var(--pkd);outline-offset:3px}
+.ic{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+.an-hero{position:relative;overflow:hidden;border-radius:28px;padding:clamp(24px,4vw,40px);color:#fff;background:linear-gradient(140deg,var(--g),var(--gd))}
+.an-hero::after{content:"";position:absolute;right:-80px;top:-90px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,var(--pk),rgba(255,107,157,0) 68%);opacity:.7}
+.an-hero>*{position:relative;z-index:1}
+.an-hero h1{margin:0 0 8px;font:800 clamp(30px,5vw,46px)/1.05 var(--h);letter-spacing:-.04em}
+.an-hero p{margin:0;max-width:56ch;color:rgba(255,255,255,.88)}
+.an-search{position:relative;display:block;margin-top:22px;max-width:520px}
+.an-search .ic{position:absolute;left:18px;top:50%;margin-top:-10px;color:var(--mu);pointer-events:none}
+.an-search input{width:100%;min-height:54px;padding:0 18px 0 48px;border:0;border-radius:999px;background:#fff;font:inherit;color:var(--ink);box-shadow:0 10px 30px rgba(0,0,0,.15)}
+.an-search input:focus{outline:3px solid var(--pk);outline-offset:2px}
+
+.an-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:18px 0 6px}
+.an-chips{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 8px;scrollbar-width:none}
+.an-chips::-webkit-scrollbar{display:none}
+.chip{flex:none;min-height:44px;padding:0 18px;border:1.5px solid var(--ln);border-radius:999px;background:#fff;color:var(--ink);font:700 13.5px var(--b);cursor:pointer;transition:all .15s}
+.chip:hover{border-color:var(--g)}
+.chip[aria-pressed="true"]{border-color:var(--g);background:var(--g);color:#fff}
+.an-count{flex:none;color:var(--mu);font-size:13px;font-weight:600;white-space:nowrap}
+
+.an-grid{display:grid;gap:16px;margin-top:10px}
+@media(min-width:640px){.an-grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1000px){.an-grid{grid-template-columns:repeat(3,1fr);gap:20px}}
+.card{display:flex;flex-direction:column;overflow:hidden;border:1px solid var(--ln);border-radius:26px;background:#fff;box-shadow:0 4px 20px rgba(34,139,87,.07);transition:transform .2s,box-shadow .2s}
+.card:hover{transform:translateY(-3px);box-shadow:0 18px 40px rgba(34,139,87,.15)}
+.card.past{opacity:.75}
+.an-img{position:relative;aspect-ratio:16/10;background:linear-gradient(135deg,var(--g),var(--gd));overflow:hidden}
+.an-img img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s}
+.card:hover .an-img img{transform:scale(1.05)}
+.an-img::after{content:"";position:absolute;inset:auto 0 0;height:45%;background:linear-gradient(transparent,rgba(15,77,49,.45))}
+.date{position:absolute;z-index:1;top:12px;left:12px;display:grid;place-items:center;min-width:54px;padding:7px 10px;border-radius:16px;background:#fff;line-height:1;box-shadow:0 6px 16px rgba(0,0,0,.15)}
+.date b{font:800 22px var(--h);letter-spacing:-.03em}.date span{margin-top:3px;color:var(--pkd);font-size:11px;font-weight:800;letter-spacing:.08em}
+.tag{position:absolute;z-index:1;top:12px;right:12px;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:700;background:#e3f1fb;color:#14537e}
+.tag.program{background:#dff5e8;color:var(--gd)}.tag.announcement{background:#ffe3ec;color:#a02350}.tag.advisory{background:#fff4d6;color:#7a5600}
+.live{position:absolute;z-index:1;left:12px;bottom:12px;display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;background:var(--pk);color:var(--ink);font-size:12px;font-weight:800}
+.live::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--ink)}
+.body{display:flex;flex:1;flex-direction:column;gap:10px;padding:18px 20px 20px}
+.body h3{margin:0;font:700 20px/1.2 var(--h);letter-spacing:-.025em;overflow-wrap:anywhere}
+.meta{display:grid;gap:5px;margin:0;padding:0;list-style:none;color:var(--mu);font-size:13px}
+.meta li{display:flex;gap:8px;align-items:flex-start}.meta .ic{width:17px;height:17px;color:var(--g);margin-top:1px}
+.desc{margin:0;color:var(--mu);font-size:14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cap{display:grid;gap:6px;font-size:12.5px;font-weight:600;color:var(--mu)}
+.bar{height:7px;border-radius:9px;background:#e9f7ef;overflow:hidden}.bar i{display:block;height:100%;border-radius:9px;background:var(--g)}
+.bar.hot i{background:var(--pk)}
+.cta{margin-top:auto;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 20px;border:0;border-radius:16px;background:var(--ink);color:#fff;font:700 14px var(--b);cursor:pointer;transition:background .15s,transform .15s}
+.cta:hover{background:var(--g)}.cta:active{transform:scale(.98)}
+.cta.reg{background:var(--pk);color:var(--ink);box-shadow:0 8px 22px rgba(255,107,157,.35)}.cta.reg:hover{background:#ff82ae}
+
+@media(min-width:760px){
+  .card.feat{grid-column:1/-1;flex-direction:row}
+  .card.feat .an-img{flex:1.2;aspect-ratio:auto;min-height:320px}
+  .card.feat .body{flex:1;justify-content:center;padding:32px}
+  .card.feat h3{font-size:clamp(26px,3vw,34px)}
+  .card.feat .desc{-webkit-line-clamp:4;font-size:15px}
+  .card.feat .cta{margin-top:8px;align-self:flex-start}
+}
+.sk{min-height:330px;border-radius:26px;background:linear-gradient(90deg,#e9f7ef,#fff,#e9f7ef);background-size:200% 100%;animation:sh 1.5s infinite}
+@keyframes sh{to{background-position:-200% 0}}
+.state{display:grid;justify-items:center;gap:8px;margin:20px 0;padding:44px 20px;border:1.5px dashed #b9d9c8;border-radius:26px;background:#f4fbf7;text-align:center;color:var(--mu)}
+.state[hidden]{display:none}
+.state .big{display:grid;place-items:center;width:60px;height:60px;border-radius:20px;background:#fff;color:var(--g)}
+.state .big .ic{width:28px;height:28px}
+.state h3{margin:6px 0 0;color:var(--ink);font:700 22px var(--h)}.state p{margin:0;max-width:40ch}
+.state button{margin-top:8px;min-height:46px;padding:0 22px;border:0;border-radius:999px;background:var(--g);color:#fff;font:700 14px var(--b);cursor:pointer}
+
+/* details sheet */
+.an-modal{position:fixed;inset:0;z-index:9000;display:flex;align-items:flex-end;justify-content:center;background:rgba(15,77,49,.6);backdrop-filter:blur(8px);opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s}
+.an-modal.on{opacity:1;visibility:visible}
+.sheet{position:relative;width:min(100%,620px);max-height:92vh;overflow-y:auto;border-radius:28px 28px 0 0;background:#fff;transform:translateY(40px);transition:transform .3s cubic-bezier(.22,1,.36,1)}
+.an-modal.on .sheet{transform:none}
+@media(min-width:700px){.an-modal{align-items:center;padding:20px}.sheet{border-radius:28px}}
+.sheet .an-img{aspect-ratio:16/9;border-radius:0}
+.close{position:absolute;z-index:3;top:14px;right:14px;display:grid;place-items:center;width:44px;height:44px;border:0;border-radius:50%;background:rgba(255,255,255,.92);color:var(--ink);cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.2)}
+.close:hover{color:var(--pkd)}
+.sbody{padding:22px 24px 8px}
+.sbody h2{margin:0 0 6px;font:800 clamp(24px,4vw,30px)/1.1 var(--h);letter-spacing:-.035em}
+.sbody .when{margin:0 0 16px;color:var(--g);font-weight:700;font-size:14px}
+.sbody .text{margin:0;color:var(--ink);font-size:15px;line-height:1.65;white-space:pre-line;overflow-wrap:anywhere}
+.sbody .cap{margin-top:18px;padding:14px 16px;border-radius:18px;background:#f4fbf7}
+.sfoot{position:sticky;bottom:0;display:flex;gap:10px;padding:16px 24px calc(18px + env(safe-area-inset-bottom));background:linear-gradient(transparent,#fff 30%)}
+.sfoot .cta{flex:1;margin:0}.sfoot .cta.soft{background:#f1f6f3;color:var(--ink);flex:none}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<symbol id="a-s" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+<symbol id="a-cal" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+<symbol id="a-pin" viewBox="0 0 24 24"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+<symbol id="a-clk" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+<symbol id="a-x" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+<symbol id="a-go" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+</svg>
+
+<main class="an">
+  <header class="an-hero">
+    <h1>SK announcements</h1>
+    <p>News, events, advisories and programs from SKalinga Youth, all in one place.</p>
+    <label class="an-search"><span class="vh">Search announcements</span><svg class="ic"><use href="#a-s"/></svg><input type="search" id="searchInput" placeholder="Search events, places or topics" autocomplete="off"></label>
+  </header>
+
+  <div class="an-bar">
+    <div class="an-chips" role="group" aria-label="Filter announcements">
+      <button type="button" class="chip" data-f="All" aria-pressed="true">All</button>
+      <button type="button" class="chip" data-f="Recent" aria-pressed="false">Recent</button>
+      <button type="button" class="chip" data-f="Events" aria-pressed="false">Events</button>
+      <button type="button" class="chip" data-f="Advisories" aria-pressed="false">Advisories</button>
+      <button type="button" class="chip" data-f="Programs" aria-pressed="false">Programs</button>
+    </div>
+    <span class="an-count" id="count" aria-live="polite"></span>
+  </div>
+
+  <div class="an-grid" id="eventsGrid" aria-live="polite"><div class="sk"></div><div class="sk"></div><div class="sk"></div></div>
+
+  <div id="noEventsMessage" class="state" hidden>
+    <span class="big"><svg class="ic"><use href="#a-cal"/></svg></span>
+    <h3>No announcements found</h3>
+    <p>Try another filter or search, or check back soon for new events.</p>
+  </div>
+  <div id="eventsError" class="state" role="status" aria-live="polite" hidden>
+    <span class="big"><svg class="ic"><use href="#a-x"/></svg></span>
+    <h3>Announcements are unavailable</h3>
+    <p>We could not load them right now. Please try again.</p>
+    <button type="button" id="retry">Try again</button>
+  </div>
+  <div class="vh" aria-hidden="true"><span id="userAvatarInitials"></span><span id="userFullName"></span><span id="userRole"></span></div>
+</main>
+
+<div class="an-modal" id="detailsModal" aria-hidden="true">
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="modalTitle" tabindex="-1">
+    <div class="an-img"><img id="modalImage" src="" alt=""><button class="close" type="button" id="closeBtn" aria-label="Close event details"><svg class="ic"><use href="#a-x"/></svg></button><span class="tag" id="modalTypeBadge">Event</span></div>
+    <div class="sbody">
+      <h2 id="modalTitle">Post title</h2>
+      <p class="when" id="modalDate"></p>
+      <p class="text" id="modalDescription"></p>
+      <div class="cap" id="modalCap" hidden></div>
+    </div>
+    <div class="sfoot" id="modalFooter"></div>
+  </div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+const typeMap={Training:'event',Seminar:'event',Sports:'program',Tournament:'program',Cultural:'announcement',Festival:'announcement',Community:'advisory',Service:'advisory',Other:'event'};
+const placeholders={
+  event:'https://images.unsplash.com/photo-1522202176988-66273c2b033f?auto=format&fit=crop&w=800&q=80',
+  program:'https://images.unsplash.com/photo-1541532713592-79a0317b6b77?auto=format&fit=crop&w=800&q=80',
+  announcement:'https://images.unsplash.com/photo-1581092160560-4c9d3a0d8d5c?auto=format&fit=crop&w=800&q=80',
+  advisory:'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=800&q=80'};
+const MON=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+let allEvents=[],shown=[],currentFilter='All',lastFocus=null;
+
+const when=e=>{const d=new Date(`${e.date}T${e.time||'00:00'}`);return isNaN(d)?null:d};
+const t12=s=>{if(!s)return '';const [h,m='00']=String(s).split(':'),n=parseInt(h,10);return isNaN(n)?'':`${n%12||12}:${m.slice(0,2)} ${n>=12?'PM':'AM'}`};
+const safeUrl=u=>/^(https?:\/\/|\/|\.\/)/i.test(String(u||'').trim());
+function status(e){
+  const d=when(e),now=new Date();
+  if(e.status==='Ongoing')return 'Ongoing';if(e.status==='Past')return 'Past';
+  if(!d)return 'Upcoming';if(d<now&&d.toDateString()!==now.toDateString())return 'Past';
+  return d.toDateString()===now.toDateString()?'Ongoing':'Upcoming';
+}
+function capInfo(e){
+  const cap=Number(e.capacity)||0;if(!cap)return null;
+  const reg=Number(e.registeredCount||0),left=Math.max(0,cap-reg);
+  return {cap,reg,left,pct:Math.min(100,Math.round(reg/cap*100)),text:`${reg}/${cap} registered · ${left?left+' slots left':'Full'}`};
+}
+
+/* ---- load ---- */
+async function loadUserProfile(){
+  try{const r=await fetch('api/get_user_profile.php'),d=await r.json();
+    if(d.success){$('userAvatarInitials').textContent=d.user.initials;$('userFullName').textContent=d.user.name;$('userRole').textContent=d.user.role}
+    else{console.error('Error loading user profile:',d.error);$('userFullName').textContent='Guest User'}}
+  catch(e){console.error('Error fetching user profile:',e);$('userFullName').textContent='Guest User'}
+}
+async function loadEventsFromAPI(){
+  try{
+    const r=await fetch('api/get_events.php'),d=await r.json();
+    if(!d.success)throw new Error(d.error);
+    allEvents=d.data||[];$('eventsError').hidden=true;performSearch();
+  }catch(e){
+    console.error('Error fetching events:',e);
+    if(!allEvents.length){$('eventsGrid').replaceChildren();$('noEventsMessage').hidden=true;$('eventsError').hidden=false;$('count').textContent=''}
+  }
+}
+
+/* ---- render ---- */
+function render(list){
+  const grid=$('eventsGrid'),none=$('noEventsMessage');
+  shown=list;$('count').textContent=list.length?`${list.length} ${list.length===1?'result':'results'}`:'';
+  if(!list.length){grid.replaceChildren();none.hidden=false;return}
+  none.hidden=true;
+  const feat=list.length>=3&&currentFilter==='All'&&!$('searchInput').value.trim();
+  grid.innerHTML=list.map((e,i)=>{
+    const d=when(e),badge=typeMap[e.type]||'event',st=status(e),img=e.imagePath||placeholders[badge],c=capInfo(e);
+    const dow=d?d.toLocaleDateString('en-US',{weekday:'long'}):'',time=d?t12(e.time):'';
+    return `<article class="card ${st.toLowerCase()}${feat&&i===0?' feat':''}">
+      <div class="an-img"><img src="${esc(img)}" alt="" loading="${i<3?'eager':'lazy'}">
+        ${d?`<div class="date"><b>${d.getDate()}</b><span>${MON[d.getMonth()]}</span></div>`:''}
+        <span class="tag ${badge}">${esc(e.type||'Event')}</span>${st==='Ongoing'?'<span class="live">Happening today</span>':''}</div>
+      <div class="body"><h3>${esc(e.title)}</h3>
+        <ul class="meta"><li><svg class="ic"><use href="#a-clk"/></svg><span>${esc(dow)}${time?', '+esc(time):''}${e.endTime?' – '+esc(t12(e.endTime)):''}</span></li>
+        <li><svg class="ic"><use href="#a-pin"/></svg><span>${esc(e.location||'Location to be announced')}</span></li></ul>
+        <p class="desc">${esc(e.description||'Join us for this exciting event!')}</p>
+        ${c?`<div class="cap"><div class="bar ${c.pct>=80?'hot':''}"><i style="width:${c.pct}%"></i></div><span>${esc(c.text)}</span></div>`:''}
+        <button class="cta ${e.regLink?'reg':''}" type="button" data-i="${i}">${e.regLink?'Register for event':'View event details'}<svg class="ic"><use href="#a-go"/></svg></button></div></article>`;
+  }).join('');
+}
+function performSearch(){
+  const q=$('searchInput').value.toLowerCase().trim(),today=new Date();today.setHours(0,0,0,0);
+  let list=allEvents.filter(e=>{const d=when(e);return d&&d>=today});
+  list.sort((a,b)=>when(a)-when(b));
+  if(currentFilter==='Events')list=list.filter(e=>(typeMap[e.type]||'event')==='event');
+  else if(currentFilter==='Advisories')list=list.filter(e=>typeMap[e.type]==='advisory');
+  else if(currentFilter==='Programs')list=list.filter(e=>typeMap[e.type]==='program');
+  else if(currentFilter==='Recent')list.sort((a,b)=>when(b)-when(a));
+  if(q)list=list.filter(e=>`${e.id} ${e.title} ${e.location} ${e.type} ${e.description}`.toLowerCase().includes(q));
+  render(list);
+}
+document.querySelectorAll('.chip').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.chip').forEach(x=>x.setAttribute('aria-pressed',x===b));currentFilter=b.dataset.f;performSearch();
+}));
+$('searchInput').addEventListener('input',performSearch);
+$('retry').onclick=()=>{$('eventsError').hidden=true;$('eventsGrid').innerHTML='<div class="sk"></div><div class="sk"></div><div class="sk"></div>';loadEventsFromAPI()};
+document.addEventListener('error',e=>{if(e.target.tagName==='IMG'&&e.target.closest('.an-img'))e.target.remove()},true);
+
+/* ---- details sheet ---- */
+const modal=$('detailsModal');
+function openDetailsModal(e){
+  lastFocus=document.activeElement;
+  const d=when(e),badge=typeMap[e.type]||'event',c=capInfo(e);
+  $('modalImage').src=e.imagePath||placeholders[badge];
+  $('modalTitle').textContent=e.title||'Untitled event';
+  $('modalDate').textContent=[d?d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}):'',t12(e.time)+(e.endTime?' – '+t12(e.endTime):''),e.location].filter(Boolean).join(' · ');
+  $('modalDescription').textContent=e.description||`Join us for ${e.title}!`;
+  const tb=$('modalTypeBadge');tb.textContent=e.type||'Event';tb.className='tag '+badge;
+  const cap=$('modalCap');cap.hidden=!c;
+  if(c)cap.innerHTML=`<div class="bar ${c.pct>=80?'hot':''}"><i style="width:${c.pct}%"></i></div><span>${esc(c.text)}</span>`;
+  const f=$('modalFooter');f.innerHTML='';
+  if(e.regLink&&safeUrl(e.regLink)){
+    const b=document.createElement('button');b.type='button';b.className='cta reg';b.textContent='Register for event';
+    b.onclick=()=>window.open(e.regLink,'_blank','noopener,noreferrer');f.appendChild(b);
+  }
+  const s=document.createElement('button');s.type='button';s.className='cta soft';s.textContent='Close';s.onclick=closeDetailsModal;f.appendChild(s);
+  modal.classList.add('on');modal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';$('closeBtn').focus();
+}
+function closeDetailsModal(){
+  if(!modal.classList.contains('on'))return;
+  modal.classList.remove('on');modal.setAttribute('aria-hidden','true');document.body.style.overflow='';if(lastFocus)lastFocus.focus();
+}
+$('eventsGrid').addEventListener('click',ev=>{const b=ev.target.closest('[data-i]');if(b)openDetailsModal(shown[+b.dataset.i])});
+$('closeBtn').onclick=closeDetailsModal;
+modal.addEventListener('click',e=>{if(e.target===modal)closeDetailsModal()});
+addEventListener('keydown',e=>{if(e.key==='Escape')closeDetailsModal()});
+
+window.addEventListener('load',loadUserProfile);
+document.addEventListener('DOMContentLoaded',loadEventsFromAPI);
+setInterval(()=>{if(!document.hidden&&!modal.classList.contains('on'))loadEventsFromAPI()},60000);
+</script>
+<script src="js/auth-guard.js" data-roles="youth"></script>
+<script src="js/youth-nav.js?v=20261021-3"></script>
+<script src="assets/js/loader.js?v=3"></script>
+</body>
+</html>

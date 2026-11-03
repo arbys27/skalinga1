@@ -1,0 +1,1 @@
+-- Retired: credentials for sample accounts are not migrated or reset to known passwords.

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SKalinga - Health Announcements</title>
+<link rel="icon" type="image/x-icon" href="/SKalinga/assets/icons/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/SKalinga/assets/icons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/SKalinga/assets/icons/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/SKalinga/assets/icons/apple-touch-icon.png">
+<link rel="manifest" href="/SKalinga/assets/icons/site.webmanifest">
+<meta name="msapplication-config" content="/SKalinga/assets/icons/browserconfig.xml">
+<meta name="theme-color" content="#FF6B9D">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/skalinga-ui.css?v=20261021-3">
+<link rel="stylesheet" href="assets/css/loader.css?v=3">
+<style>
+.hl,.hl-modal{--g:#228B57;--gd:#0F4D31;--mint:#A8E6CF;--pk:#FF6B9D;--pkd:#E04F7E;--ink:#16303F;--mu:#5F7788;--ln:#E3ECE7;--h:"Bricolage Grotesque",system-ui,sans-serif;--b:"Plus Jakarta Sans",system-ui,sans-serif;font-family:var(--b);color:var(--ink)}
+.hl{width:min(1180px,100% - 32px);margin:0 auto;padding:16px 0 110px}
+.hl *,.hl-modal *{box-sizing:border-box}
+.hl [hidden],.hl-modal[hidden]{display:none!important}
+.hl :focus-visible,.hl-modal :focus-visible{outline:3px solid var(--pkd);outline-offset:3px}
+.ic{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+.hero{position:relative;overflow:hidden;border-radius:28px;padding:clamp(24px,4vw,40px);color:#fff;background:linear-gradient(140deg,var(--g),var(--gd))}
+.hero::after{content:"";position:absolute;right:-80px;top:-90px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,var(--pk),rgba(255,107,157,0) 68%);opacity:.7}
+.hero>*{position:relative;z-index:1}
+.hero h1{margin:0 0 8px;font:800 clamp(30px,5vw,46px)/1.05 var(--h);letter-spacing:-.04em}
+.hero p{margin:0;max-width:56ch;color:rgba(255,255,255,.88)}
+.search{position:relative;display:block;margin-top:22px;max-width:520px}
+.search .ic{position:absolute;left:18px;top:50%;margin-top:-10px;color:var(--mu);pointer-events:none}
+.search input{width:100%;min-height:54px;padding:0 18px 0 48px;border:0;border-radius:999px;background:#fff;font:inherit;color:var(--ink);box-shadow:0 10px 30px rgba(0,0,0,.15)}
+.search input:focus{outline:3px solid var(--pk);outline-offset:2px}
+
+.bar{display:grid;gap:10px;margin:18px 0 6px}
+@media(min-width:900px){.bar{grid-template-columns:1fr auto;align-items:center}}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 8px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;min-height:44px;padding:0 18px;border:1.5px solid var(--ln);border-radius:999px;background:#fff;color:var(--ink);font:700 13.5px var(--b);cursor:pointer;transition:all .15s}
+.chip:hover{border-color:var(--g)}
+.chip[aria-pressed="true"]{border-color:var(--g);background:var(--g);color:#fff}
+.right{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.seg{display:inline-flex;padding:4px;border-radius:999px;background:#e9f7ef}
+.seg button{min-height:42px;padding:0 20px;border:0;border-radius:999px;background:transparent;color:var(--gd);font:700 13.5px var(--b);cursor:pointer}
+.seg button[aria-pressed="true"]{background:#fff;box-shadow:0 2px 10px rgba(34,139,87,.2)}
+.count{color:var(--mu);font-size:13px;font-weight:600;white-space:nowrap}
+
+.grid{display:grid;gap:16px;margin-top:10px}
+@media(min-width:640px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1000px){.grid{grid-template-columns:repeat(3,1fr);gap:20px}}
+.card{position:relative;display:flex;flex-direction:column;overflow:hidden;border:1px solid var(--ln);border-radius:26px;background:#fff;box-shadow:0 4px 20px rgba(34,139,87,.07);transition:transform .2s,box-shadow .2s}
+.card:hover{transform:translateY(-3px);box-shadow:0 18px 40px rgba(34,139,87,.15)}
+.card.off .img,.card.off .body{opacity:.6}
+.img{position:relative;display:grid;place-items:center;aspect-ratio:16/10;overflow:hidden;background:linear-gradient(135deg,var(--mint),#ffd3e2);color:var(--g)}
+.img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.card:hover .img img{transform:scale(1.05)}
+.img .big{width:56px;height:56px;stroke-width:1.6}
+.date{position:absolute;z-index:1;top:12px;left:12px;display:grid;place-items:center;min-width:54px;padding:7px 10px;border-radius:16px;background:#fff;line-height:1;box-shadow:0 6px 16px rgba(0,0,0,.15)}
+.date b{font:800 22px var(--h);letter-spacing:-.03em;color:var(--ink)}.date span{margin-top:3px;color:var(--pkd);font-size:11px;font-weight:800;letter-spacing:.08em}
+.ribbon{position:absolute;z-index:2;top:12px;right:12px;padding:6px 12px;border-radius:999px;background:var(--pkd);color:#fff;font-size:11.5px;font-weight:800;letter-spacing:.06em}
+.body{display:flex;flex:1;flex-direction:column;gap:10px;padding:18px 20px 20px}
+.cat{align-self:flex-start;padding:5px 12px;border-radius:999px;background:#dff5e8;color:var(--gd);font-size:12px;font-weight:700}
+.body h2{margin:0;font:700 20px/1.2 var(--h);letter-spacing:-.025em;overflow-wrap:anywhere}
+.meta{display:grid;gap:5px;margin:0;padding:0;list-style:none;color:var(--mu);font-size:13px}
+.meta li{display:flex;gap:8px;align-items:flex-start}.meta .ic{width:17px;height:17px;color:var(--g);margin-top:1px}
+.slots{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;padding:4px 11px;border-radius:999px;background:#ffe9f1;color:#a02350;font-size:12.5px;font-weight:700}
+.slots .ic{width:15px;height:15px}
+.cta{margin-top:auto;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 20px;border:0;border-radius:16px;background:var(--ink);color:#fff;font:700 14px var(--b);cursor:pointer;transition:background .15s,transform .15s}
+.cta:hover{background:var(--g)}.cta:active{transform:scale(.98)}
+
+.sk{min-height:340px;border-radius:26px;background:linear-gradient(90deg,#e9f7ef,#fff,#e9f7ef);background-size:200% 100%;animation:sh 1.5s infinite}
+@keyframes sh{to{background-position:-200% 0}}
+.state{display:grid;justify-items:center;gap:8px;margin:20px 0;padding:44px 20px;border:1.5px dashed #b9d9c8;border-radius:26px;background:#f4fbf7;text-align:center;color:var(--mu)}
+.state .bigi{display:grid;place-items:center;width:60px;height:60px;border-radius:20px;background:#fff;color:var(--g)}
+.state .bigi .ic{width:28px;height:28px}
+.state h3{margin:6px 0 0;color:var(--ink);font:700 22px var(--h)}.state p{margin:0;max-width:42ch}
+.state button{margin-top:8px;min-height:46px;padding:0 22px;border:0;border-radius:999px;background:var(--g);color:#fff;font:700 14px var(--b);cursor:pointer}
+
+.hl-modal{position:fixed;inset:0;z-index:9000;display:flex;align-items:flex-end;justify-content:center;background:rgba(15,77,49,.6);backdrop-filter:blur(8px);opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s}
+.hl-modal.on{opacity:1;visibility:visible}
+.sheet{position:relative;width:min(100%,620px);max-height:92vh;overflow-y:auto;border-radius:28px 28px 0 0;background:#fff;transform:translateY(40px);transition:transform .3s cubic-bezier(.22,1,.36,1)}
+.hl-modal.on .sheet{transform:none}
+@media(min-width:700px){.hl-modal{align-items:center;padding:20px}.sheet{border-radius:28px}}
+.sheet .img{aspect-ratio:16/8}
+.close{position:absolute;z-index:3;top:14px;right:14px;display:grid;place-items:center;width:44px;height:44px;border:0;border-radius:50%;background:rgba(255,255,255,.92);color:var(--ink);cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.2)}
+.close:hover{color:var(--pkd)}
+.sb{padding:22px 24px calc(26px + env(safe-area-inset-bottom))}
+.sb h2{margin:10px 0 12px;font:800 clamp(24px,4vw,30px)/1.1 var(--h);letter-spacing:-.035em}
+.alert{margin:0 0 14px;padding:12px 14px;border-radius:16px;background:#ffe3ec;color:#a02350;font-weight:700;font-size:14px}
+.desc{margin:0 0 18px;color:var(--ink);font-size:15px;line-height:1.65;white-space:pre-line;overflow-wrap:anywhere}
+.info{display:grid;gap:10px;margin:0}
+.info div{display:grid;grid-template-columns:40px 1fr;gap:12px;align-items:start;padding:12px 14px;border-radius:18px;background:#f4fbf7}
+.info .ico{display:grid;place-items:center;width:40px;height:40px;border-radius:14px;background:#fff;color:var(--g)}
+.info dt{margin:0;color:var(--mu);font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.info dd{margin:2px 0 0;font-size:14.5px;font-weight:600;white-space:pre-line;overflow-wrap:anywhere}
+.note{display:flex;align-items:center;gap:10px;margin:16px 0 0;padding:13px 15px;border-radius:16px;background:#fff0f5;color:#8a2a4d;font-size:13.5px;font-weight:600}
+.note .ic{color:var(--pkd)}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<symbol id="k-heart" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"/></symbol>
+<symbol id="k-cross" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M12 8v8M8 12h8"/></symbol>
+<symbol id="k-drop" viewBox="0 0 24 24"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11Z"/></symbol>
+<symbol id="k-leaf" viewBox="0 0 24 24"><path d="M5 19c0-8 5-14 15-14 0 10-6 15-14 15"/><path d="M5 19c3-5 6-7 9-9"/></symbol>
+<symbol id="k-s" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+<symbol id="k-cal" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+<symbol id="k-pin" viewBox="0 0 24 24"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+<symbol id="k-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></symbol>
+<symbol id="k-id" viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="3"/><circle cx="9" cy="11" r="2"/><path d="M5.5 16a3.8 3.8 0 0 1 7 0M15 10h3M15 14h3"/></symbol>
+<symbol id="k-x" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+<symbol id="k-go" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+</svg>
+
+<main class="hl">
+  <header class="hero">
+    <h1>Health announcements</h1>
+    <p>Find upcoming and past health programs, schedules and venue details from your SK.</p>
+    <label class="search"><span class="vh">Search announcements</span><svg class="ic"><use href="#k-s"/></svg><input id="searchInput" type="search" placeholder="Search programs, venues or topics" autocomplete="off"></label>
+  </header>
+
+  <div class="bar" aria-label="Health announcement filters">
+    <div id="categoryChips" class="chips" role="group" aria-label="Category"></div>
+    <div class="right">
+      <div class="seg health-toggle" role="group" aria-label="Date filter">
+        <button type="button" data-period="upcoming" aria-pressed="true">Upcoming</button>
+        <button type="button" data-period="past" aria-pressed="false">Past</button>
+      </div>
+      <span class="count" id="count" aria-live="polite"></span>
+    </div>
+  </div>
+
+  <div id="healthLoading" class="grid" aria-label="Loading announcements" hidden><div class="sk"></div><div class="sk"></div><div class="sk"></div></div>
+  <div id="healthError" class="state" role="status" aria-live="polite" hidden>
+    <span class="bigi"><svg class="ic"><use href="#k-x"/></svg></span><h3>We couldn’t load announcements</h3><p>Please check your connection and try again.</p><button type="button" id="retry">Try again</button>
+  </div>
+  <div id="healthEmpty" class="state" role="status" aria-live="polite" hidden>
+    <span class="bigi"><svg class="ic"><use href="#k-heart"/></svg></span><h3 id="emptyTitle">No health announcements yet</h3><p id="emptyText">Check back soon for new programs.</p>
+  </div>
+  <div id="healthGrid" class="grid" aria-live="polite" hidden></div>
+</main>
+
+<div id="detailsModal" class="hl-modal" aria-hidden="true">
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="detailsTitle" tabindex="-1">
+    <button class="close health-modal-close" type="button" aria-label="Close"><svg class="ic"><use href="#k-x"/></svg></button>
+    <div id="detailsContent"></div>
+  </div>
+</div>
+
+<script>
+const categories=['All','Dental Caravan','Medical Mission','Vaccination','Free Check-up','Mental Health','Nutrition and Fitness','Blood Donation','Other'];
+const state={category:'',period:'upcoming',search:'',posts:[]};
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+const MON=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+const parseD=v=>{const d=new Date(`${v}T00:00:00`);return isNaN(d)?null:d};
+const dateText=v=>{const d=parseD(v);return d?d.toLocaleDateString(undefined,{month:'long',day:'numeric',year:'numeric'}):'Date to be announced'};
+const t=s=>{const d=new Date(`1970-01-01T${s}`);return isNaN(d)?'':d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})};
+const timeText=(a,b)=>a?`${t(a)}${b?' – '+t(b):''}`:'Time to be announced';
+const iconFor=c=>({'Medical Mission':'cross','Free Check-up':'cross','Vaccination':'cross','Blood Donation':'drop','Nutrition and Fitness':'leaf'})[c]||'heart';
+let lastFocus=null;
+
+$('categoryChips').innerHTML=categories.map(c=>`<button type="button" class="chip" aria-pressed="${c==='All'}" data-category="${esc(c==='All'?'':c)}">${esc(c)}</button>`).join('');
+
+function show(which){['healthLoading','healthError','healthEmpty','healthGrid'].forEach(id=>$(id).hidden=id!==which)}
+function render(){
+  const list=state.posts.filter(p=>(!state.category||p.category===state.category)&&(!state.search||`${p.title} ${p.description||''} ${p.venue||''}`.toLowerCase().includes(state.search)));
+  $('count').textContent=list.length?`${list.length} ${list.length===1?'program':'programs'}`:'';
+  if(!list.length){
+    const past=state.period==='past',filt=state.category||state.search;
+    $('emptyTitle').textContent=filt?'No matching announcements':past?'No past programs yet':'No upcoming programs yet';
+    $('emptyText').textContent=filt?'Try another category or search.':'Check back soon for new health programs.';
+    show('healthEmpty');return;
+  }
+  show('healthGrid');
+  $('healthGrid').innerHTML=list.map(p=>{
+    const d=parseD(p.event_date),off=p.status==='Cancelled';
+    return `<article class="card ${off?'off':''}">
+      <div class="img">${p.image_path?`<img src="${esc(p.image_path)}" alt="" loading="lazy">`:`<svg class="ic big"><use href="#k-${iconFor(p.category)}"/></svg>`}
+        ${d?`<div class="date"><b>${d.getDate()}</b><span>${MON[d.getMonth()]}</span></div>`:''}${off?'<span class="ribbon">CANCELLED</span>':''}</div>
+      <div class="body"><span class="cat">${esc(p.category)}</span><h2>${esc(p.title)}</h2>
+        <ul class="meta"><li><svg class="ic"><use href="#k-cal"/></svg><span>${esc(dateText(p.event_date))}${p.start_time?' · '+esc(timeText(p.start_time,p.end_time)):''}</span></li>
+        <li><svg class="ic"><use href="#k-pin"/></svg><span>${esc(p.venue||'Venue to be announced')}</span></li></ul>
+        ${p.slots?`<span class="slots"><svg class="ic"><use href="#k-id"/></svg>Slots: ${esc(p.slots)}</span>`:''}
+        <button type="button" class="cta health-details-btn" data-id="${esc(p.id)}">View details<svg class="ic"><use href="#k-go"/></svg></button></div></article>`;
+  }).join('');
+}
+
+function openDetails(p){
+  if(!p)return;lastFocus=document.activeElement;
+  const off=p.status==='Cancelled',row=(i,l,v)=>`<div><span class="ico"><svg class="ic"><use href="#k-${i}"/></svg></span><span><dt>${l}</dt><dd>${esc(v)}</dd></span></div>`;
+  $('detailsContent').innerHTML=`
+    <div class="img">${p.image_path?`<img src="${esc(p.image_path)}" alt="">`:`<svg class="ic big"><use href="#k-${iconFor(p.category)}"/></svg>`}</div>
+    <div class="sb"><span class="cat">${esc(p.category)}</span><h2 id="detailsTitle">${esc(p.title)}</h2>
+    ${off?'<div class="alert">This activity has been cancelled.</div>':''}
+    <p class="desc">${esc(p.description||'More details will be announced soon.')}</p>
+    <dl class="info">${row('cal','Schedule',dateText(p.event_date)+(p.start_time?', '+timeText(p.start_time,p.end_time):''))}${row('pin','Venue',p.venue||'To be announced')}${p.requirements?row('file','Requirements',p.requirements):''}${p.slots?row('id','Slots',p.slots):''}</dl>
+    <p class="note"><svg class="ic"><use href="#k-id"/></svg>Please bring your Digital Youth ID.</p></div>`;
+  const m=$('detailsModal');m.classList.add('on');m.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';m.querySelector('.close').focus();
+}
+function closeDetails(){
+  const m=$('detailsModal');if(!m.classList.contains('on'))return;
+  m.classList.remove('on');m.setAttribute('aria-hidden','true');document.body.style.overflow='';if(lastFocus)lastFocus.focus();
+}
+
+async function loadAnnouncements(){
+  show('healthLoading');
+  try{
+    const params=new URLSearchParams({period:state.period});
+    if(state.category)params.set('category',state.category);
+    if(state.search)params.set('search',state.search);
+    const r=await fetch(`api/health_announcements/list_public.php?${params}`,{credentials:'same-origin'});
+    if(!r.ok)throw new Error('Request failed');
+    const d=await r.json();if(!d.success)throw new Error(d.message||'Request failed');
+    state.posts=d.data||[];render();
+  }catch(e){console.error(e);$('count').textContent='';show('healthError')}
+}
+
+$('categoryChips').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  $('categoryChips').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));
+  state.category=b.dataset.category;loadAnnouncements();
+});
+document.querySelectorAll('.health-toggle button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.health-toggle button').forEach(x=>x.setAttribute('aria-pressed',x===b));
+  state.period=b.dataset.period;loadAnnouncements();
+}));
+let timer;
+$('searchInput').addEventListener('input',e=>{clearTimeout(timer);state.search=e.target.value.trim().toLowerCase();timer=setTimeout(loadAnnouncements,250)});
+$('healthGrid').addEventListener('click',e=>{const b=e.target.closest('[data-id]');if(b)openDetails(state.posts.find(p=>String(p.id)===b.dataset.id))});
+$('retry').onclick=loadAnnouncements;
+document.querySelector('.health-modal-close').addEventListener('click',closeDetails);
+$('detailsModal').addEventListener('click',e=>{if(e.target.id==='detailsModal')closeDetails()});
+addEventListener('keydown',e=>{if(e.key==='Escape')closeDetails()});
+loadAnnouncements();
+</script>
+<script src="js/auth-guard.js" data-roles="youth"></script>
+<script src="js/youth-nav.js?v=20261021-3"></script>
+<script src="assets/js/loader.js?v=3"></script>
+</body>
+</html>

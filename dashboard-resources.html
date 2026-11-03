@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SKalinga - Resources &amp; Lending</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/x-icon" href="/SKalinga/assets/icons/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/SKalinga/assets/icons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/SKalinga/assets/icons/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/SKalinga/assets/icons/apple-touch-icon.png">
+<link rel="manifest" href="/SKalinga/assets/icons/site.webmanifest">
+<meta name="msapplication-config" content="/SKalinga/assets/icons/browserconfig.xml">
+<meta name="theme-color" content="#FF6B9D">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="assets/css/dashboard.css">
+<link rel="stylesheet" href="assets/css/admin-theme.css">
+<link rel="stylesheet" href="assets/css/loader.css?v=3">
+<style>
+.lm,.lm-modal{--g:#228B57;--gd:#0F4D31;--mint:#A8E6CF;--pk:#FF6B9D;--pkd:#E04F7E;--ink:#16303F;--mu:#5F7788;--ln:#E3ECE7;--mono:"JetBrains Mono",ui-monospace,monospace}
+.lm *,.lm-modal *{box-sizing:border-box}
+.lm [hidden],.lm-modal [hidden]{display:none!important}
+.lm :focus-visible,.lm-modal :focus-visible{outline:3px solid var(--pkd);outline-offset:2px}
+.mono{font-family:var(--mono);font-size:.92em}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:18px}
+@media(min-width:900px){.stats{grid-template-columns:repeat(4,1fr);gap:16px}}
+.stat{display:flex;align-items:center;gap:14px;padding:16px 18px;border:1px solid var(--ln);border-radius:20px;background:#fff;box-shadow:0 2px 12px rgba(34,139,87,.06)}
+.stat .si{display:grid;place-items:center;width:46px;height:46px;border-radius:15px;background:#e9f7ef;color:var(--g);font-size:18px;flex:none}
+.stat.pink .si{background:#ffe9f1;color:var(--pkd)}.stat.amber .si{background:#fff4d6;color:#a86a00}.stat.sky .si{background:#e3f1fb;color:#14537e}
+.stat b{display:block;font-size:26px;line-height:1;letter-spacing:-.03em;color:var(--ink)}
+.stat span{display:block;margin-top:4px;color:var(--mu);font-size:12.5px;font-weight:600}
+
+/* toolbar */
+.bar{display:grid;gap:12px;margin-bottom:14px}
+@media(min-width:900px){.bar{grid-template-columns:1fr auto;align-items:center}}
+.find{position:relative;display:block;max-width:460px}
+.find i{position:absolute;left:16px;top:50%;margin-top:-7px;color:var(--mu);font-size:14px;pointer-events:none}
+.find input{width:100%;min-height:46px;padding:0 16px 0 42px;border:1.5px solid var(--ln);border-radius:14px;background:#fff;font:inherit;color:var(--ink)}
+.find input:focus{outline:none;border-color:var(--g);box-shadow:0 0 0 4px rgba(34,139,87,.14)}
+.acts{display:flex;gap:10px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 20px;border:0;border-radius:14px;font:600 14px inherit;font-family:inherit;cursor:pointer;transition:transform .15s,background .15s}
+.btn:active{transform:scale(.97)}
+.btn.pink{background:var(--pk);color:var(--ink);box-shadow:0 8px 20px rgba(255,107,157,.35)}.btn.pink:hover{background:#ff82ae}
+.btn.green{background:var(--g);color:#fff}.btn.green:hover{background:var(--gd)}
+.btn.soft{background:#f1f6f3;color:var(--ink)}.btn.soft:hover{background:#e3ece7}
+.btn.red{background:#d64545;color:#fff}.btn.red:hover{background:#b93636}
+.btn:disabled{opacity:.6;cursor:wait}
+.row2{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.tabs{display:inline-flex;padding:4px;border-radius:999px;background:#e9f7ef}
+.tabs button{min-height:40px;padding:0 18px;border:0;border-radius:999px;background:none;color:var(--gd);font:600 13.5px inherit;font-family:inherit;cursor:pointer}
+.tabs button[aria-pressed="true"]{background:#fff;box-shadow:0 2px 10px rgba(34,139,87,.2)}
+.chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 14px;border:1.5px solid var(--ln);border-radius:999px;background:#fff;color:var(--ink);font:600 13px inherit;font-family:inherit;cursor:pointer}
+.chip em{font-style:normal;min-width:22px;padding:1px 7px;border-radius:999px;background:#eef3f0;color:var(--mu);font-size:11.5px;text-align:center}
+.chip[aria-pressed="true"]{border-color:var(--g);background:var(--g);color:#fff}.chip[aria-pressed="true"] em{background:rgba(255,255,255,.22);color:#fff}
+
+/* table */
+.tw{border:1px solid var(--ln);border-radius:20px;background:#fff;overflow:hidden;box-shadow:0 2px 12px rgba(34,139,87,.06)}
+.tw .scroll{overflow-x:auto}
+table.lt{width:100%;border-collapse:collapse;font-size:14px}
+.lt th{position:sticky;top:0;padding:13px 16px;background:#f4fbf7;color:var(--mu);font-size:11.5px;font-weight:700;letter-spacing:.06em;text-align:left;text-transform:uppercase;white-space:nowrap;border-bottom:1px solid var(--ln)}
+.lt td{padding:14px 16px;border-bottom:1px solid #eef3f0;color:var(--ink);vertical-align:middle}
+.lt tbody tr:last-child td{border-bottom:0}
+.lt tbody tr:hover{background:#fafdfb}
+.who b{display:block;font-weight:600}.who span{color:var(--mu);font-size:12.5px}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap}
+.pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.pill.borrowed{background:#e3f1fb;color:#14537e}.pill.overdue{background:#ffe3ec;color:#a02350}.pill.returned{background:#dff5e8;color:var(--gd)}
+.pill.ok{background:#dff5e8;color:var(--gd)}.pill.low{background:#fff4d6;color:#7a5600}.pill.out{background:#ffe3ec;color:#a02350}
+.ab{display:flex;gap:6px}
+.ib{display:grid;place-items:center;width:38px;height:38px;border:0;border-radius:12px;background:#f1f6f3;color:var(--ink);cursor:pointer;transition:background .15s,color .15s}
+.ib:hover{background:var(--g);color:#fff}.ib.ret:hover{background:var(--pk);color:var(--ink)}.ib.del:hover{background:#d64545;color:#fff}
+.empty{padding:44px 20px;text-align:center;color:var(--mu)}
+.empty i{display:block;margin-bottom:10px;font-size:30px;color:#b9d9c8}
+@media(max-width:820px){
+  .lt thead{display:none}
+  .lt,.lt tbody,.lt tr,.lt td{display:block;width:100%}
+  .lt tr{padding:14px 16px;border-bottom:1px solid var(--ln)}
+  .lt tr:last-child{border-bottom:0}
+  .lt td{display:flex;justify-content:space-between;gap:14px;padding:5px 0;border:0;text-align:right}
+  .lt td::before{content:attr(data-l);color:var(--mu);font-size:12px;font-weight:700;text-align:left;flex:none}
+  .lt td.ab-td{justify-content:flex-end;padding-top:10px}.lt td.ab-td::before{display:none}
+}
+
+/* inventory */
+.inv{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.item{padding:18px;border:1px solid var(--ln);border-radius:20px;background:#fff;box-shadow:0 2px 12px rgba(34,139,87,.06)}
+.item h3{margin:0 0 4px;font-size:16px}.item p{margin:0 0 12px;color:var(--mu);font-size:13px;min-height:18px}
+.item .top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.meter{height:8px;border-radius:9px;background:#e9f7ef;overflow:hidden;margin:6px 0 8px}.meter i{display:block;height:100%;border-radius:9px;background:var(--g)}
+.item.lowc .meter i{background:#e0a100}.item.outc .meter i{background:var(--pk)}
+.item small{color:var(--mu);font-weight:600}
+.inventory-toolbar{grid-column:1/-1;display:flex;justify-content:flex-end}
+.item-actions{display:flex;gap:8px;margin-top:14px}
+.item-actions .btn{min-height:38px;padding:0 13px;font-size:12.5px}
+
+/* modals */
+.lm-modal{position:fixed;inset:0;z-index:9500;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(15,77,49,.55);backdrop-filter:blur(6px);opacity:0;visibility:hidden;transition:opacity .2s,visibility .2s;font-family:inherit}
+.lm-modal.on{opacity:1;visibility:visible}
+.box{position:relative;width:min(100%,520px);max-height:92vh;overflow-y:auto;padding:26px;border-radius:24px;background:#fff;color:var(--ink);transform:translateY(12px);transition:transform .25s}
+.lm-modal.on .box{transform:none}
+.box.sm{width:min(100%,420px)}
+.box h2{margin:0 44px 6px 0;font-size:22px;letter-spacing:-.02em}
+.box>p.lead{margin:0 0 18px;color:var(--mu);font-size:14px}
+.cl{position:absolute;top:14px;right:14px;display:grid;place-items:center;width:40px;height:40px;border:1px solid var(--ln);border-radius:50%;background:#fff;color:var(--mu);cursor:pointer}
+.cl:hover{color:var(--pkd)}
+.f{margin-bottom:14px}
+.f label{display:block;margin:0 0 6px;font-weight:600;font-size:13px}
+.f input,.f select,.f textarea{width:100%;min-height:46px;padding:10px 14px;border:1.5px solid var(--ln);border-radius:12px;background:#fff;font:inherit;color:var(--ink)}
+.f textarea{min-height:90px;resize:vertical}
+.f input:focus,.f select:focus,.f textarea:focus{outline:none;border-color:var(--g);box-shadow:0 0 0 4px rgba(34,139,87,.14)}
+.two{display:grid;gap:12px;grid-template-columns:1fr 1fr}
+@media(max-width:480px){.two{grid-template-columns:1fr}}
+.quick{display:flex;gap:6px;margin-top:8px}
+.quick button{min-height:34px;padding:0 12px;border:1.5px solid var(--ln);border-radius:999px;background:#fff;font:600 12.5px inherit;font-family:inherit;cursor:pointer}
+.quick button:hover{border-color:var(--g);color:var(--g)}
+.scanbox{display:flex;gap:10px}.scanbox .f{flex:1;margin:0}
+.found{display:flex;gap:12px;align-items:center;margin:16px 0;padding:14px;border:1.5px solid #b9d9c8;border-radius:18px;background:#f4fbf7}
+.found .av{display:grid;place-items:center;width:46px;height:46px;border-radius:15px;background:var(--g);color:#fff;font-weight:700;font-size:19px;flex:none}
+.found b{display:block}.found span{color:var(--mu);font-size:13px}
+.det{display:grid;gap:8px;margin:0}
+.det div{display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px dashed var(--ln);font-size:14px}
+.det div:last-child{border:0}.det dt{color:var(--mu)}.det dd{margin:0;font-weight:600;text-align:right;overflow-wrap:anywhere}
+.fa-end{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+#toastContainer{position:fixed;z-index:10000;right:20px;bottom:20px;display:grid;gap:10px;width:min(360px,calc(100% - 40px))}
+.toast{padding:14px 16px;border-radius:14px;background:#fff;border-left:4px solid var(--g);box-shadow:0 12px 32px rgba(22,48,63,.2);font-size:14px;font-weight:600}
+.toast.error{border-color:#d64545}.toast.warning{border-color:#e0a100}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app-container">
+  <aside class="sidebar" id="adminSidebar"></aside>
+  <main class="main-content">
+    <header class="top-header">
+      <div class="header-left"><h2>Resources &amp; Lending</h2><p id="dashboard-datetime">Loading date and time...</p></div>
+      <div class="header-right"><div class="user-profile-card"><div class="user-avatar-new" id="userAvatarInitials">--</div><div class="user-details"><h4 id="userFullName">Loading...</h4><span class="user-role-badge" id="userRole">Administrator</span></div></div></div>
+    </header>
+
+    <div class="dashboard-content lm">
+      <section class="stats" aria-label="Lending summary">
+        <div class="stat"><span class="si"><i class="fas fa-box"></i></span><div><b id="sStock">0</b><span>Units in stock</span></div></div>
+        <div class="stat sky"><span class="si"><i class="fas fa-hand-holding"></i></span><div><b id="sBorrowed">0</b><span>Borrowed now</span></div></div>
+        <div class="stat pink"><span class="si"><i class="fas fa-clock"></i></span><div><b id="sOverdue">0</b><span>Overdue</span></div></div>
+        <div class="stat amber"><span class="si"><i class="fas fa-rotate-left"></i></span><div><b id="sReturned">0</b><span>Returned</span></div></div>
+      </section>
+
+      <div class="bar">
+        <label class="find"><span style="position:absolute;width:1px;height:1px;overflow:hidden">Search records</span><i class="fas fa-magnifying-glass"></i><input type="search" id="searchInput" placeholder="Search by item or borrower" autocomplete="off"></label>
+        <div class="acts">
+          <button class="btn pink" id="recordBorrowBtn" type="button"><i class="fas fa-plus"></i>Record borrowing</button>
+          <button class="btn soft" id="scanReturnBtn" type="button"><i class="fas fa-rotate-left"></i>Find loan to return</button>
+        </div>
+      </div>
+
+      <div class="row2">
+        <div class="tabs" role="group" aria-label="View">
+          <button type="button" data-view="records" aria-pressed="true">Lending records</button>
+          <button type="button" data-view="inventory" aria-pressed="false">Inventory</button>
+        </div>
+        <div class="chips" id="statusChips" role="group" aria-label="Filter by status">
+          <button class="chip" type="button" data-s="" aria-pressed="true">All<em id="cAll">0</em></button>
+          <button class="chip" type="button" data-s="Borrowed" aria-pressed="false">Borrowed<em id="cBorrowed">0</em></button>
+          <button class="chip" type="button" data-s="Overdue" aria-pressed="false">Overdue<em id="cOverdue">0</em></button>
+          <button class="chip" type="button" data-s="Returned" aria-pressed="false">Returned<em id="cReturned">0</em></button>
+        </div>
+      </div>
+
+      <div class="tw" id="recordsView">
+        <div class="scroll">
+          <table class="lt admin-table" id="lendingTable">
+            <thead><tr><th>Item</th><th>Qty</th><th>Borrower</th><th>Borrowed</th><th>Due</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="lendingTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="inv" id="inventoryView" hidden></div>
+    </div>
+  </main>
+</div>
+
+<!-- Add item -->
+<div class="lm-modal" id="addItemModal" role="dialog" aria-modal="true" aria-labelledby="itemModalTitle">
+  <div class="box">
+    <button class="cl" id="closeItemModal" type="button" aria-label="Close"><i class="fas fa-xmark"></i></button>
+    <h2 id="itemModalTitle">Add borrowable item</h2><p class="lead">New items become available for youth to borrow right away.</p>
+    <form id="itemForm">
+      <div class="f"><label for="itemName">Item name *</label><input type="text" id="itemName" placeholder="Projector, microphone, basketball..." required></div>
+      <div class="f"><label for="itemDescription">Description</label><textarea id="itemDescription" placeholder="Brand, condition, notes..."></textarea></div>
+      <div class="f"><label for="itemQuantity">Quantity available *</label><input type="number" id="itemQuantity" min="1" value="1" required></div>
+      <div class="fa-end"><button class="btn soft" type="button" data-close="addItemModal">Cancel</button><button class="btn green" type="submit" id="itemSave">Save item</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- Edit inventory item -->
+<div class="lm-modal" id="editItemModal" role="dialog" aria-modal="true" aria-labelledby="editItemTitle">
+  <div class="box">
+    <button class="cl" id="closeEditItemModal" type="button" aria-label="Close"><i class="fas fa-xmark"></i></button>
+    <h2 id="editItemTitle">Edit inventory item</h2><p class="lead">Update item details or add stock without changing items currently on loan.</p>
+    <form id="editItemForm">
+      <input type="hidden" id="editItemId">
+      <div class="f"><label for="editItemName">Item name *</label><input type="text" id="editItemName" required></div>
+      <div class="f"><label for="editItemDescription">Description</label><textarea id="editItemDescription"></textarea></div>
+      <div class="f"><label for="restockQuantity">Add stock quantity</label><input type="number" id="restockQuantity" min="0" value="0" required></div>
+      <div class="fa-end"><button class="btn soft" type="button" data-close="editItemModal">Cancel</button><button class="btn green" type="submit" id="editItemSave">Save changes</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- Borrow -->
+<div class="lm-modal" id="borrowModal" role="dialog" aria-modal="true" aria-labelledby="borrowModalTitle">
+  <div class="box">
+    <button class="cl" id="closeBorrowModal" type="button" aria-label="Close"><i class="fas fa-xmark"></i></button>
+    <h2 id="borrowModalTitle">Record a borrowing</h2><p class="lead">Enter the member number and borrowing details.</p>
+    <div id="borrowForm">
+      <form id="borrowFormElement">
+        <div class="f"><label for="borrowYouthId">Member ID *</label><input type="text" id="borrowYouthId" maxlength="50" required></div>
+        <div class="f"><label for="borrowItem">Item to borrow *</label><select id="borrowItem" required></select></div>
+        <div class="f"><label for="borrowQuantity">Quantity *</label><input type="number" id="borrowQuantity" min="1" value="1" required></div>
+        <div class="two">
+          <div class="f"><label for="borrowDate">Borrow date *</label><input type="date" id="borrowDate" required></div>
+          <div class="f"><label for="dueDate">Due date *</label><input type="date" id="dueDate" required></div>
+        </div>
+        <div class="quick" aria-label="Quick due date"><button type="button" data-days="1">Tomorrow</button><button type="button" data-days="3">3 days</button><button type="button" data-days="7">1 week</button></div>
+        <div class="fa-end"><button class="btn soft" type="button" data-close="borrowModal">Cancel</button><button class="btn pink" type="submit" id="borrowSave">Confirm borrow</button></div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Return by youth ID -->
+<div class="lm-modal" id="returnScanModal" role="dialog" aria-modal="true" aria-labelledby="returnScanTitle">
+  <div class="box">
+    <button class="cl" id="closeReturnScanModal" type="button" aria-label="Close"><i class="fas fa-xmark"></i></button>
+    <h2 id="returnScanTitle">Return an item</h2><p class="lead">Find the member’s active loan and record its condition on return.</p>
+    <div class="scanbox"><div class="f"><label for="returnYouthId" style="position:absolute;width:1px;height:1px;overflow:hidden">Youth ID</label><input type="text" id="returnYouthId" placeholder="SK-2024-XXXX" autocomplete="off" style="text-transform:uppercase"></div><button id="lookupReturnYouthBtn" class="btn green" type="button">Look up</button></div>
+    <div id="returnYouthInfo" class="found" hidden></div>
+    <form id="returnForm" hidden>
+      <div class="f"><label for="returnBorrowId">Item to return *</label><select id="returnBorrowId" required></select></div>
+      <div class="f"><label for="returnCondition">Condition after return *</label><textarea id="returnCondition" maxlength="500" placeholder="Describe the item's condition after return" required></textarea></div>
+      <div class="fa-end"><button class="btn soft" type="button" data-close="returnScanModal">Cancel</button><button class="btn pink" type="submit" id="returnSave">Confirm return</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- View -->
+<div class="lm-modal" id="viewLendingModal" role="dialog" aria-modal="true" aria-labelledby="viewTitle">
+  <div class="box">
+    <button class="cl" id="closeViewLending" type="button" aria-label="Close"><i class="fas fa-xmark"></i></button>
+    <h2 id="viewTitle">Lending record</h2>
+    <dl class="det" id="lendingDetails"></dl>
+    <div class="fa-end" id="viewActions"></div>
+  </div>
+</div>
+
+<!-- Confirm -->
+<div class="lm-modal" id="confirmationModal" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle">
+  <div class="box sm">
+    <h2 id="confirmTitle">Confirm action</h2><p class="lead" id="confirmMessage"></p>
+    <div class="fa-end"><button id="confirmCancelBtn" class="btn soft" type="button">Cancel</button><button id="confirmOkBtn" class="btn red" type="button"><span id="confirmOkBtnText">Confirm</span></button></div>
+  </div>
+</div>
+
+<div id="toastContainer" aria-live="polite"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+const youthIdFromScan=value=>(String(value||'').toUpperCase().match(/SK-\d{4}-\d{4}/)||[])[0]||'';
+let itemsData=[],lendingData=[],statusFilter='',view='records',lookingUp=false,lookTimer;
+let csrfToken='';
+
+async function getCsrfToken(){
+  if(csrfToken)return csrfToken;
+  const response=await fetch('api/csrf_token.php',{credentials:'same-origin',cache:'no-store'});
+  const data=await response.json();
+  if(!response.ok||!data.success||!data.csrf_token)throw new Error(data.message||'Unable to prepare a secure request.');
+  csrfToken=data.csrf_token;
+  return csrfToken;
+}
+
+/* ---- feedback (uses showAlert from admin-common.js when present) ---- */
+function notify(msg,type='success'){
+  if(typeof showAlert==='function'){showAlert(msg,type);return}
+  const t=document.createElement('div');t.className='toast '+type;t.textContent=msg;$('toastContainer').appendChild(t);setTimeout(()=>t.remove(),4000);
+}
+
+/* ---- modals ---- */
+const openM=id=>{$(id).classList.add('on');document.body.style.overflow='hidden'};
+const closeM=id=>{$(id).classList.remove('on');if(!document.querySelector('.lm-modal.on'))document.body.style.overflow=''};
+document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>closeM(b.dataset.close)));
+[['closeItemModal','addItemModal'],['closeEditItemModal','editItemModal'],['closeBorrowModal','borrowModal'],['closeReturnScanModal','returnScanModal'],['closeViewLending','viewLendingModal']].forEach(([b,m])=>$(b).onclick=()=>closeM(m));
+document.querySelectorAll('.lm-modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeM(m.id)}));
+addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.lm-modal.on').forEach(m=>closeM(m.id))});
+
+function showConfirm(message,onConfirm,label='Confirm'){
+  $('confirmMessage').textContent=message;$('confirmOkBtnText').textContent=label;openM('confirmationModal');$('confirmCancelBtn').focus();
+  $('confirmOkBtn').onclick=()=>{closeM('confirmationModal');if(onConfirm)onConfirm()};
+  $('confirmCancelBtn').onclick=()=>closeM('confirmationModal');
+}
+
+/* ---- clock ---- */
+function updateDashboardDateTime(){
+  $('dashboard-datetime').textContent=new Date().toLocaleString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true});
+}
+setInterval(updateDashboardDateTime,30000);updateDashboardDateTime();
+
+/* ---- data ---- */
+async function getJSON(url){try{const r=await fetch(url),d=await r.json();if(d.success)return d.data||[];console.error(url,d.error)}catch(e){console.error(url,e)}return[]}
+const loadResources=async()=>itemsData=await getJSON('api/get_resources.php');
+const loadBorrowRecords=async()=>lendingData=await getJSON('api/get_borrow_records.php');
+const dayOf=d=>{const x=new Date(d);return isNaN(x)?null:new Date(x.getFullYear(),x.getMonth(),x.getDate())};
+function statusOf(r){
+  if(r.status==='Returned'||r.return_date)return 'Returned';
+  if(r.status==='Overdue')return 'Overdue';
+  const due=dayOf(r.due_date),t=dayOf(new Date());return due&&due<t?'Overdue':'Borrowed';
+}
+const fmt=d=>{const x=new Date(d);return isNaN(x)?'—':x.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})};
+
+/* ---- render ---- */
+function renderStats(){
+  const s=lendingData.map(statusOf),count=k=>s.filter(x=>x===k).length;
+  $('sStock').textContent=itemsData.reduce((a,i)=>a+(Number(i.available)||0),0);
+  $('sBorrowed').textContent=count('Borrowed')+count('Overdue');$('sOverdue').textContent=count('Overdue');$('sReturned').textContent=count('Returned');
+  $('cAll').textContent=s.length;$('cBorrowed').textContent=count('Borrowed');$('cOverdue').textContent=count('Overdue');$('cReturned').textContent=count('Returned');
+}
+function renderLendingTable(list=lendingData){
+  const tb=$('lendingTableBody');
+  if(!list.length){tb.innerHTML=`<tr><td colspan="7" class="empty"><i class="fas fa-box-open"></i>No borrowing records found</td></tr>`;return}
+  tb.innerHTML=list.map(r=>{
+    const st=statusOf(r),id=esc(r.borrow_id);
+    return `<tr>
+      <td data-l="Item"><div class="who"><b>${esc(r.item_name)}</b><span class="mono">${esc(r.item_id)}</span></div></td>
+      <td data-l="Qty" class="mono">${esc(r.quantity||1)}</td>
+      <td data-l="Borrower"><div class="who"><b>${esc(r.borrower_name)}</b><span class="mono">${esc(r.member_id)}</span></div></td>
+      <td data-l="Borrowed">${esc(fmt(r.borrow_date))}</td><td data-l="Due">${esc(fmt(r.due_date))}</td>
+      <td data-l="Status"><span class="pill ${st.toLowerCase()}">${st}</span></td>
+      <td class="ab-td"><div class="ab">
+        <button class="ib" type="button" data-act="view" data-id="${id}" aria-label="View details" title="View details"><i class="fas fa-eye"></i></button>
+        ${st!=='Returned'?`<button class="ib ret" type="button" data-act="return" data-id="${id}" aria-label="Mark as returned" title="Mark as returned"><i class="fas fa-rotate-left"></i></button>`:''}
+        <button class="ib del" type="button" data-act="delete" data-id="${id}" aria-label="Delete record" title="Delete record"><i class="fas fa-trash"></i></button></div></td></tr>`;
+  }).join('');
+}
+function renderInventory(){
+  const q=$('searchInput').value.toLowerCase().trim(),list=itemsData.filter(i=>`${i.name} ${i.description||''}`.toLowerCase().includes(q));
+  $('inventoryView').innerHTML=`<div class="inventory-toolbar"><button class="btn green" id="addItemBtn" type="button"><i class="fas fa-plus"></i>Add item</button></div>`+(list.length?list.map(i=>{
+    const a=Number(i.available)||0,t=Number(i.quantity)||0,pct=t?Math.round(a/t*100):0,k=a===0?'out':pct<=30?'low':'ok';
+    return `<article class="item ${k==='ok'?'':k+'c'}"><div class="top"><h3>${esc(i.name)}</h3><span class="pill ${k}">${k==='out'?'Out of stock':k==='low'?'Low stock':'Available'}</span></div>
+      <p>${esc(i.description||'')}</p><div class="meter"><i style="width:${pct}%"></i></div><small><span class="mono">${a}</span> of <span class="mono">${t}</span> available</small>
+      <div class="item-actions"><button class="btn soft" type="button" data-edit-item="${esc(i.item_id)}"><i class="fas fa-pen"></i>Edit / restock</button></div></article>`;
+  }).join(''):`<div class="empty" style="grid-column:1/-1"><i class="fas fa-box-open"></i>No items found</div>`);
+}
+function filterLending(){
+  renderStats();
+  if(view==='inventory'){renderInventory();return}
+  const q=$('searchInput').value.toLowerCase().trim();
+  renderLendingTable(lendingData.filter(r=>`${r.item_name} ${r.member_id} ${r.borrower_name}`.toLowerCase().includes(q)&&(!statusFilter||statusOf(r)===statusFilter)));
+}
+$('searchInput').addEventListener('input',filterLending);
+$('statusChips').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;statusFilter=b.dataset.s;document.querySelectorAll('.chip').forEach(x=>x.setAttribute('aria-pressed',x===b));filterLending()});
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{
+  view=b.dataset.view;document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-pressed',x===b));
+  $('recordsView').hidden=view!=='records';$('inventoryView').hidden=view!=='inventory';$('statusChips').hidden=view!=='records';filterLending();
+}));
+$('lendingTableBody').addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]');if(!b)return;
+  ({view:viewLending,return:returnItem,delete:deleteLending})[b.dataset.act](b.dataset.id);
+});
+document.addEventListener('click',e=>{
+  if(e.target.closest('#addItemBtn')){$('itemForm').reset();openM('addItemModal');$('itemName').focus();return}
+  const edit=e.target.closest('[data-edit-item]');
+  if(edit){
+    const item=itemsData.find(i=>String(i.item_id)===edit.dataset.editItem);
+    if(!item){notify('Inventory item not found. Refresh and try again.','error');return}
+    $('editItemForm').reset();$('editItemId').value=item.item_id;$('editItemName').value=item.name;$('editItemDescription').value=item.description||'';$('restockQuantity').value=0;
+    openM('editItemModal');$('editItemName').focus();
+  }
+});
+const refresh=async()=>{await Promise.all([loadResources(),loadBorrowRecords()]);populateBorrowItemDropdown();filterLending()};
+
+/* ---- add item ---- */
+$('itemForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const name=$('itemName').value.trim(),description=$('itemDescription').value.trim(),quantity=parseInt($('itemQuantity').value,10);
+  if(!name||!(quantity>=1)){notify('Please fill in all required fields with valid values','warning');return}
+  $('itemSave').disabled=true;
+  try{
+    const r=await fetch('api/add_resource.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,description,quantity})}),d=await r.json();
+    if(d.success){notify('Item added successfully!');closeM('addItemModal');await refresh()}else notify('Error: '+d.error,'error');
+  }catch(err){console.error(err);notify('Failed to add item. Please try again.','error')}
+  $('itemSave').disabled=false;
+});
+
+/* ---- inventory edit / restock ---- */
+$('editItemForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const item_id=$('editItemId').value,name=$('editItemName').value.trim(),description=$('editItemDescription').value.trim(),restock_quantity=parseInt($('restockQuantity').value,10);
+  if(!item_id||!name||!Number.isInteger(restock_quantity)||restock_quantity<0){notify('Enter a valid item name and a non-negative stock quantity.','warning');return}
+  $('editItemSave').disabled=true;
+  try{
+    const r=await fetch('api/update_resource.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({item_id,name,description,restock_quantity})}),d=await r.json();
+    if(d.success){notify('Inventory item updated successfully.');closeM('editItemModal');await refresh()}else notify('Error: '+d.error,'error');
+  }catch(err){console.error(err);notify('Failed to update inventory item. Please try again.','error')}
+  finally{$('editItemSave').disabled=false}
+});
+
+/* ---- borrow and return ---- */
+function resetScan(){
+  $('borrowFormElement').reset();
+  populateBorrowItemDropdown();
+  setDefaultDates();
+}
+$('recordBorrowBtn').onclick=()=>{resetScan();openM('borrowModal');setTimeout(()=>$('borrowYouthId').focus(),50)};
+$('scanReturnBtn').onclick=()=>{resetReturnScan();openM('returnScanModal');setTimeout(()=>$('returnYouthId').focus(),50)};
+function populateBorrowItemDropdown(){
+  const s=$('borrowItem');if(!s)return;
+  const avail=itemsData.filter(i=>Number(i.available)>0);
+  s.innerHTML='<option value="" disabled selected>Select item</option>'+(avail.length?avail.map(i=>`<option value="${esc(i.item_id)}">${esc(i.name)} (${esc(i.available)}/${esc(i.quantity)} available)</option>`).join(''):'<option disabled>No items available</option>');
+}
+$('borrowItem').addEventListener('change',()=>{
+  const it=itemsData.find(i=>String(i.item_id)===$('borrowItem').value);
+  if(it){$('borrowQuantity').max=it.available;if(+$('borrowQuantity').value>it.available)$('borrowQuantity').value=it.available}
+});
+function resetReturnScan(){
+  $('returnYouthId').value='';$('returnYouthInfo').hidden=true;$('returnYouthInfo').innerHTML='';
+  $('returnForm').hidden=true;$('returnForm').reset();$('returnBorrowId').innerHTML='';
+}
+function showReturnLoans(memberId,selectedBorrowId=''){
+  const active=lendingData.filter(r=>String(r.member_id).toUpperCase()===memberId&&statusOf(r)!=='Returned');
+  $('returnBorrowId').innerHTML=(selectedBorrowId?'':'<option value="" disabled selected>Select a borrowed item</option>')+active.map(r=>`<option value="${esc(r.borrow_id)}"${String(r.borrow_id)===String(selectedBorrowId)?' selected':''}>${esc(r.item_name)} × ${esc(r.quantity||1)} — due ${esc(fmt(r.due_date))}</option>`).join('');
+  $('returnForm').hidden=!active.length;
+  if(!active.length)notify('No active borrowed items were found for this Youth ID.','warning');
+  if(active.length)$('returnCondition').focus();
+}
+function showReturnYouth(memberId,name,phone=''){
+  $('returnYouthInfo').innerHTML=`<span class="av">${esc(name.charAt(0).toUpperCase())}</span><div><b>${esc(name)}</b><span><span class="mono">${esc(memberId)}</span>${phone?' · '+esc(phone):''}</span></div>`;
+  $('returnYouthInfo').hidden=false;
+  showReturnLoans(memberId);
+}
+async function lookupReturnYouth(){
+  const memberId=youthIdFromScan($('returnYouthId').value);
+  if(!memberId){notify('Please scan or enter a Youth ID.','warning');return}
+  $('returnYouthId').value=memberId;
+  $('lookupReturnYouthBtn').disabled=true;
+  try{
+    const r=await fetch('api/get_user.php?member_id='+encodeURIComponent(memberId)),d=await r.json();
+    if(!r.ok||!d.success||!d.user){notify(d.error||'Youth ID not found. Please verify and try again.','error');return}
+    const y=d.user,name=y.name||`${y.firstname||''} ${y.lastname||''}`.trim()||'Youth';
+    showReturnYouth(memberId,name,y.phone||'');
+  }catch(err){console.error(err);notify('Could not look up this Youth ID. Check your connection and try again.','error')}
+  finally{$('lookupReturnYouthBtn').disabled=false}
+}
+$('lookupReturnYouthBtn').onclick=lookupReturnYouth;
+$('returnYouthId').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();lookupReturnYouth()}});
+$('returnYouthId').addEventListener('input',function(){
+  clearTimeout(lookTimer);
+  if(youthIdFromScan(this.value))lookTimer=setTimeout(lookupReturnYouth,400);
+});
+$('returnForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const borrow_id=parseInt($('returnBorrowId').value,10),return_condition=$('returnCondition').value.trim();
+  if(!Number.isInteger(borrow_id)||!return_condition){notify('Select an item and describe its condition.','warning');return}
+  $('returnSave').disabled=true;
+  try{
+    const csrf=await getCsrfToken();
+    const r=await fetch('api/return_resource.php',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({borrow_id,return_condition})}),d=await r.json();
+    if(!r.ok||!d.success){notify('Error: '+(d.error||'Unable to return item.'),'error');return}
+    notify('Item returned successfully.');closeM('returnScanModal');resetReturnScan();await refresh();
+  }catch(err){console.error(err);notify('Failed to return item. Please try again.','error')}
+  finally{$('returnSave').disabled=false}
+});
+
+function setDefaultDates(days=1){
+  const t=new Date(),d=new Date(t);d.setDate(d.getDate()+days);
+  const f=x=>`${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`;
+  $('borrowDate').value=f(t);$('dueDate').value=f(d);
+}
+document.querySelectorAll('.quick button').forEach(b=>b.addEventListener('click',()=>{
+  const base=new Date(`${$('borrowDate').value}T00:00:00`);if(isNaN(base))return;
+  base.setDate(base.getDate()+Number(b.dataset.days));
+  $('dueDate').value=`${base.getFullYear()}-${String(base.getMonth()+1).padStart(2,'0')}-${String(base.getDate()).padStart(2,'0')}`;
+}));
+
+/* ---- borrow ---- */
+$('borrowFormElement').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const item_id=$('borrowItem').value,member_id=$('borrowYouthId').value.trim(),quantity=parseInt($('borrowQuantity').value,10),bd=$('borrowDate').value,due_date=$('dueDate').value;
+  if(!item_id||!member_id||!Number.isInteger(quantity)||!bd||!due_date||!(quantity>=1)){notify('Enter the member ID and complete all borrowing details.','warning');return}
+  if(new Date(due_date)<=new Date(bd)){notify('Due date must be after borrow date','warning');return}
+  const item=itemsData.find(i=>String(i.item_id)===String(item_id));
+  if(!item){notify('Item not found','error');return}
+  if(Number(item.available)<quantity){notify(`Only ${item.available} unit(s) available. Please adjust the quantity.`,'warning');return}
+  $('borrowSave').disabled=true;
+  try{
+    const csrf=await getCsrfToken();
+    const r=await fetch('api/borrow_resource.php',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({item_id,member_id,quantity,due_date})}),d=await r.json();
+    if(d.success){notify('Item borrowed successfully!');closeM('borrowModal');resetScan();await refresh()}else notify('Error: '+d.error,'error');
+  }catch(err){console.error(err);notify('Failed to borrow item. Please try again.','error')}
+  $('borrowSave').disabled=false;
+});
+
+/* ---- return / delete / view ---- */
+async function post(url,borrow_id,okMsg,failMsg){
+  try{
+    const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({borrow_id})}),d=await r.json();
+    if(d.success){notify(okMsg);await refresh()}else notify('Error: '+d.error,'error');
+  }catch(err){console.error(err);notify(failMsg,'error')}
+}
+const recOf=id=>lendingData.find(r=>String(r.borrow_id)===String(id));
+function returnItem(id){
+  const record=recOf(id);
+  if(!record){notify('Borrowing record not found. Refresh and try again.','error');return}
+  closeM('viewLendingModal');resetReturnScan();
+  const memberId=String(record.member_id||'').toUpperCase();
+  $('returnYouthId').value=memberId;
+  $('returnYouthInfo').innerHTML=`<span class="av">${esc(String(record.borrower_name||'Y').charAt(0).toUpperCase())}</span><div><b>${esc(record.borrower_name||'Youth')}</b><span class="mono">${esc(memberId)}</span></div>`;
+  $('returnYouthInfo').hidden=false;
+  showReturnLoans(memberId,id);
+  openM('returnScanModal');$('returnCondition').focus();
+}
+function deleteLending(id){closeM('viewLendingModal');showConfirm('Delete this lending record? This cannot be undone.',()=>post('api/delete_borrow_record.php',Number(id),'Lending record deleted successfully!','Failed to delete record. Please try again.'),'Delete')}
+function viewLending(id){
+  const r=recOf(id);if(!r){notify('Record not found','error');return}
+  const st=statusOf(r),dt=d=>{const x=new Date(d);return isNaN(x)?'—':x.toLocaleString()};
+  $('lendingDetails').innerHTML=[['Item',r.item_name],['Quantity',r.quantity||1],['Borrower',r.borrower_name],['Member ID',r.member_id],['Borrowed',dt(r.borrow_date)],['Due',dt(r.due_date)],['Returned',r.return_date?dt(r.return_date):'Not yet returned']]
+    .map(([k,v])=>`<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('')+`<div><dt>Status</dt><dd><span class="pill ${st.toLowerCase()}">${st}</span></dd></div>`+(r.return_condition?`<div><dt>Condition on return</dt><dd>${esc(r.return_condition)}</dd></div>`:'')+(r.description?`<div><dt>Item notes</dt><dd>${esc(r.description)}</dd></div>`:'');
+  $('viewActions').innerHTML=st!=='Returned'?`<button class="btn pink" type="button" id="vReturn"><i class="fas fa-rotate-left"></i>Mark as returned</button>`:'';
+  if(st!=='Returned')$('vReturn').onclick=()=>returnItem(id);
+  openM('viewLendingModal');
+}
+
+/* ---- profile + init ---- */
+async function loadUserProfile(){
+  try{const r=await fetch('api/get_user_profile.php'),d=await r.json();
+    if(d.success){$('userAvatarInitials').textContent=d.user.initials;$('userFullName').textContent=d.user.name;$('userRole').textContent=d.user.role}
+    else{console.error('Error loading user profile:',d.error);$('userFullName').textContent='Guest User'}}
+  catch(e){console.error('Error fetching user profile:',e);$('userFullName').textContent='Guest User'}
+}
+window.addEventListener('load',async()=>{setDefaultDates();await getCsrfToken().catch(error=>console.error(error));await loadUserProfile();await refresh()});
+</script>
+<script src="js/auth-guard.js" data-roles="admin,sk_official"></script>
+<script src="assets/js/loader.js?v=3"></script>
+<script src="js/admin-common.js"></script>
+<script src="js/admin-sidebar.js"></script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+/includes/config.local.php
+/.env
+/.env.*
+!/.env.example
+/logs/*.log
+/uploads/
+/database/skalinga_youth.sql

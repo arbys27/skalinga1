@@ -1,0 +1,562 @@
+/* assets/css/global.css */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --primary: #228B57;
+  --dark: #1a6b43;
+  --light: #A8E6CF;
+  --pink: #FF6B9D;
+  --sky: #5DADE2;
+  --bg: linear-gradient(135deg, #5dade2 0%, #7ec8e3 50%, #a8dff5 100%);
+  --white: #FFFFFF;
+  --text-dark: #222;
+  --text-gray: #666;
+  --shadow: rgba(93,173,226,0.28);
+  --border-light: rgba(168,230,207,0.55);
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  color: var(--text-dark);
+}
+
+.btn {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, var(--primary), var(--dark));
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(34,139,87,0.35);
+}
+
+.logo {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid white;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+  margin: 0 auto 24px;
+  display: block;
+}
+
+h1 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--primary);
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  text-align: center;
+  color: var(--text-gray);
+  font-size: 15px;
+  margin-bottom: 32px;
+}
+
+label {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 8px;
+  display: block;
+  color: #333;
+}
+
+input {
+  width: 100%;
+  padding: 15px 18px;
+  border: 2px solid var(--border-light);
+  border-radius: 12px;
+  font-size: 15px;
+  margin-bottom: 22px;
+  background: rgba(255,255,255,0.75);
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(34,139,87,0.18);
+}
+
+.extra {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 14.5px;
+  color: #555;
+}
+
+.extra a {
+  color: var(--pink);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 32px 24px;
+  }
+}
+
+/* assets/css/global.css */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --primary: #228B57;
+  --dark: #1a6b43;
+  --light: #A8E6CF;
+  --pink: #FF6B9D;
+  --sky: #5DADE2;
+  --white: #FFFFFF;
+  --text-dark: #222;
+  --text-gray: #666;
+  --shadow: rgba(93, 173, 226, 0.28);
+  --border-light: rgba(168, 230, 207, 0.55);
+}
+
+body {
+  font-family: 'DM Sans', 'IBM Plex Sans', sans-serif;
+  background: linear-gradient(135deg, #5dade2 0%, #7ec8e3 50%, #a8dff5 100%);
+  min-height: 100vh;
+  color: var(--text-dark);
+}
+
+.container {
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(14px);
+  border-radius: 24px;
+  width: 100%;
+  max-width: 980px;
+  overflow: hidden;
+  box-shadow: 0 12px 48px var(--shadow);
+  border: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: row;
+}
+
+.btn {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, var(--primary), var(--dark));
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s;
+  margin-top: 12px;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(34,139,87,0.35);
+}
+
+.btn:disabled {
+  background: #aaa;
+  cursor: not-allowed;
+}
+
+/* Common logo styles */
+.logo, .logos-row img, .header-logos img {
+  object-fit: contain;
+  border-radius: 50%;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+h1 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--primary);
+  text-align: center;
+}
+
+.subtitle {
+  text-align: center;
+  color: var(--text-gray);
+  font-size: 15px;
+  margin-bottom: 32px;
+}
+
+/* assets/css/global.css */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --primary: #228B57;
+  --dark:    #1a6b43;
+  --light:   #A8E6CF;
+  --pink:    #FF6B9D;
+  --sky:     #5DADE2;
+  --bg:      linear-gradient(135deg, #5dade2 0%, #7ec8e3 50%, #a8dff5 100%);
+  --white:   #FFFFFF;
+  --text-dark: #222;
+  --text-gray: #666;
+  --shadow:  rgba(93,173,226,0.28);
+  --border-light: rgba(168,230,207,0.55);
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  color: var(--text-dark);
+}
+
+.container {
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(14px);
+  border-radius: 24px;
+  width: 100%;
+  max-width: 980px;
+  overflow: hidden;
+  box-shadow: 0 12px 48px var(--shadow);
+  border: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: row;
+}
+
+h1 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--primary);
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  text-align: center;
+  color: var(--text-gray);
+  font-size: 15px;
+  margin-bottom: 32px;
+}
+
+label {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 8px;
+  display: block;
+  color: #333;
+}
+
+input {
+  width: 100%;
+  padding: 14px 18px;
+  border: 2px solid var(--border-light);
+  border-radius: 12px;
+  font-size: 15px;
+  margin-bottom: 20px;
+  background: rgba(255,255,255,0.9);
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(34,139,87,0.18);
+}
+
+.btn {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, var(--primary), var(--dark));
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s;
+  margin-top: 12px;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(34,139,87,0.35);
+}
+
+.btn:disabled {
+  background: #aaa;
+  cursor: not-allowed;
+}
+
+.privacy {
+  margin: 20px 0 28px;
+  font-size: 14px;
+  color: #444;
+  line-height: 1.5;
+}
+
+.privacy a {
+  color: var(--pink);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.privacy a:hover {
+  text-decoration: underline;
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  margin-top: 3px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.extra {
+  text-align: center;
+  margin-top: 28px;
+  font-size: 14.5px;
+  color: #555;
+}
+
+.extra a {
+  color: var(--pink);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* assets/css/global.css — add or update these for dashboard */
+
+:root {
+  --primary-green: #228B57;
+  --dark-green: #1a6b43;
+  --light-green: #A8E6CF;
+  --accent-pink: #FF6B9D;
+  --sky-blue: #5DADE2;
+  --white: #FFFFFF;
+  --soft-gray: #F5F7F8;
+  --dark-gray: #37474F;
+  --text-dark: #1a1a1a;
+  --text-gray: #666;
+  --border: rgba(93, 173, 226, 0.15);
+  --shadow: rgba(93, 173, 226, 0.12);
+  --hover-shadow: rgba(93, 173, 226, 0.2);
+}
+
+body {
+  font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: linear-gradient(135deg, #E8F6F3 0%, #D5EFF0 100%);
+  color: var(--text-dark);
+  overflow-x: hidden;
+}
+
+/* Common card / section styles */
+.content-card, .stat-card {
+  background: var(--white);
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.action-btn {
+  flex: 1;
+  padding: 20px 24px;
+  border-radius: 14px;
+  border: none;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.action-btn.primary {
+  background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-green) 100%);
+  color: white;
+  box-shadow: 0 4px 16px rgba(46, 125, 50, 0.25);
+}
+
+.action-btn.primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(46, 125, 50, 0.35);
+}
+
+.action-btn.secondary {
+  background: white;
+  color: var(--primary-green);
+  border: 2px solid var(--light-green);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.action-btn.secondary:hover {
+  background: var(--light-green);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 16px var(--shadow);
+}
+
+/* assets/css/global.css */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-green: #228B57;
+    --light-green: #A8E6CF;
+    --accent-pink: #FF6B9D;
+    --sky-blue: #5DADE2;
+    --white: #FFFFFF;
+    --soft-gray: #F5F7F8;
+    --text-dark: #1a1a1a;
+    --text-gray: #666;
+    --card-shadow: rgba(93, 173, 226, 0.12);
+}
+
+body {
+    font-family: 'DM Sans', sans-serif;
+    background: linear-gradient(135deg, #5DADE2 0%, #7EC8E3 50%, #A8DFF5 100%);
+    color: var(--text-dark);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+button, .nav-btn {
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.status-badge, .date-badge {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Top-right user badge (avatar + name) */
+.user-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;               /* reduced gap for tighter look */
+  padding: 6px 12px;       /* smaller padding */
+  background: linear-gradient(135deg, var(--light-green) 0%, rgba(165, 214, 167, 0.6) 100%);
+  border-radius: 12px;     /* slightly smaller radius */
+  cursor: pointer;
+  transition: all 0.3s;
+  text-decoration: none;
+  font-size: 14px;         /* base font size smaller */
+}
+
+.user-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(46, 125, 50, 0.25);
+}
+
+/* Avatar circle */
+.user-avatar {
+  width: 36px;             /* ← smaller size (was 44px) */
+  height: 36px;
+  border-radius: 50%;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;         /* text inside is now proportional */
+  color: var(--primary-green);
+  border: 2px solid var(--light-green);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  flex-shrink: 0;
+}
+
+/* Name next to avatar */
+.user-name {
+  font-weight: 600;
+  color: var(--primary-green);
+  font-size: 14px;         /* matches overall scale */
+}
+
+/* Notification button (keep same height as avatar) */
+.notification-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--soft-gray);
+  border: 2px solid var(--border);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.25s;
+}
+
+/* Make sure header-right aligns everything perfectly */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;               /* reduced gap */
+  flex-shrink: 0;
+}
+
+/* Reduce space between fields */
+.form-group {
+  margin-bottom: 10px;
+}
+
+/* Reduce label spacing */
+label {
+  margin-bottom: 4px;
+  display: block;
+  font-size: 14px;
+}
+
+/* Reduce input height slightly */
+input, select {
+  padding: 10px 14px;
+}
+
+/* Reduce gap between side-by-side rows */
+.form-row {
+  gap: 12px;
+  margin-bottom: 10px;
+}

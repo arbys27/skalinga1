@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <title>SKalinga Admin | KK Masterlist</title>
+  <link rel="icon" type="image/x-icon" href="/SKalinga/assets/icons/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/SKalinga/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/SKalinga/assets/icons/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/SKalinga/assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/SKalinga/assets/icons/site.webmanifest">
+  <meta name="msapplication-config" content="/SKalinga/assets/icons/browserconfig.xml">
+  <meta name="theme-color" content="#FF6B9D">
+  <link rel="stylesheet" href="assets/css/dashboard.css">
+    <link rel="stylesheet" href="assets/css/admin-theme.css">
+  <link rel="stylesheet" href="assets/css/loader.css?v=3">
+  <style>.masterlist-toolbar { margin-bottom: 24px; }
+    .masterlist-toolbar .search-group { align-items: center; }
+    .masterlist-toolbar .search-input { min-width: 280px; }
+    .masterlist-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .masterlist-button { min-height: 44px; border: 0; border-radius: 8px; padding: 12px 20px; background: #228B57; color: white; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; transition: all .2s; }
+    .masterlist-button:hover:not(:disabled) { background: #1a6b43; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(34,139,87,.3); }
+    .masterlist-button.secondary { background: #5DADE2; }
+    .masterlist-button.secondary:hover:not(:disabled) { background: #3498db; }
+    .masterlist-button:disabled { opacity: .55; cursor: wait; }
+    .import-panel { display: none; margin-bottom: 24px; }
+    .import-panel.open { display: block; }
+    .import-panel .card-body { padding-top: 20px; }
+    .import-panel form { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .import-panel input[type=file] { flex: 1; min-width: 240px; padding: 10px; background: white; border: 2px solid #ddd; border-radius: 8px; font: inherit; }
+    .report { margin-top: 14px; color: #a33b2e; font-size: 13px; line-height: 1.5; }
+    .report p { margin: 5px 0; }
+    .report:empty { display: none; }
+    .claimed { color: #228B57; font-weight: 700; }
+    .unclaimed { color: #b46d18; font-weight: 700; }
+    .table-wrap { overflow-x: auto; }
+    .masterlist-card { overflow: hidden; }
+    .masterlist-card .card-body { padding: 0; }
+    .masterlist-card .admin-table { border-radius: 0; box-shadow: none; }
+    .empty-state { padding: 44px 24px; text-align: center; color: #68757d; }
+    .empty-state strong { display: block; color: #1a6b43; font-size: 16px; margin-bottom: 6px; }
+    @media (max-width: 760px) {
+      .masterlist-toolbar .search-group { min-width: 100%; flex-direction: column; align-items: stretch; }
+      .masterlist-toolbar .search-input { min-width: 0; }
+      .masterlist-actions, .masterlist-actions .masterlist-button { width: 100%; }
+      .masterlist-actions .masterlist-button { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar" id="adminSidebar"></aside>
+    <main class="main-content">
+      <header class="top-header"><div class="header-left"><h2>KK Masterlist</h2><p id="dashboard-datetime">Official youth records</p></div><div class="header-right"><div class="user-profile-card"><div class="user-avatar-new" id="userAvatar">AD</div><div class="user-details"><h4 id="userFullName">Admin</h4><span class="user-role-badge" id="userRole">Staff</span></div></div></div></header>
+      <div class="dashboard-content">
+        <div class="search-filter-bar masterlist-toolbar">
+          <div class="search-group"><input type="search" id="searchInput" class="search-input" placeholder="Search voter ID, name, or address"><select id="claimedFilter" class="filter-select" aria-label="Filter by account status"><option value="">All records</option><option value="0">Available for activation</option><option value="1">Already claimed</option></select></div>
+          <div class="masterlist-actions"><button class="masterlist-button secondary" id="templateButton" type="button">CSV Template</button><button class="masterlist-button" id="toggleImport" type="button">Import Masterlist</button></div>
+        </div>
+        <section class="content-card import-panel" id="importPanel">
+          <div class="card-header"><h3>Import KK Masterlist</h3><span class="status-badge pending">Preview first</span></div>
+          <div class="card-body">
+            <p>Upload a CSV, preview validation results, then import the valid rows.</p>
+            <form id="importForm"><input type="file" id="csvFile" name="masterlist" accept=".csv,text/csv" required><button class="masterlist-button secondary" type="submit">Preview CSV</button><button class="masterlist-button" id="confirmImport" type="button" disabled>Import Valid Rows</button></form>
+            <div class="report" id="importReport" role="status"></div>
+          </div>
+        </section>
+        <section class="content-card masterlist-card">
+          <div class="card-header"><h3>Official Youth Records</h3><span class="status-badge active" id="recordCount">Loading...</span></div>
+          <div class="card-body"><div class="table-wrap"><table class="admin-table"><thead><tr><th>Voter ID</th><th>Name</th><th>Birthday</th><th>Age / Sex</th><th>Address</th><th>Status</th></tr></thead><tbody id="masterlistBody"></tbody></table><div class="empty-state" id="emptyState" hidden><strong>No masterlist records found</strong>Try a different search or import the official CSV.</div></div></div>
+        </section>
+      </div>
+    </main>
+  </div>
+  <script>
+    const body = document.getElementById('masterlistBody');
+    const report = document.getElementById('importReport');
+    const confirmImport = document.getElementById('confirmImport');
+    const emptyState = document.getElementById('emptyState');
+    const recordCount = document.getElementById('recordCount');
+    let previewReady = false;
+
+    function addCell(row, value, className) {
+      const cell = document.createElement('td');
+      cell.textContent = value ?? '';
+      if (className) cell.className = className;
+      row.appendChild(cell);
+    }
+
+    async function loadMasterlist() {
+      const params = new URLSearchParams({ search: document.getElementById('searchInput').value, claimed: document.getElementById('claimedFilter').value });
+      const response = await fetch(`api/masterlist_list.php?${params}`);
+      const data = await response.json();
+      if (!data.success) throw new Error(data.message || 'Unable to load masterlist');
+      body.replaceChildren();
+      recordCount.textContent = `${data.data.length} record${data.data.length === 1 ? '' : 's'}`;
+      emptyState.hidden = data.data.length > 0;
+      data.data.forEach(record => {
+        const row = document.createElement('tr');
+        addCell(row, record.voter_id);
+        addCell(row, [record.first_name, record.middle_name, record.last_name].filter(Boolean).join(' '));
+        addCell(row, record.birthday);
+        addCell(row, `${record.age} / ${record.sex}`);
+        addCell(row, `${record.address}, ${record.purok_or_barangay}`);
+        addCell(row, Number(record.is_claimed) === 1 ? 'Claimed' : 'Available', Number(record.is_claimed) === 1 ? 'claimed' : 'unclaimed');
+        body.appendChild(row);
+      });
+    }
+
+    function showReport(data) {
+      report.replaceChildren();
+      const summary = document.createElement('p');
+      summary.textContent = data.mode === 'import' ? `Imported ${data.imported} valid row(s).` : `Preview: ${data.valid} valid row(s).`;
+      report.appendChild(summary);
+      data.errors.forEach(item => {
+        const error = document.createElement('p');
+        error.textContent = `Row ${item.line}: ${item.errors.join(', ')}`;
+        report.appendChild(error);
+      });
+    }
+
+    document.getElementById('toggleImport').addEventListener('click', () => document.getElementById('importPanel').classList.toggle('open'));
+    document.getElementById('searchInput').addEventListener('input', () => loadMasterlist().catch(error => { report.textContent = error.message; }));
+    document.getElementById('claimedFilter').addEventListener('change', () => loadMasterlist().catch(error => { report.textContent = error.message; }));
+    document.getElementById('templateButton').addEventListener('click', () => {
+      const content = 'voter_id,first_name,last_name,middle_name,birthday,age,sex,address,purok_or_barangay\n';
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(new Blob([content], { type: 'text/csv' }));
+      link.download = 'kk-masterlist-template.csv';
+      link.click();
+      URL.revokeObjectURL(link.href);
+    });
+
+    document.getElementById('importForm').addEventListener('submit', async event => {
+      event.preventDefault();
+      const form = new FormData(event.target);
+      form.append('mode', 'preview');
+      const response = await fetch('api/masterlist_import.php', { method: 'POST', body: form });
+      const data = await response.json();
+      showReport(data);
+      previewReady = data.success && data.valid > 0;
+      confirmImport.disabled = !previewReady;
+    });
+
+    confirmImport.addEventListener('click', async () => {
+      if (!previewReady) return;
+      const form = new FormData(document.getElementById('importForm'));
+      form.append('mode', 'import');
+      confirmImport.disabled = true;
+      const response = await fetch('api/masterlist_import.php', { method: 'POST', body: form });
+      const data = await response.json();
+      showReport(data);
+      previewReady = false;
+      await loadMasterlist();
+    });
+fetch('api/check_admin_session.php').then(response => response.json()).then(data => { if (!data.authenticated) window.location.href = 'login.html'; else { document.getElementById('userFullName').textContent = data.admin.username; document.getElementById('userRole').textContent = data.admin.role; } });
+    loadMasterlist().catch(error => { report.textContent = error.message; });
+  </script>
+  <script src="js/auth-guard.js" data-roles="admin,sk_official"></script>
+  <script src="assets/js/loader.js?v=3"></script>
+<script src="js/admin-common.js"></script>
+<script src="js/admin-sidebar.js"></script>
+</body>
+</html>

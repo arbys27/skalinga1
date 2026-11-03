@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+    <title>SKalinga - Events Management</title>
+    <link rel="icon" type="image/x-icon" href="/SKalinga/assets/icons/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/SKalinga/assets/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/SKalinga/assets/icons/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/SKalinga/assets/icons/apple-touch-icon.png">
+    <link rel="manifest" href="/SKalinga/assets/icons/site.webmanifest">
+    <meta name="msapplication-config" content="/SKalinga/assets/icons/browserconfig.xml">
+    <meta name="theme-color" content="#FF6B9D">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- Your shared dashboard CSS -->
+    <link rel="stylesheet" href="assets/css/dashboard.css">
+    <link rel="stylesheet" href="assets/css/admin-theme.css">
+
+    <!-- Professional Loader System -->
+    <link rel="stylesheet" href="assets/css/loader.css?v=3">
+
+    <style>
+
+        .user-greeting {
+            font-size: 11px;
+            color: #5DADE2;
+            font-weight: 600;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            opacity: 0.85;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+@media (max-width: 768px) {
+
+            .user-greeting {
+                font-size: 10px;
+            }
+        }
+    </style>
+    
+</head>
+<body>
+
+<div class="app-container">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="adminSidebar"></aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="top-header">
+            <div class="header-left">
+                <h2>Events Management</h2>
+                <p id="dashboard-datetime">Loading date and time...</p>
+            </div>
+            <div class="header-right">
+                <div class="user-profile-card">
+                    <div class="user-avatar-new" id="userAvatarInitials">--</div>
+                    <div class="user-details">
+                        <h4 id="userFullName">Loading...</h4>
+                        <span class="user-role-badge" id="userRole">Administrator</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="dashboard-content">
+            <div class="search-filter-bar">
+                <div class="search-group">
+                    <input type="text" id="searchInput" class="search-input" placeholder="🔍 Search by title, location...">
+                    <select id="filterStatus" class="filter-select">
+                        <option value="">All Status</option>
+                        <option value="Upcoming">Upcoming</option>
+                        <option value="Ongoing">Ongoing</option>
+                        <option value="Past">Past</option>
+                    </select>
+                </div>
+                <button class="btn-add-event" id="addEventBtn">
+                    <i class="fas fa-plus"></i> Add New Event
+                </button>
+            </div>
+
+            <table class="admin-table" id="eventsTable">
+                <thead>
+                    <tr>
+                        <th>Event ID</th>
+                        <th>Title</th>
+                        <th>Date & Time</th>
+                        <th>Location</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Registration Link</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="eventsTableBody"></tbody>
+            </table>
+        </div>
+    </main>
+
+</div>
+
+<!-- Add/Edit Event Modal -->
+<div class="modal" id="addEventModal">
+    <div class="modal-content">
+        <span class="close-modal" id="closeEventModal">×</span>
+        <h2 id="eventModalTitle">Add New Event</h2>
+
+        <form id="eventForm">
+            <input type="hidden" id="editEventId">
+
+            <div class="form-group">
+                <label for="eventTitle">Event Title *</label>
+                <input type="text" id="eventTitle" placeholder="Youth Leadership Summit" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="eventDate">Date *</label>
+                    <input type="date" id="eventDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="eventStartTime">Start Time *</label>
+                    <input type="time" id="eventStartTime" required>
+                </div>
+                <div class="form-group">
+                    <label for="eventEndTime">End Time</label>
+                    <input type="time" id="eventEndTime">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="eventLocation">Location *</label>
+                <input type="text" id="eventLocation" placeholder="Barangay Hall, San Antonio" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="eventType">Event Type *</label>
+                    <select id="eventType" required>
+                        <option value="" disabled selected>Select type</option>
+                        <option value="Training">Training / Seminar</option>
+                        <option value="Sports">Sports / Tournament</option>
+                        <option value="Cultural">Cultural / Festival</option>
+                        <option value="Community">Community Service</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="eventCapacity">Capacity (Attendees)</label>
+                    <input type="number" id="eventCapacity" placeholder="50" min="0">
+                    <small style="color: #666; font-size: 13px;">Maximum number of participants</small>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="eventDescription">Description</label>
+                <textarea id="eventDescription" placeholder="Brief description of the event..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="eventImage">Event Image</label>
+                <input type="file" id="eventImage" accept="image/*">
+                <small style="color: #666; font-size: 13px;">Upload a JPG or PNG image for the event (optional)</small>
+                <div id="imagePreview" style="margin-top: 12px; display: none;">
+                    <img id="previewImg" style="max-width: 100%; max-height: 200px; border-radius: 8px;">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="registrationLink">Registration Link (Google Form or external)</label>
+                <input type="url" id="registrationLink" placeholder="https://forms.gle/xxxxxx">
+                <small style="color: #666; font-size: 13px;">Paste the Google Form link here so youth can register.</small>
+            </div>
+
+            <div class="form-group">
+                <label for="eventStatus">Status</label>
+                <select id="eventStatus">
+                    <option value="Upcoming">Upcoming</option>
+                    <option value="Ongoing">Ongoing</option>
+                    <option value="Past">Past</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn-submit">Save Event</button>
+        </form>
+    </div>
+</div>
+
+<!-- View Event Modal -->
+<div class="modal" id="viewEventModal">
+    <div class="modal-content">
+        <span class="close-modal" id="closeViewEvent">×</span>
+        <h2>Event Details</h2>
+
+        <div id="eventDetails" class="event-details"></div>
+
+        <div style="margin-top: 24px;">
+            <a id="viewRegLink" href="#" target="_blank" class="btn-add-event" style="display: inline-flex; text-decoration: none;">
+                <i class="fas fa-external-link-alt"></i> Open Registration Form
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Notification Container -->
+<div id="toastContainer"></div>
+
+<!-- Confirmation Modal -->
+<div class="modal" id="confirmationModal">
+    <div class="modal-content" style="max-width: 420px;">
+        <h2 style="margin-bottom: 12px; color: #E74C3C;">
+            <i class="fas fa-exclamation-triangle" style="margin-right: 8px;"></i> Confirm Action
+        </h2>
+        <p id="confirmMessage" style="color: #666; margin: 0 0 28px 0; font-size: 15px; line-height: 1.5;"></p>
+        <div style="display: flex; gap: 12px; justify-content: flex-end;">
+            <button id="confirmCancelBtn" class="btn-add-event" style="background: #95A5A6; margin: 0; padding: 10px 24px;">
+                Cancel
+            </button>
+            <button id="confirmOkBtn" class="btn-add-event" style="background: linear-gradient(135deg, #E74C3C 0%, #C0392B 100%); margin: 0; padding: 10px 24px;">
+                <i class="fas fa-trash" style="margin-right: 6px;"></i> Delete
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ────────────────────────────────────────────────
+// Toast Notification
+// ────────────────────────────────────────────────
+
+// ────────────────────────────────────────────────
+// Confirmation Modal
+// ────────────────────────────────────────────────
+function showConfirm(message, onConfirm) {
+    const confirmModal = document.getElementById('confirmationModal');
+    const confirmMessage = document.getElementById('confirmMessage');
+    const confirmOkBtn = document.getElementById('confirmOkBtn');
+    const confirmCancelBtn = document.getElementById('confirmCancelBtn');
+    
+    confirmMessage.textContent = message;
+    confirmModal.style.display = 'flex';
+    
+    confirmOkBtn.onclick = () => {
+        confirmModal.style.display = 'none';
+        if (onConfirm) onConfirm();
+    };
+    
+    confirmCancelBtn.onclick = () => {
+        confirmModal.style.display = 'none';
+    };
+}
+
+// ────────────────────────────────────────────────
+// Live date & time
+// ────────────────────────────────────────────────
+function updateDashboardDateTime() {
+    const el = document.getElementById('dashboard-datetime');
+    if (!el) return;
+    const now = new Date();
+    const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    el.textContent = `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()} • ${now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+}
+setInterval(updateDashboardDateTime, 1000);
+updateDashboardDateTime();
+
+// ────────────────────────────────────────────────
+// Load user profile dynamically
+// ────────────────────────────────────────────────
+async function loadUserProfile() {
+    try {
+        const response = await fetch('api/get_user_profile.php');
+        const result = await response.json();
+        
+        if (result.success) {
+            const user = result.user;
+            document.getElementById('userAvatarInitials').textContent = user.initials;
+            document.getElementById('userFullName').textContent = user.name;
+            document.getElementById('userRole').textContent = user.role;
+        } else {
+            console.error('Error loading user profile:', result.error);
+            // Fallback to defaults if not logged in
+            document.getElementById('userFullName').textContent = 'Guest User';
+        }
+    } catch (error) {
+        console.error('Error fetching user profile:', error);
+    }
+}
+loadUserProfile();
+
+// ────────────────────────────────────────────────
+// Data & Storage - Using MySQL API
+// ────────────────────────────────────────────────
+let eventsData = [];
+
+// ────────────────────────────────────────────────
+// Load events from API
+// ────────────────────────────────────────────────
+async function loadEvents() {
+    try {
+        const response = await fetch('api/get_events.php');
+        const result = await response.json();
+        
+        if (result.success) {
+            eventsData = result.data || [];
+            renderEventsTable();
+            filterEvents();
+        } else {
+            console.error('Failed to load events:', result.error);
+            showAlert('Error loading events: ' + result.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error fetching events:', error);
+        alert('Error loading events from server');
+    }
+}
+
+// Render table
+function renderEventsTable(filtered = eventsData) {
+    const tbody = document.getElementById('eventsTableBody');
+    tbody.innerHTML = '';
+
+    filtered.forEach(event => {
+        const dateTime = new Date(`${event.date}T${event.time}`);
+        const statusClass = {
+            Upcoming: 'status-upcoming',
+            Ongoing: 'status-ongoing',
+            Past: 'status-past'
+        }[event.status] || '';
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td style="font-family: 'JetBrains Mono', monospace; font-weight: 600;">${event.id}</td>
+            <td style="font-weight: 600;">${event.title}</td>
+            <td>${dateTime.toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'})} • ${event.time}</td>
+            <td>${event.location}</td>
+            <td>${event.type}</td>
+            <td><span class="status-badge ${statusClass}">${event.status}</span></td>
+            <td>
+                ${event.regLink ? `<a href="${event.regLink}" target="_blank" style="color:#228B57;">Google Form</a>` : '—'}
+            </td>
+            <td class="action-buttons">
+                <button class="action-btn btn-view" onclick="viewEvent('${event.id}')" title="View Details">
+                    <i class="fas fa-eye"></i>
+                </button>
+                <button class="action-btn btn-edit" onclick="editEvent('${event.id}')" title="Edit Event">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="action-btn btn-delete" onclick="deleteEvent('${event.id}')" title="Delete Event">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+// ────────────────────────────────────────────────
+// Search & Filter
+// ────────────────────────────────────────────────
+function filterEvents() {
+    const search = document.getElementById('searchInput').value.toLowerCase().trim();
+    const status = document.getElementById('filterStatus').value;
+
+    const filtered = eventsData.filter(e => {
+        const text = `${e.id} ${e.title} ${e.location} ${e.type}`.toLowerCase();
+        return text.includes(search) && (!status || e.status === status);
+    });
+
+    renderEventsTable(filtered);
+}
+
+document.getElementById('searchInput')?.addEventListener('input', filterEvents);
+document.getElementById('filterStatus')?.addEventListener('change', filterEvents);
+
+// ────────────────────────────────────────────────
+// Modal Controls
+// ────────────────────────────────────────────────
+const addEventModal = document.getElementById('addEventModal');
+const viewEventModal = document.getElementById('viewEventModal');
+
+document.getElementById('addEventBtn').onclick = () => {
+    document.getElementById('eventModalTitle').textContent = "Add New Event";
+    document.getElementById('eventForm').reset();
+    document.getElementById('editEventId').value = "";
+    document.getElementById('imagePreview').style.display = 'none';
+    addEventModal.style.display = 'flex';
+};
+
+// Image preview when file is selected
+document.getElementById('eventImage').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            document.getElementById('previewImg').src = event.target.result;
+            document.getElementById('imagePreview').style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    } else {
+        document.getElementById('imagePreview').style.display = 'none';
+    }
+});
+
+document.getElementById('closeEventModal').onclick = () => addEventModal.style.display = 'none';
+document.getElementById('closeViewEvent').onclick = () => viewEventModal.style.display = 'none';
+
+window.onclick = e => {
+    if (e.target.classList.contains('modal')) e.target.style.display = 'none';
+};
+
+// ────────────────────────────────────────────────
+// Save / Edit Event
+// ────────────────────────────────────────────────
+document.getElementById('eventForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const editId = document.getElementById('editEventId').value;
+    
+    const formData = new FormData();
+    formData.append('title', document.getElementById('eventTitle').value.trim());
+    formData.append('date', document.getElementById('eventDate').value);
+    formData.append('startTime', document.getElementById('eventStartTime').value);
+    formData.append('endTime', document.getElementById('eventEndTime').value);
+    formData.append('location', document.getElementById('eventLocation').value.trim());
+    formData.append('type', document.getElementById('eventType').value);
+    formData.append('capacity', document.getElementById('eventCapacity').value || 0);
+    formData.append('description', document.getElementById('eventDescription').value.trim());
+    formData.append('regLink', document.getElementById('registrationLink').value.trim());
+    formData.append('status', document.getElementById('eventStatus').value);
+    
+    // Add image file if selected
+    const fileInput = document.getElementById('eventImage');
+    if (fileInput.files && fileInput.files[0]) {
+        formData.append('image', fileInput.files[0]);
+    }
+
+    try {
+        let response;
+        let endpoint;
+        
+        if (editId) {
+            // Update existing event
+            formData.append('id', editId);
+            endpoint = 'api/update_event.php';
+        } else {
+            // Add new event
+            endpoint = 'api/add_event.php';
+        }
+        
+        response = await fetch(endpoint, {
+            method: 'POST',
+            body: formData
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            // Reload events from server
+            await loadEvents();
+            addEventModal.style.display = 'none';
+            document.getElementById('eventForm').reset();
+            document.getElementById('imagePreview').style.display = 'none';
+            showAlert(`Event ${editId ? 'updated' : 'added'} successfully!`, 'success');
+        } else {
+            showAlert('Error: ' + result.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error saving event:', error);
+        showAlert('Error saving event: ' + error.message, 'error');
+    }
+});
+
+// ────────────────────────────────────────────────
+// Edit Event
+// ────────────────────────────────────────────────
+function editEvent(id) {
+    const event = eventsData.find(e => e.id === id);
+    if (!event) {
+        showAlert('Event not found', 'error');
+        return;
+    }
+
+    document.getElementById('eventModalTitle').textContent = "Edit Event";
+    document.getElementById('editEventId').value = event.id;
+
+    document.getElementById('eventTitle').value = event.title;
+    document.getElementById('eventDate').value = event.date;
+    document.getElementById('eventStartTime').value = event.time;
+    document.getElementById('eventEndTime').value = event.endTime || '';
+    document.getElementById('eventLocation').value = event.location;
+    document.getElementById('eventType').value = event.type;
+    document.getElementById('eventCapacity').value = event.capacity || '';
+    document.getElementById('eventDescription').value = event.description || '';
+    document.getElementById('registrationLink').value = event.regLink || '';
+    document.getElementById('eventStatus').value = event.status;
+    
+    // Show existing image if available
+    if (event.imagePath) {
+        document.getElementById('previewImg').src = event.imagePath;
+        document.getElementById('imagePreview').style.display = 'block';
+    } else {
+        document.getElementById('imagePreview').style.display = 'none';
+    }
+
+    addEventModal.style.display = 'flex';
+}
+
+// ────────────────────────────────────────────────
+// Delete Event
+// ────────────────────────────────────────────────
+async function deleteEvent(id) {
+    showConfirm('Delete this event?', async () => {
+        try {
+            const response = await fetch('api/delete_event.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                await loadEvents();
+                showAlert('Event deleted successfully', 'success');
+            } else {
+                showAlert('Error: ' + result.error, 'error');
+        }
+        } catch (error) {
+            console.error('Error deleting event:', error);
+            showAlert('Error deleting event: ' + error.message, 'error');
+        }
+    });
+}
+
+// ────────────────────────────────────────────────
+// View Event
+// ────────────────────────────────────────────────
+function viewEvent(id) {
+    const event = eventsData.find(e => e.id === id);
+    if (!event) {
+        showAlert('Event not found', 'error');
+        return;
+    }
+
+    const dateTime = new Date(`${event.date}T${event.time}`).toLocaleString('en-US', {
+        month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit'
+    });
+
+    let html = `
+        ${event.imagePath ? `<div style="margin-bottom: 20px; text-align: center;"><img src="${event.imagePath}" style="max-width: 100%; max-height: 300px; border-radius: 8px;"></div>` : ''}
+        <p><strong>Event ID:</strong> ${event.id}</p>
+        <p><strong>Title:</strong> ${event.title}</p>
+        <p><strong>Date & Time:</strong> ${dateTime}${event.endTime ? ` - ${event.endTime}` : ''}</p>
+        <p><strong>Location:</strong> ${event.location}</p>
+        <p><strong>Type:</strong> ${event.type}</p>
+        <p><strong>Status:</strong> ${event.status}</p>
+        ${event.capacity ? `<p><strong>Capacity:</strong> ${event.capacity} participants</p>` : ''}
+        <p><strong>Description:</strong> ${event.description || 'No description'}</p>
+        ${event.regLink ? `<p><strong>Registration Link:</strong> <a href="${event.regLink}" target="_blank">Open Registration Form</a></p>` : ''}
+    `;
+
+    document.getElementById('eventDetails').innerHTML = html;
+    viewEventModal.style.display = 'flex';
+}
+
+// ────────────────────────────────────────────────
+// Initial load
+// ────────────────────────────────────────────────
+// Setup events table on first load
+fetch('api/setup_events_table.php').catch(() => {});
+
+// Load events from API
+loadEvents();
+</script>
+
+<!-- Professional Loader System -->
+<script src="js/auth-guard.js" data-roles="admin,sk_official"></script>
+<script src="assets/js/loader.js?v=3"></script>
+<script src="js/admin-common.js"></script>
+<script src="js/admin-sidebar.js"></script>
+</body>
+</html>

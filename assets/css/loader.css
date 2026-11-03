@@ -1,0 +1,456 @@
+/* ════════════════════════════════════════════════════════════════
+   Modern Premium Loading System - SKalinga
+   Redesigned with cool gradient animations and glassmorphism
+   ════════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────────
+   Loading Overlay Container
+   ───────────────────────────────────────────────────────────────── */
+.loader-overlay {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: auto;
+  height: auto;
+  background: transparent;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  animation: fadeInLoader 0.3s ease-out;
+}
+
+.loader-overlay.show {
+  display: flex;
+}
+
+.loader-overlay.hide {
+  animation: fadeOutLoader 0.3s ease-out forwards;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   Loader Content Wrapper - Card/Panel Style
+   ───────────────────────────────────────────────────────────────── */
+.loader-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 40px 35px;
+  border-radius: 20px;
+  box-shadow: 
+    0 8px 32px rgba(34, 139, 87, 0.15),
+    0 0 1px rgba(34, 139, 87, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(34, 139, 87, 0.1);
+  min-width: 200px;
+  text-align: center;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   PREMIUM GRADIENT SPINNER - Main Loader
+   Modern, cool, and professional design
+   ════════════════════════════════════════════════════════════════ */
+.loader-spinner {
+  width: 70px;
+  height: 70px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Outer rotating gradient ring */
+.spinner-ring {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    #228B57 0deg,
+    #5DADE2 90deg,
+    #A8E6CF 180deg,
+    #228B57 270deg,
+    #228B57 360deg
+  );
+  animation: spinnerRotate 3s linear infinite;
+  position: relative;
+  box-shadow: 
+    0 0 20px rgba(34, 139, 87, 0.3),
+    0 0 40px rgba(93, 173, 226, 0.2),
+    inset 0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+/* Inner decorative ring */
+.spinner-ring::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 180deg,
+    #A8E6CF 0deg,
+    #5DADE2 90deg,
+    #228B57 180deg,
+    #A8E6CF 360deg
+  );
+  animation: spinnerRotate 2s linear infinite reverse;
+  opacity: 0.6;
+  box-shadow: inset 0 0 15px rgba(34, 139, 87, 0.2);
+}
+
+/* Center core with pulsing effect */
+.spinner-ring::after {
+  content: '';
+  position: absolute;
+  inset: 16px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #228B57 0%, #5DADE2 100%);
+  animation: corePulse 2s ease-in-out infinite;
+  box-shadow: 
+    0 0 15px rgba(34, 139, 87, 0.4),
+    inset 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+@keyframes spinnerRotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes corePulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.8;
+    box-shadow: 
+      0 0 15px rgba(34, 139, 87, 0.4),
+      inset 0 0 10px rgba(255, 255, 255, 0.2);
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+    box-shadow: 
+      0 0 30px rgba(34, 139, 87, 0.6),
+      0 0 20px rgba(93, 173, 226, 0.4),
+      inset 0 0 15px rgba(255, 255, 255, 0.3);
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   OPTION 2: Premium Shield Icon (SKalinga Branded)
+   For branded loading states
+   ════════════════════════════════════════════════════════════════ */
+.loader-shield {
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.shield-icon {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #228B57 0%, #1a6b43 50%, #0d5a2f 100%);
+  clip-path: polygon(50% 0%, 100% 25%, 100% 60%, 50% 100%, 0% 60%, 0% 25%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 800;
+  font-size: 32px;
+  animation: shieldPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  box-shadow: 
+    0 0 30px rgba(34, 139, 87, 0.4),
+    0 8px 24px rgba(34, 139, 87, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  position: relative;
+}
+
+.shield-icon::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: inherit;
+  background: radial-gradient(ellipse at top, rgba(34, 139, 87, 0.3), transparent 70%);
+  animation: shieldGlow 2s ease-in-out infinite;
+}
+
+@keyframes shieldPulse {
+  0%, 100% {
+    transform: scale(1) translateY(0);
+    box-shadow: 
+      0 0 30px rgba(34, 139, 87, 0.4),
+      0 8px 24px rgba(34, 139, 87, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+  50% {
+    transform: scale(1.08) translateY(-4px);
+    box-shadow: 
+      0 0 50px rgba(34, 139, 87, 0.6),
+      0 12px 32px rgba(34, 139, 87, 0.35),
+      inset 0 2px 8px rgba(255, 255, 255, 0.3);
+  }
+}
+
+@keyframes shieldGlow {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   OPTION 3: Modern Dot Loader with Wave Effect
+   Minimal and elegant
+   ════════════════════════════════════════════════════════════════ */
+.loader-dots {
+  display: flex;
+  gap: 10px;
+  height: 60px;
+  align-items: center;
+  justify-content: center;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #228B57 0%, #5DADE2 100%);
+  animation: dotWave 1.4s ease-in-out infinite;
+  box-shadow: 
+    0 0 10px rgba(34, 139, 87, 0.3),
+    0 0 20px rgba(93, 173, 226, 0.2);
+}
+
+.dot:nth-child(1) { animation-delay: 0s; }
+.dot:nth-child(2) { animation-delay: 0.15s; }
+.dot:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes dotWave {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(-20px) scale(1.1);
+    opacity: 1;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   OPTION 4: SVG Loader with Glow
+   For custom SVG animations
+   ════════════════════════════════════════════════════════════════ */
+.loader-svg {
+  width: 70px;
+  height: 70px;
+  animation: svgGlowPulse 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 15px rgba(34, 139, 87, 0.3));
+}
+
+.loader-svg svg {
+  animation: svgRotate 2.5s linear infinite;
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes svgRotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes svgGlowPulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 15px rgba(34, 139, 87, 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 0 30px rgba(34, 139, 87, 0.5)) drop-shadow(0 0 15px rgba(93, 173, 226, 0.3));
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   Fade Animations
+   ───────────────────────────────────────────────────────────────── */
+@keyframes fadeInLoader {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes fadeOutLoader {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+    visibility: hidden;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   Progress Bar (Optional - for longer operations)
+   ───────────────────────────────────────────────────────────────── */
+.loader-progress-bar {
+  width: 100%;
+  max-width: 240px;
+  height: 4px;
+  background: rgba(162, 210, 223, 0.2);
+  border-radius: 10px;
+  overflow: hidden;
+  display: none;
+  margin-top: 16px;
+  box-shadow: inset 0 0 10px rgba(34, 139, 87, 0.1);
+}
+
+.loader-progress-bar.show {
+  display: block;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #228B57 0%, #5DADE2 50%, #A8E6CF 100%);
+  border-radius: 10px;
+  animation: progressFlow 2s ease-in-out infinite;
+  box-shadow: 0 0 10px rgba(34, 139, 87, 0.4);
+}
+
+@keyframes progressFlow {
+  0% { width: 10%; }
+  50% { width: 80%; }
+  100% { width: 90%; }
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   Accessibility - Respect Motion Preferences
+   ───────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .loader-overlay,
+  .spinner-ring,
+  .spinner-ring::before,
+  .spinner-ring::after,
+  .shield-icon,
+  .shield-icon::before,
+  .loader-svg svg,
+  .dot,
+  .progress-fill {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+
+  .loader-overlay.show {
+    display: flex !important;
+  }
+
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   Responsive Design - Mobile & Tablet
+   ───────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .loader-overlay {
+    background: transparent;
+  }
+
+  .loader-content {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 35px 30px;
+    border-radius: 18px;
+    min-width: 180px;
+  }
+
+  .loader-spinner {
+    width: 60px;
+    height: 60px;
+  }
+
+  .spinner-ring {
+    box-shadow: 
+      0 0 15px rgba(34, 139, 87, 0.25),
+      0 0 30px rgba(93, 173, 226, 0.15),
+      inset 0 0 15px rgba(255, 255, 255, 0.08);
+  }
+
+  .spinner-ring::before {
+    inset: 5px;
+  }
+
+  .spinner-ring::after {
+    inset: 14px;
+  }
+
+  .shield-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 28px;
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    gap: 8px;
+  }
+
+  .loader-svg {
+    width: 60px;
+    height: 60px;
+  }
+
+  .loader-progress-bar {
+    max-width: 200px;
+    height: 3px;
+  }
+}
+
+@media (max-width: 480px) {
+  .loader-spinner {
+    width: 50px;
+    height: 50px;
+  }
+
+  .spinner-ring::after {
+    inset: 12px;
+  }
+
+  .shield-icon {
+    width: 45px;
+    height: 45px;
+    font-size: 24px;
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+  }
+
+  .loader-svg {
+    width: 50px;
+    height: 50px;
+  }
+}
+
+/* ────────────────────────────────────────────────────────────────
+   Dark Mode Support
+   ──────────────────────────────────────────────────────────────── */
+@media (prefers-color-scheme: dark) {
+  .loader-overlay {
+    background: transparent;
+  }
+}

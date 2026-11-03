@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SKalinga - Youth Portal</title>
+<link rel="icon" type="image/x-icon" href="/SKalinga/assets/icons/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/SKalinga/assets/icons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/SKalinga/assets/icons/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/SKalinga/assets/icons/apple-touch-icon.png">
+<link rel="manifest" href="/SKalinga/assets/icons/site.webmanifest">
+<meta name="msapplication-config" content="/SKalinga/assets/icons/browserconfig.xml">
+<meta name="theme-color" content="#FF6B9D">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/skalinga-ui.css?v=20261021-3">
+<link rel="stylesheet" href="assets/css/loader.css?v=3">
+<style>
+.hm,.hm-modal{--g:#228B57;--gd:#0F4D31;--mint:#A8E6CF;--pk:#FF6B9D;--pkd:#E04F7E;--ink:#16303F;--mu:#5F7788;--ln:#E3ECE7;--h:"Bricolage Grotesque",system-ui,sans-serif;--b:"Plus Jakarta Sans",system-ui,sans-serif;font-family:var(--b);color:var(--ink)}
+.hm{width:min(1180px,100% - 32px);margin:0 auto;padding:16px 0 110px}
+.hm *,.hm-modal *{box-sizing:border-box}
+.hm a{color:inherit;text-decoration:none}
+.hm :focus-visible,.hm-modal :focus-visible{outline:3px solid var(--pkd);outline-offset:3px}
+.ic{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+.hm-layout{display:grid;gap:16px}
+.hm-main,.hm-rail{display:contents}
+.hero{order:1}.wallet{order:2}.next{order:3}.svcs{order:4}.coming{order:5}.health{order:6}.disc{order:7}
+@media(min-width:960px){
+  .hm-layout{grid-template-columns:1.5fr 1fr;gap:22px;align-items:start}
+  .hm-main{display:grid;gap:22px;align-content:start}
+  .hm-rail{display:grid;gap:18px;align-content:start;position:sticky;top:96px}
+}
+.card{background:#fff;border:1px solid var(--ln);border-radius:26px;padding:clamp(18px,3vw,26px);box-shadow:0 4px 20px rgba(34,139,87,.07)}
+.sh{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.sh h2{margin:0;font:700 clamp(21px,2.4vw,25px)/1.15 var(--h);letter-spacing:-.03em}
+.sh p{margin:3px 0 0;color:var(--mu);font-size:13px}
+.more{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 4px;color:var(--g);font-weight:700;font-size:13.5px;white-space:nowrap}
+.more:hover{color:var(--pkd)}
+.more .ic{width:17px;height:17px}
+
+/* hero */
+.hero{position:relative;overflow:hidden;border-radius:30px;padding:clamp(24px,4vw,40px);color:#fff;min-height:200px;background:linear-gradient(140deg,var(--g),var(--gd))}
+.hero::before{content:"";position:absolute;right:-90px;top:-100px;width:330px;height:330px;border-radius:50%;background:radial-gradient(circle,var(--pk),rgba(255,107,157,0) 68%);opacity:.75}
+.hero::after{content:"";position:absolute;left:-70px;bottom:-110px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,var(--mint),rgba(168,230,207,0) 68%);opacity:.35}
+.hero>*{position:relative;z-index:1}
+.today{display:inline-block;padding:6px 14px;border-radius:999px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);font-size:13px;font-weight:600;backdrop-filter:blur(8px)}
+.hero h1{margin:16px 0 6px;font:800 clamp(34px,6vw,56px)/1.02 var(--h);letter-spacing:-.045em}
+.hero p{margin:0;max-width:46ch;color:rgba(255,255,255,.88);font-size:clamp(15px,2vw,18px)}
+.note{display:flex;align-items:center;gap:8px;margin-top:20px;color:var(--mint);font-size:13.5px;font-weight:600}
+
+/* wallet */
+.wallet{position:relative;overflow:hidden;border-radius:28px;padding:22px;color:#fff;background:linear-gradient(150deg,#1b7a4c 0%,var(--gd) 70%);box-shadow:0 18px 40px rgba(15,77,49,.3)}
+.wallet::after{content:"";position:absolute;right:-60px;bottom:-70px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,var(--pk),rgba(255,107,157,0) 68%);opacity:.6;pointer-events:none}
+.wallet>*{position:relative;z-index:1}
+.wtop{display:flex;align-items:center;gap:10px;margin-bottom:22px;font-weight:700;font-size:13px;color:rgba(255,255,255,.85)}
+.wtop img{width:38px;height:38px;border-radius:50%;border:2px solid #fff;background:#fff;object-fit:contain}
+.wlabel{margin:0 0 4px;color:var(--mint);font-size:12px;font-weight:700;letter-spacing:.1em}
+.wallet-name{margin:0 0 14px;font:800 clamp(22px,3vw,28px)/1.1 var(--h);letter-spacing:-.035em;overflow-wrap:anywhere}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.badge{display:inline-flex;align-items:center;gap:6px;min-height:32px;padding:5px 11px;border-radius:999px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);font-size:12.5px;font-weight:700;backdrop-filter:blur(8px)}
+.badge .ic{width:15px;height:15px;color:var(--mint)}
+.wbtn{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:52px;margin-top:20px;padding:0 18px;border-radius:16px;background:var(--pk);color:var(--ink)!important;font-weight:700;font-size:14.5px;box-shadow:0 10px 26px rgba(255,107,157,.4);transition:transform .15s,background .15s}
+.wbtn:hover{background:#ff82ae}.wbtn:active{transform:scale(.98)}
+
+/* services */
+.sgrid{display:grid;gap:12px;grid-template-columns:repeat(2,1fr)}
+@media(min-width:640px){.sgrid{grid-template-columns:repeat(3,1fr)}}
+.tile{position:relative;display:flex;flex-direction:column;gap:6px;min-height:168px;padding:16px;border:1px solid var(--ln);border-radius:22px;background:#fff;transition:transform .2s,box-shadow .2s,border-color .2s}
+.tile:hover{transform:translateY(-3px);border-color:#b9d9c8;box-shadow:0 16px 34px rgba(34,139,87,.15)}
+.tile:active{transform:scale(.98)}
+.tile .chip{display:grid;place-items:center;width:48px;height:48px;margin-bottom:10px;border-radius:16px;background:#e9f7ef;color:var(--g)}
+.tile:nth-child(even) .chip{background:#ffe9f1;color:var(--pkd)}
+.tile .chip .ic{width:24px;height:24px}
+.tile strong{font:700 15.5px/1.3 var(--b)}
+.tile span.d{color:var(--mu);font-size:12.5px;line-height:1.45}
+.tile .go{position:absolute;top:16px;right:16px;width:18px;height:18px;color:var(--mu);opacity:0;transform:translateX(-4px);transition:all .2s}
+.tile:hover .go{opacity:1;transform:none}
+.new{display:inline-block;margin-left:6px;padding:2px 8px;border-radius:999px;background:var(--pk);color:var(--ink);font-size:11px;font-weight:800;vertical-align:middle}
+.new[hidden],.health[hidden]{display:none}
+
+/* health */
+.health{background:linear-gradient(140deg,#fff,#e9f7ef)}
+.hitems{display:grid;gap:10px}
+@media(min-width:640px){.hitems{grid-template-columns:repeat(2,1fr)}}
+.hitem{display:grid;gap:3px;min-height:68px;align-content:center;padding:13px 16px;border:1px solid #cfe9db;border-radius:18px;background:#fff;transition:border-color .15s}
+.hitem:hover{border-color:var(--g)}
+.hitem strong{font-size:14.5px;line-height:1.35}.hitem span{color:var(--mu);font-size:12.5px}
+
+/* disclosure */
+.disc{display:flex;align-items:center;gap:16px;padding:20px 22px;border-radius:26px;background:linear-gradient(120deg,var(--pk),var(--pkd));color:#fff!important;transition:transform .2s,box-shadow .2s}
+.disc:hover{transform:translateY(-2px);box-shadow:0 18px 38px rgba(224,79,126,.35)}
+.disc .ico{display:grid;place-items:center;width:52px;height:52px;border-radius:18px;background:rgba(255,255,255,.2);flex:none}
+.disc .ico .ic{width:26px;height:26px}
+.disc strong{display:block;font:800 clamp(18px,2.4vw,22px)/1.15 var(--h);letter-spacing:-.03em}
+.disc span.t{display:block;margin-top:3px;color:rgba(255,255,255,.92);font-size:13.5px}
+.disc>.ic{margin-left:auto}
+
+/* events */
+.date{display:inline-flex;align-items:center;min-height:34px;padding:0 13px;border-radius:12px;background:var(--mint);color:var(--ink);font-size:12.5px;font-weight:800}
+.fe h3{margin:12px 0 10px;font:700 21px/1.2 var(--h);letter-spacing:-.025em;overflow-wrap:anywhere}
+.fe .det{display:grid;gap:6px}
+.fe .det p{display:flex;align-items:flex-start;gap:8px;margin:0;color:var(--mu);font-size:13px}
+.fe .det .ic{width:17px;height:17px;color:var(--g);margin-top:1px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.tag{display:inline-flex;align-items:center;min-height:28px;padding:3px 11px;border-radius:999px;background:#e3f1fb;color:#14537e;font-size:12px;font-weight:700}
+.tag.urgent{background:var(--pk);color:var(--ink)}
+.reg{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:48px;margin-top:16px;padding:0 16px;border-radius:15px;background:var(--ink);color:#fff!important;font-weight:700;font-size:14px;transition:background .15s,transform .15s}
+.reg:hover{background:var(--g)}.reg:active{transform:scale(.98)}
+.eitem{display:flex;align-items:center;gap:12px;min-height:68px;padding:10px 0;border-top:1px solid var(--ln)}
+.eitem:first-child{border-top:0}
+.eitem .ld{display:grid;place-items:center;min-width:54px;min-height:48px;padding:4px;border-radius:14px;background:#e9f7ef;color:var(--gd);font-size:12px;font-weight:800;text-align:center;line-height:1.2}
+.eitem .lc{display:grid;gap:2px;min-width:0;flex:1}
+.eitem strong{font-size:14px;line-height:1.35;overflow-wrap:anywhere}.eitem .lc span{color:var(--mu);font-size:12.5px}
+.eitem>.ic{width:17px;height:17px;color:var(--mu)}
+.eitem:hover strong{color:var(--g)}
+.empty-state,.events-note{margin:0;padding:14px 0 2px;color:var(--mu);font-size:14px}
+.sk{border-radius:16px;background:linear-gradient(90deg,#e9f7ef,#fff,#e9f7ef);background-size:200% 100%;animation:sh 1.5s infinite}
+.sk.n{min-height:170px}.sk.e{min-height:90px}.sk.hs{min-height:68px}
+@keyframes sh{to{background-position:-200% 0}}
+
+/* help */
+.help{display:flex;align-items:center;gap:14px;padding:18px 20px;border:1.5px dashed #b9d9c8;border-radius:24px;background:#f4fbf7}
+.help .ico{display:grid;place-items:center;width:46px;height:46px;border-radius:16px;background:#fff;color:var(--g);flex:none}
+.help b{display:block;font-size:15px}.help span{color:var(--mu);font-size:13px}
+.help button{margin-left:auto;min-height:44px;padding:0 18px;border:0;border-radius:999px;background:var(--g);color:#fff;font:700 13.5px var(--b);cursor:pointer}
+.help button:hover{background:var(--gd)}
+.hm-modal{position:fixed;inset:0;z-index:9000;display:grid;place-items:center;padding:20px;background:rgba(15,77,49,.6);backdrop-filter:blur(8px)}
+.hm-modal[hidden]{display:none}
+.box{position:relative;width:min(100%,460px);max-height:90vh;overflow-y:auto;padding:26px;border-radius:28px;background:#fff;animation:up .25s ease-out}
+@keyframes up{from{opacity:0;transform:translateY(10px)}}
+.box h2{margin:0 52px 10px 0;font:800 26px/1.1 var(--h);letter-spacing:-.035em}
+.box p{margin:8px 0;color:var(--mu);font-size:14.5px}
+.box ul{display:grid;gap:10px;margin:14px 0;padding-left:22px;color:var(--ink);font-size:14.5px}.box li::marker{color:var(--g)}
+.x{position:absolute;top:14px;right:14px;display:grid;place-items:center;width:44px;height:44px;border:1px solid var(--ln);border-radius:50%;background:#fff;color:var(--mu);cursor:pointer}.x:hover{color:var(--pkd)}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<symbol id="h-cal" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+<symbol id="h-box" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 8 9 5 9-5M3 8v9l9 5 9-5V8M12 13v9"/></symbol>
+<symbol id="h-print" viewBox="0 0 24 24"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/></symbol>
+<symbol id="h-heart" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"/><path d="M3 12h5l2-4 4 8 2-4h5"/></symbol>
+<symbol id="h-alert" viewBox="0 0 24 24"><path d="M12 22a2 2 0 0 0 2-2h-4a2 2 0 0 0 2 2ZM18 16v-5a6 6 0 0 0-5-5.9V4a1 1 0 0 0-2 0v1.1A6 6 0 0 0 6 11v5l-2 2h16l-2-2Z"/></symbol>
+<symbol id="h-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></symbol>
+<symbol id="h-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+<symbol id="h-pin" viewBox="0 0 24 24"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+<symbol id="h-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+<symbol id="h-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+<symbol id="h-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.6 9a2.5 2.5 0 1 1 4.4 1.6c-1.1 1.1-2 1.4-2 3M12 17h.01"/></symbol>
+<symbol id="h-x" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+</svg>
+
+<span id="nav-user-name" hidden></span>
+<main class="hm">
+  <div class="hm-layout">
+    <div class="hm-main">
+      <section class="hero" aria-labelledby="welcome-title">
+        <span class="today" id="today"></span>
+        <h1 id="welcome-title">Hey there!</h1>
+        <p id="welcome-subtitle">Ready to make a difference today?</p>
+        <div class="note"><span aria-hidden="true">✦</span> Good things happen when young people show up.</div>
+      </section>
+
+      <section class="card svcs" id="services" aria-labelledby="services-title">
+        <div class="sh"><div><h2 id="services-title">Explore services</h2><p>Made for our youth</p></div></div>
+        <div class="sgrid">
+          <a class="tile" href="events.html"><span class="chip"><svg class="ic"><use href="#h-cal"/></svg></span><strong>SK Announcements</strong><span class="d">Browse and join upcoming youth events.</span><svg class="ic go"><use href="#h-arrow"/></svg></a>
+          <a class="tile" href="borrow.html"><span class="chip"><svg class="ic"><use href="#h-box"/></svg></span><strong>Borrow Resources</strong><span class="d">Borrow and return equipment and resources.</span><svg class="ic go"><use href="#h-arrow"/></svg></a>
+          <a class="tile" href="print.html"><span class="chip"><svg class="ic"><use href="#h-print"/></svg></span><strong>Print Services</strong><span class="d">Send a document printing request.</span><svg class="ic go"><use href="#h-arrow"/></svg></a>
+          <a class="tile" href="health.html"><span class="chip"><svg class="ic"><use href="#h-heart"/></svg></span><strong>Health Services <span id="health-new-badge" class="new" hidden>New</span></strong><span class="d">Find health information and SK programs.</span><svg class="ic go"><use href="#h-arrow"/></svg></a>
+          <a class="tile" href="report.html"><span class="chip"><svg class="ic"><use href="#h-alert"/></svg></span><strong>Report an Issue</strong><span class="d">Share a concern or ask for urgent help.</span><svg class="ic go"><use href="#h-arrow"/></svg></a>
+          <a class="tile" href="public-disclosure.html"><span class="chip"><svg class="ic"><use href="#h-file"/></svg></span><strong>Public Disclosure</strong><span class="d">Explore SK reports and budget updates.</span><svg class="ic go"><use href="#h-arrow"/></svg></a>
+        </div>
+      </section>
+
+      <section class="card health" id="health-announcement-strip" aria-labelledby="health-announcements-title" hidden>
+        <div class="sh"><div><h2 id="health-announcements-title">Health announcements</h2><p>Wellness and community</p></div><a class="more" href="health.html">See all <svg class="ic"><use href="#h-arrow"/></svg></a></div>
+        <div class="hitems" id="health-announcement-items" aria-live="polite"></div>
+      </section>
+
+      <a class="disc" href="public-disclosure.html">
+        <span class="ico"><svg class="ic"><use href="#h-file"/></svg></span>
+        <span><strong>See how your SK works for you</strong><span class="t">View public documents, reports and budget updates.</span></span>
+        <svg class="ic"><use href="#h-arrow"/></svg>
+      </a>
+
+      <div class="help" role="group" aria-label="Help">
+        <span class="ico"><svg class="ic"><use href="#h-help"/></svg></span>
+        <div><b>Need a hand?</b><span>Quick tips for using SKalinga.</span></div>
+        <button type="button" id="fab-help">How can we help?</button>
+      </div>
+    </div>
+
+    <aside class="hm-rail" aria-label="Your membership and upcoming events">
+      <section class="wallet" aria-labelledby="digital-id-title">
+        <div class="wtop"><img src="assets/images/sklogo.jpg" alt="" width="38" height="38"><span>SKalinga member</span></div>
+        <p class="wlabel">YOUR DIGITAL ID</p>
+        <h2 class="wallet-name" id="wallet-member-name">Loading your name...</h2>
+        <span class="vh" id="digital-id-title" style="position:absolute;width:1px;height:1px;overflow:hidden">Your Digital ID</span>
+        <div class="chips">
+          <span class="badge" id="badge-status"><svg class="ic"><use href="#h-check"/></svg><span>Loading status...</span></span>
+          <span class="badge" id="badge-member-since"><svg class="ic"><use href="#h-cal"/></svg><span>Loading...</span></span>
+          <span class="badge" id="badge-events"><svg class="ic"><use href="#h-check"/></svg><span>Loading...</span></span>
+        </div>
+        <a class="wbtn" href="profile.html">Show my Digital ID <svg class="ic"><use href="#h-arrow"/></svg></a>
+      </section>
+
+      <section class="card next" aria-labelledby="next-event-heading">
+        <div class="sh"><div><h2 id="next-event-heading">Next event</h2><p>Save the date</p></div><a class="more" href="events.html">All events <svg class="ic"><use href="#h-arrow"/></svg></a></div>
+        <div id="next-event" aria-live="polite"><div class="sk n" aria-label="Loading next event"></div></div>
+      </section>
+
+      <section class="card coming" aria-labelledby="events-title">
+        <div class="sh"><div><h2 id="events-title">Coming up</h2><p>More ways to get involved</p></div></div>
+        <div id="events-container" aria-live="polite"><div class="sk e" aria-label="Loading events"></div></div>
+      </section>
+    </aside>
+  </div>
+</main>
+
+<div class="hm-modal" id="help-modal" role="dialog" aria-modal="true" aria-labelledby="help-title" hidden>
+  <div class="box">
+    <button class="x" id="close-help-modal" type="button" aria-label="Close help dialog"><svg class="ic"><use href="#h-x"/></svg></button>
+    <h2 id="help-title">Need a hand?</h2>
+    <p>Everything you need to take your next step is right here.</p>
+    <ul>
+      <li>Visit Events to browse and register for upcoming activities.</li>
+      <li>Use Borrow Resources to borrow or return equipment.</li>
+      <li>Check Print Services to request document printing.</li>
+      <li>Your Digital ID is available from your profile.</li>
+    </ul>
+    <p>For other questions, use the Report service or visit the SK Office.</p>
+  </div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+function formatTime24To12(t){
+  if(!t)return 'Time TBA';const [h,m='00']=String(t).split(':'),n=Number.parseInt(h,10);
+  return Number.isFinite(n)?`${n%12||12}:${m.slice(0,2)} ${n>=12?'PM':'AM'}`:'Time TBA';
+}
+function formatEventDate(v,o){const d=new Date(`${v}T00:00:00`);return isNaN(d)?'Date TBA':d.toLocaleDateString(undefined,o)}
+function getBadgeLabel(n){
+  const k=String(n||'General').trim().toLowerCase();
+  const l={announcement:'Announcement',urgent:'Urgent',featured:'Featured',free:'General',community:'Community',workshop:'Workshop',seminar:'Seminar',training:'Training',conference:'Conference',cultural:'Cultural',sports:'Sports',health:'Health'};
+  return l[k]||k.charAt(0).toUpperCase()+k.slice(1);
+}
+function createIcon(name){
+  const s=document.createElementNS('http://www.w3.org/2000/svg','svg'),u=document.createElementNS('http://www.w3.org/2000/svg','use');
+  s.setAttribute('class','ic');s.setAttribute('aria-hidden','true');u.setAttribute('href','#h-'+name);s.appendChild(u);return s;
+}
+const el=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e};
+
+function renderEvents(events){
+  const next=$('next-event'),list=$('events-container'),wrap=list.closest('.coming');
+  next.replaceChildren();list.replaceChildren();wrap.hidden=false;
+  if(!events.length){next.appendChild(el('p','empty-state','No upcoming events just yet. Check back soon!'));wrap.hidden=true;return}
+  const [f,...rest]=events,card=el('article','fe');
+  const det=el('div','det');
+  [['clock',f.time],['pin',f.location]].forEach(([i,t])=>{const p=el('p');p.append(createIcon(i),el('span','',t));det.appendChild(p)});
+  const tags=el('div','tags');
+  f.badges.forEach(b=>tags.appendChild(el('span','tag'+(b.toLowerCase()==='urgent'?' urgent':''),getBadgeLabel(b))));
+  const reg=el('a','reg',f.hasRegistrationLink?'Register now':'View events');reg.href=f.link;reg.appendChild(createIcon('arrow'));
+  if(f.opensNewTab){reg.target='_blank';reg.rel='noopener noreferrer'}
+  card.append(el('span','date',f.shortDate),el('h3','',f.title),det);
+  if(tags.childElementCount)card.appendChild(tags);
+  card.appendChild(reg);next.appendChild(card);
+  if(!rest.length){list.appendChild(el('p','events-note','That’s the next one! More events will appear here.'));return}
+  rest.forEach(e=>{
+    const a=el('a','eitem');a.href=e.link;if(e.opensNewTab){a.target='_blank';a.rel='noopener noreferrer'}
+    const lc=el('span','lc');lc.append(el('strong','',e.title),el('span','',`${e.time} · ${e.location}`));
+    a.append(el('span','ld',e.shortDate),lc,createIcon('arrow'));list.appendChild(a);
+  });
+}
+
+async function fetchEventsFromDatabase(){
+  const next=$('next-event'),list=$('events-container');
+  try{
+    const r=await fetch('api/get_events.php',{method:'GET',credentials:'include'});
+    if(!r.ok)throw new Error(`Events request failed (${r.status})`);
+    const d=await r.json();if(!d.success)throw new Error(d.message||'Events could not be loaded');
+    const today=new Date();today.setHours(0,0,0,0);
+    const events=(Array.isArray(d.data)?d.data:[]).map(e=>{
+      const date=new Date(`${e.date}T00:00:00`);
+      const slots=Number(e.capacity)>0?Math.max(0,Number(e.capacity)-Number(e.registeredCount||0)):null;
+      const raw=String(e.regLink||''),has=/^https?:\/\//i.test(raw)||raw.startsWith('/')||raw.startsWith('./'),link=has?raw:'events.html';
+      return {date,shortDate:formatEventDate(e.date,{month:'short',day:'numeric'}),time:formatTime24To12(e.time),title:e.title||'Untitled event',
+        location:e.location||'Location to be announced',link,hasRegistrationLink:has,opensNewTab:/^https?:\/\//i.test(link),
+        badges:[e.type||'General',...(slots!==null&&slots>0&&slots<=5?['urgent']:[])]};
+    }).filter(e=>!isNaN(e.date)&&e.date>=today).sort((a,b)=>a.date-b.date);
+    renderEvents(events);
+  }catch(err){
+    console.error('Unable to load upcoming events:',err);
+    next.replaceChildren(el('p','empty-state','Events are taking a little longer to load. Please try again soon.'));list.closest('.coming').hidden=true;
+  }
+}
+
+async function fetchHealthAnnouncements(){
+  const strip=$('health-announcement-strip'),items=$('health-announcement-items');
+  strip.hidden=false;items.innerHTML='<div class="sk hs" aria-label="Loading health announcements"></div>';
+  try{
+    const r=await fetch('api/health_announcements/list_public.php?period=upcoming',{credentials:'same-origin'});
+    if(!r.ok)throw new Error(`Health announcements request failed (${r.status})`);
+    const res=await r.json();if(!res.success)throw new Error(res.message||'Health announcements could not be loaded');
+    const posts=Array.isArray(res.data)?res.data.slice(0,2):[];
+    if(!posts.length){strip.hidden=true;return}
+    items.innerHTML=posts.map(p=>{
+      const d=p.event_date?esc(formatEventDate(p.event_date,{month:'short',day:'numeric'})):'Date TBA';
+      return `<a class="hitem" href="health.html"><strong>${esc(p.title||'Health announcement')}</strong><span>${d} · ${esc(p.venue||'Venue to be announced')}</span></a>`;
+    }).join('');
+    $('health-new-badge').hidden=!posts.some(p=>p.published_at&&Date.now()-new Date(p.published_at).getTime()<=7*864e5);
+  }catch(err){console.error('Unable to load health announcements:',err);items.innerHTML='<p class="empty-state">Health updates are temporarily unavailable.</p>'}
+}
+
+function setBadge(elm,icon,text){elm.replaceChildren(createIcon(icon),el('span','',text))}
+async function loadUserProfile(){
+  try{
+    const r=await fetch('api/get_user.php',{method:'GET',credentials:'include'});
+    if(!r.ok)throw new Error(`Profile request failed (${r.status})`);
+    const d=await r.json();if(!d.success){location.href='login.html';return}
+    const first=String(d.firstname||'').trim(),full=`${first} ${d.lastname||''}`.trim()||'SKalinga member';
+    $('nav-user-name').textContent=full;$('wallet-member-name').textContent=full;
+    $('welcome-title').textContent=first?`Hey ${first}!`:'Hey there!';
+    const h=new Date().getHours();
+    $('welcome-subtitle').textContent=h<12?'Good morning! Ready to make a difference today?':h<18?'Good afternoon! Let’s make an impact today!':'Good evening! Keep up the great work!';
+    setBadge($('badge-status'),'check',d.status==='active'?'Active member':d.status==='suspended'?'Suspended':'Inactive member');
+    const since=d.created_at?new Date(d.created_at).toLocaleString(undefined,{month:'long',year:'numeric'}):'Member';
+    setBadge($('badge-member-since'),'cal',`Since ${since}`);
+    const n=Number(d.events_attended)||0;setBadge($('badge-events'),'check',`${n} ${n===1?'event':'events'} attended`);
+  }catch(err){console.error('Unable to load youth profile:',err);location.href='login.html'}
+}
+
+const helpModal=$('help-modal');
+const closeHelp=()=>{helpModal.hidden=true};
+$('fab-help').addEventListener('click',()=>{helpModal.hidden=false;$('close-help-modal').focus()});
+$('close-help-modal').addEventListener('click',closeHelp);
+helpModal.addEventListener('click',e=>{if(e.target===helpModal)closeHelp()});
+addEventListener('keydown',e=>{if(e.key==='Escape')closeHelp()});
+
+document.addEventListener('DOMContentLoaded',()=>{
+  $('today').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  loadUserProfile();fetchEventsFromDatabase();fetchHealthAnnouncements();
+});
+</script>
+<script src="js/auth-guard.js" data-roles="youth"></script>
+<script src="js/youth-nav.js?v=20261021-3"></script>
+<script src="assets/js/loader.js?v=3"></script>
+</body>
+</html>

@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SKalinga - Borrow Resources</title>
+<link rel="icon" type="image/x-icon" href="/SKalinga/assets/icons/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/SKalinga/assets/icons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/SKalinga/assets/icons/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/SKalinga/assets/icons/apple-touch-icon.png">
+<link rel="manifest" href="/SKalinga/assets/icons/site.webmanifest">
+<meta name="msapplication-config" content="/SKalinga/assets/icons/browserconfig.xml">
+<meta name="theme-color" content="#FF6B9D">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/skalinga-ui.css?v=20261021-3">
+<link rel="stylesheet" href="assets/css/loader.css?v=3">
+<link rel="stylesheet" href="assets/css/digital-youth-id.css">
+<style>
+.pr,.pr-modal,.pr-drawer{--g:#228B57;--gd:#0F4D31;--pk:#FF6B9D;--pkd:#E04F7E;--ink:#16303F;--mu:#5F7788;--ln:#E3ECE7;--h:"Bricolage Grotesque",system-ui,sans-serif;--b:"Plus Jakarta Sans",system-ui,sans-serif;font-family:var(--b);color:var(--ink)}
+.pr{width:min(1180px,100% - 32px);margin:0 auto;padding:16px 0 110px}
+.pr *,.pr-modal *,.pr-drawer *{box-sizing:border-box}
+.pr :focus-visible,.pr-modal :focus-visible,.pr-drawer :focus-visible{outline:3px solid var(--pkd);outline-offset:3px}
+.ic{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+.pr-hero{position:relative;overflow:hidden;border-radius:28px;padding:clamp(24px,4vw,40px);color:#fff;background:linear-gradient(140deg,var(--g),var(--gd))}
+.pr-hero::after{content:"";position:absolute;right:-80px;top:-90px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,var(--pk),rgba(255,107,157,0) 68%);opacity:.7}
+.pr-hero>*{position:relative;z-index:1}
+.pr-hero h1{margin:0 0 8px;font:800 clamp(30px,5vw,46px)/1.05 var(--h);letter-spacing:-.04em}
+.pr-hero p{margin:0;max-width:58ch;color:rgba(255,255,255,.88)}
+.pr-acts{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.btn{display:inline-flex;align-items:center;gap:9px;min-height:50px;padding:0 22px;border:1px solid transparent;border-radius:999px;font:700 14.5px var(--b);cursor:pointer;transition:transform .15s,background .15s,color .15s}
+.btn:active{transform:scale(.97)}
+.btn.pink{background:var(--pk);color:var(--ink);box-shadow:0 8px 24px rgba(255,107,157,.4)}.btn.pink:hover{background:#ff82ae}
+.btn.ghost{background:rgba(255,255,255,.16);color:#fff;border-color:rgba(255,255,255,.45);backdrop-filter:blur(8px)}.btn.ghost:hover{background:#fff;color:var(--gd)}
+.btn.soft{background:#f1f6f3;color:var(--ink);min-height:44px;padding:0 16px}.btn.soft:hover{background:var(--g);color:#fff}
+.cnt{display:grid;place-items:center;min-width:24px;height:24px;padding:0 7px;border-radius:999px;background:var(--pk);color:var(--ink);font-size:12px}
+.cnt[hidden]{display:none}
+
+.pr-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+.stat{padding:16px 18px;border:1px solid var(--ln);border-radius:20px;background:#fff}
+.stat b{display:block;font:800 clamp(26px,4vw,34px) var(--h);letter-spacing:-.04em;line-height:1}
+.stat span{display:block;margin-top:6px;color:var(--mu);font-size:13px;font-weight:600}
+.stat.warn b{color:#a86a00}.stat.bad b{color:var(--pkd)}
+
+.pr-grid{display:grid;gap:18px;margin-top:18px}
+@media(min-width:960px){.pr-grid{grid-template-columns:1.5fr 1fr;align-items:start}.pr-side{position:sticky;top:96px}}
+.pr-card{background:#fff;border:1px solid var(--ln);border-radius:24px;padding:clamp(18px,3vw,28px);box-shadow:0 4px 20px rgba(34,139,87,.07)}
+.pr-card h2{margin:0 0 4px;font:700 22px var(--h);letter-spacing:-.03em}
+.pr-card .hint{margin:0 0 16px;color:var(--mu);font-size:14px}
+.how{display:grid;gap:14px;margin:0;padding:0;list-style:none;counter-reset:s}
+.how li{display:grid;grid-template-columns:34px 1fr;gap:12px;font-size:14px;color:var(--mu)}
+.how li::before{counter-increment:s;content:counter(s);display:grid;place-items:center;width:34px;height:34px;border-radius:12px;background:#e9f7ef;color:var(--g);font:800 15px var(--h)}
+.how b{display:block;color:var(--ink)}
+
+.item{display:grid;grid-template-columns:48px 1fr auto;gap:14px;align-items:center;padding:16px 0;border-top:1px solid var(--ln)}
+.item:first-child{border-top:0}
+.item .ico{display:grid;place-items:center;width:48px;height:48px;border-radius:16px;background:#e9f7ef;color:var(--g)}
+.item.overdue .ico{background:#ffe3ec;color:var(--pkd)}
+.item h3{margin:0;font:700 15.5px var(--b);overflow-wrap:anywhere}
+.item p{margin:3px 0 0;color:var(--mu);font-size:13px}
+.item .end{display:grid;gap:8px;justify-items:end}
+.st{display:inline-block;padding:5px 11px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap}
+.st.borrowed{background:#e3f1fb;color:#14537e}.st.due-soon{background:#fff4d6;color:#7a5600}
+.st.overdue{background:#ffe3ec;color:#a02350}.st.returned{background:#dff5e8;color:#0F4D31}
+.empty{padding:28px 8px;text-align:center;color:var(--mu);font-size:14px}
+.empty .btn{margin-top:14px}
+.sk{height:68px;margin:8px 0;border-radius:16px;background:linear-gradient(90deg,#e9f7ef,#fff,#e9f7ef);background-size:200% 100%;animation:sh 1.5s infinite}
+@keyframes sh{to{background-position:-200% 0}}
+@media(max-width:560px){.item{grid-template-columns:48px 1fr}.item .end{grid-column:1/-1;grid-template-columns:auto auto;justify-content:space-between;justify-items:start;align-items:center}.pr-stats{gap:8px}.stat{padding:12px}}
+
+.x{width:44px;height:44px;flex:none;border:1px solid var(--ln);border-radius:50%;background:#fff;color:var(--mu);cursor:pointer;display:grid;place-items:center}.x:hover{color:var(--pkd)}
+.scrim{position:fixed;inset:0;z-index:8000;background:rgba(15,77,49,.5);backdrop-filter:blur(6px);opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s}
+.scrim.on{opacity:1;visibility:visible}
+.pr-drawer{position:fixed;z-index:8100;top:0;right:0;bottom:0;display:flex;flex-direction:column;width:min(460px,100%);background:#fff;box-shadow:-20px 0 60px rgba(22,48,63,.25);transform:translateX(100%);visibility:hidden;transition:transform .3s cubic-bezier(.22,1,.36,1),visibility .3s}
+.pr-drawer.on{transform:none;visibility:visible}
+.dh{display:flex;justify-content:space-between;gap:12px;padding:22px 22px 12px}
+.dh h2{margin:0 0 4px;font:800 24px var(--h);letter-spacing:-.03em}.dh p{margin:0;color:var(--mu);font-size:14px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:4px 22px 14px;border-bottom:1px solid var(--ln);scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;min-height:40px;padding:0 16px;border:1.5px solid var(--ln);border-radius:999px;background:#fff;color:var(--ink);font:700 13px var(--b);cursor:pointer}
+.chip[aria-pressed="true"]{border-color:var(--g);background:#e9f7ef;color:var(--gd)}
+.db{flex:1;overflow-y:auto;padding:4px 22px}
+.df{padding:14px 22px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--ln);display:flex;gap:10px}
+.df .btn{flex:1;justify-content:center}
+.mon{margin:14px 0 2px;color:var(--mu);font:700 12px var(--b);letter-spacing:.06em;text-transform:uppercase}
+
+.pr-modal{position:fixed;inset:0;z-index:9000;display:grid;place-items:center;padding:20px;background:rgba(15,77,49,.6);backdrop-filter:blur(8px);overflow-y:auto}
+.pr-modal[hidden]{display:none}
+.pr-box{position:relative;width:min(100%,560px);max-height:92vh;overflow-y:auto;padding:26px;border-radius:28px;background:#fff;animation:up .25s ease-out}
+@keyframes up{from{opacity:0;transform:translateY(10px)}}
+.pr-box h2{margin:0 52px 6px 0;font:800 24px/1.1 var(--h);letter-spacing:-.03em}
+.pr-box>p{margin:0 0 14px;color:var(--mu);font-size:14px}
+.pr-box>.x{position:absolute;top:14px;right:14px}
+.target{display:none;align-items:center;gap:10px;margin:0 0 14px;padding:12px 14px;border-radius:16px;background:#fff0f5;color:#8a2a4d;font-size:14px;font-weight:600}
+.target.on{display:flex}.target .ic{color:var(--pkd)}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<symbol id="b-box" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 8 9 5 9-5M3 8v9l9 5 9-5V8M12 13v9"/></symbol>
+<symbol id="b-hist" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+<symbol id="b-x" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+<symbol id="b-ret" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></symbol>
+<symbol id="b-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+</svg>
+
+<main class="pr">
+  <header class="pr-hero">
+    <h1>Borrow resources</h1>
+    <p>Borrow equipment and materials for your activities, and return them on time. Show your Digital Youth ID to the SK admin and they will record it.</p>
+    <div class="pr-acts">
+      <button class="btn pink" id="requestBorrowBtn" type="button"><svg class="ic"><use href="#b-plus"/></svg>Borrow an item</button>
+      <button class="btn ghost" id="returnBtn" type="button"><svg class="ic"><use href="#b-ret"/></svg>Return an item</button>
+      <button class="btn ghost" id="openHistory" type="button" aria-haspopup="dialog"><svg class="ic"><use href="#b-hist"/></svg>View history<span class="cnt" id="histCount" hidden></span></button>
+    </div>
+  </header>
+
+  <div class="pr-stats" aria-label="Borrowing summary">
+    <div class="stat"><b id="nActive">0</b><span>Borrowed now</span></div>
+    <div class="stat warn"><b id="nSoon">0</b><span>Due soon</span></div>
+    <div class="stat bad"><b id="nLate">0</b><span>Overdue</span></div>
+  </div>
+
+  <div class="pr-grid">
+    <section class="pr-card" aria-labelledby="curTitle">
+      <h2 id="curTitle">Currently borrowed</h2>
+      <p class="hint">Items you still have. Tap Return when you are ready to bring one back.</p>
+      <div id="currentList" aria-live="polite"><div class="sk"></div><div class="sk"></div></div>
+    </section>
+
+    <aside class="pr-side">
+      <section class="pr-card">
+        <h2>How it works</h2>
+        <p class="hint">Three quick steps at the SK Office.</p>
+        <ol class="how">
+          <li><span><b>Open your Digital ID</b>Tap Borrow or Return to show your QR code.</span></li>
+          <li><span><b>Admin scans and records</b>They check the item and note the quantity and due date.</span></li>
+          <li><span><b>Return it on time</b>Bring it back by the due date so others can use it.</span></li>
+        </ol>
+      </section>
+    </aside>
+  </div>
+</main>
+
+<div class="scrim" id="scrim"></div>
+<aside class="pr-drawer" id="historyDrawer" role="dialog" aria-modal="true" aria-labelledby="histTitle">
+  <header class="dh">
+    <div><h2 id="histTitle">Borrow history</h2><p>Everything you have borrowed and returned.</p></div>
+    <button class="x" id="closeHistory" type="button" aria-label="Close history"><svg class="ic"><use href="#b-x"/></svg></button>
+  </header>
+  <div class="chips" role="group" aria-label="Filter history">
+    <button class="chip" type="button" data-f="all" aria-pressed="true">All</button>
+    <button class="chip" type="button" data-f="active" aria-pressed="false">Borrowed</button>
+    <button class="chip" type="button" data-f="returned" aria-pressed="false">Returned</button>
+    <button class="chip" type="button" data-f="overdue" aria-pressed="false">Overdue</button>
+  </div>
+  <div class="db" id="borrowList" aria-live="polite"><div class="sk"></div><div class="sk"></div></div>
+  <footer class="df"><button class="btn soft" type="button" onclick="refreshBorrowHistory()">Refresh</button><button class="btn pink" id="newFromHistory" type="button">Borrow an item</button></footer>
+</aside>
+
+<div class="pr-modal" id="digitalIdModal" hidden>
+  <div class="pr-box" role="dialog" aria-modal="true" aria-labelledby="borrowIdTitle">
+    <button class="x" id="closeModal" type="button" aria-label="Close digital ID"><svg class="ic"><use href="#b-x"/></svg></button>
+    <h2 id="borrowIdTitle">Digital Youth ID – For Admin Scan</h2>
+    <p id="idHelp">Present this to the admin for quick scanning and form filling.</p>
+    <div class="target" id="idTarget"><svg class="ic"><use href="#b-box"/></svg><span id="idTargetText"></span></div>
+    <div class="digital-youth-id-card">
+     <section class="dyid-front" aria-label="Front of SKalinga membership ID">
+      <div class="dyid-header">
+        <img src="assets/images/sklogo.jpg" alt="SK logo" class="dyid-logo">
+        <div class="dyid-brand"><span>SKalinga Youth Services</span><strong>SK San Antonio</strong></div>
+        <span class="dyid-classification">Member ID</span>
+      </div>
+      <div class="dyid-main">
+        <div class="dyid-person">
+          <img src="assets/images/default-avatar.png" alt="Member photo" class="dyid-photo">
+          <div class="dyid-details">
+            <span class="dyid-field-label">Youth Member</span>
+            <h4 class="dyid-name" id="userFullName">Loading...</h4>
+            <span class="dyid-number-stamp"><span>Member number</span><strong id="userMemberId">SK-XXXX-XXXX</strong></span>
+            <span class="dyid-detail">Date issued<strong id="userIssuedDate">Loading...</strong></span>
+          </div>
+        </div>
+        <div class="dyid-qr-panel">
+          <div class="dyid-qr-box" id="userQRCode" role="img" aria-label="Member reference QR code"></div>
+          <span class="dyid-qr-caption">Reference only — not proof of identity</span>
+        </div>
+      </div>
+      <div class="dyid-footer"><span>Personal identification</span><span>Present to SK staff</span></div>
+      <span class="dyid-hologram" aria-hidden="true">SK</span>
+     </section>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+let currentUser={},records=[],filter='all';
+const day=d=>{const x=new Date(d);return isNaN(x)?null:new Date(x.getFullYear(),x.getMonth(),x.getDate())};
+const fd=(d,t)=>{const x=new Date(d);return isNaN(x)?'Not set':x.toLocaleDateString('en-US',t?{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'}:{month:'short',day:'numeric',year:'numeric'})};
+
+/* status: returned | overdue | due-soon | borrowed (overdue only after the due date has fully passed) */
+function info(r){
+  const returned=r.status==='Returned'||!!r.return_date, due=day(r.due_date), today=day(new Date());
+  const left=due?Math.round((due-today)/864e5):null;
+  let key='borrowed',label='Borrowed';
+  if(returned){key='returned';label='Returned'}
+  else if(left!==null&&left<0){key='overdue';label='Overdue'}
+  else if(left!==null&&left<=2){key='due-soon';label='Due soon'}
+  const dueText=returned?'':left===null?'':left<0?`Overdue by ${-left} day${left===-1?'':'s'}`:left===0?'Due today':left===1?'Due tomorrow':`${left} days left`;
+  return {key,label,returned,left,dueText};
+}
+
+/* ---- render ---- */
+function render(){
+  const meta=records.map(info);
+  const act=records.map((r,i)=>({r,i,m:meta[i]})).filter(x=>!x.m.returned);
+  $('nActive').textContent=act.length;
+  $('nSoon').textContent=act.filter(x=>x.m.key==='due-soon').length;
+  $('nLate').textContent=act.filter(x=>x.m.key==='overdue').length;
+  const c=$('histCount');c.hidden=!records.length;c.textContent=records.length;
+
+  $('currentList').innerHTML=act.length?act.sort((a,b)=>(a.m.left??999)-(b.m.left??999)).map(({r,i,m})=>`
+    <article class="item ${m.key==='overdue'?'overdue':''}">
+      <span class="ico"><svg class="ic"><use href="#b-box"/></svg></span>
+      <div><h3>${esc(r.item_name||'Unknown item')} <small style="color:var(--mu);font-weight:600">× ${esc(r.quantity||1)}</small></h3>
+        <p>Borrowed ${esc(fd(r.borrow_date))} · Due ${esc(fd(r.due_date))}</p></div>
+      <div class="end"><span class="st ${m.key}">${esc(m.dueText||m.label)}</span><button class="btn soft" type="button" data-return="${i}"><svg class="ic"><use href="#b-ret"/></svg>Return</button></div>
+    </article>`).join('')
+  :`<div class="empty">You have nothing borrowed right now.<br><button class="btn soft" type="button" data-borrow>Borrow an item</button></div>`;
+
+  renderHistory(meta);
+}
+function renderHistory(meta=records.map(info)){
+  const rows=records.map((r,i)=>({r,m:meta[i]})).filter(({m})=>filter==='all'||(filter==='active'?!m.returned:m.key===filter));
+  if(!rows.length){$('borrowList').innerHTML=`<p class="empty">${records.length?'Nothing matches this filter.':'No borrowing history yet. Your borrowed items will show up here.'}</p>`;return}
+  rows.sort((a,b)=>new Date(b.r.borrow_date)-new Date(a.r.borrow_date));
+  let html='',last='';
+  rows.forEach(({r,m})=>{
+    const d=new Date(r.borrow_date),mon=isNaN(d)?'Undated':d.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+    if(mon!==last){html+=`<div class="mon">${esc(mon)}</div>`;last=mon}
+    html+=`<article class="item ${m.key==='overdue'?'overdue':''}"><span class="ico"><svg class="ic"><use href="#b-box"/></svg></span>
+      <div><h3>${esc(r.item_name||'Unknown item')} <small style="color:var(--mu);font-weight:600">× ${esc(r.quantity||1)}</small></h3>
+      <p>Borrowed ${esc(fd(r.borrow_date,1))}</p><p>Due ${esc(fd(r.due_date))} · ${r.return_date?'Returned '+esc(fd(r.return_date)):'Not yet returned'}</p></div>
+      <span class="st ${m.key}">${esc(m.label)}</span></article>`;
+  });
+  $('borrowList').innerHTML=html;
+}
+
+/* ---- data ---- */
+async function loadUserProfile(){
+  try{
+    const r=await fetch('api/get_user_profile.php?role=youth'),d=await r.json();
+    if(d.success&&d.user){
+      const u=currentUser=d.user;
+      $('userFullName').textContent=u.name;$('userMemberId').textContent=u.member_id;$('userIssuedDate').textContent=u.issued_date;
+    }else throw new Error(d.error);
+  }catch(e){console.error('Error loading user profile:',e);$('userFullName').textContent='Error loading profile';$('userMemberId').textContent='Not found'}
+}
+async function loadBorrowHistory(){
+  try{
+    const r=await fetch(`api/get_user_borrow_records.php?t=${Date.now()}`,{cache:'no-store'}),d=await r.json();
+    if(!r.ok||!d.success)throw new Error(d.message||'Unable to load borrowing history.');
+    if(!Array.isArray(d.data))throw new Error('The borrowing history response was invalid.');
+    records=d.data;render();
+  }catch(e){
+    console.error('Error loading borrow history:',e);
+    const msg='<p class="empty">We could not load your borrowing history. Please refresh and try again.</p>';
+    $('currentList').innerHTML=msg;$('borrowList').innerHTML=msg;
+  }
+}
+async function refreshBorrowHistory(){$('borrowList').innerHTML='<div class="sk"></div><div class="sk"></div>';await loadBorrowHistory()}
+
+/* ---- Digital ID modal (borrow or return) ---- */
+const modal=$('digitalIdModal');
+async function openId(mode,rec){
+  const ret=mode==='return';
+  $('borrowIdTitle').textContent=ret?'Show this ID to return':'Show this ID to borrow';
+  $('idHelp').textContent=ret?'Present this to the admin so they can scan it and record your return.':'Present this to the admin for quick scanning and form filling.';
+  $('idTarget').classList.toggle('on',!!rec);
+  if(rec)$('idTargetText').textContent=`Returning: ${rec.item_name||'item'} × ${rec.quantity||1}`;
+  const memberId=String(currentUser.member_id||'');
+  $('userQRCode').replaceChildren();
+  if(window.QRCode&&memberId){
+    new QRCode($('userQRCode'),{text:memberId,width:90,height:90,correctLevel:QRCode.CorrectLevel.M});
+  }else{
+    $('userQRCode').textContent='QR unavailable';
+  }
+  modal.hidden=false;$('closeModal').focus();
+}
+const closeM=()=>{modal.hidden=true};
+$('requestBorrowBtn').onclick=()=>openId('borrow');
+$('returnBtn').onclick=()=>openId('return');
+$('closeModal').onclick=closeM;
+modal.addEventListener('click',e=>{if(e.target===modal)closeM()});
+document.addEventListener('click',e=>{
+  const rb=e.target.closest('[data-return]');if(rb){openId('return',records[+rb.dataset.return]);return}
+  if(e.target.closest('[data-borrow]'))openId('borrow');
+});
+
+/* ---- history drawer ---- */
+const drawer=$('historyDrawer'),scrim=$('scrim');let lastFocus=null;
+function openH(){lastFocus=document.activeElement;drawer.classList.add('on');scrim.classList.add('on');document.body.style.overflow='hidden';$('closeHistory').focus();loadBorrowHistory()}
+function closeH(){if(!drawer.classList.contains('on'))return;drawer.classList.remove('on');scrim.classList.remove('on');document.body.style.overflow='';if(lastFocus)lastFocus.focus()}
+$('openHistory').onclick=openH;$('closeHistory').onclick=closeH;scrim.onclick=closeH;
+$('newFromHistory').onclick=()=>{closeH();openId('borrow')};
+document.querySelectorAll('.chip').forEach(b=>b.addEventListener('click',()=>{
+  filter=b.dataset.f;document.querySelectorAll('.chip').forEach(x=>x.setAttribute('aria-pressed',x===b));renderHistory();
+}));
+addEventListener('keydown',e=>{if(e.key==='Escape'){closeM();closeH()}});
+
+document.addEventListener('DOMContentLoaded',()=>{loadUserProfile();loadBorrowHistory()});
+</script>
+<script src="js/auth-guard.js" data-roles="youth"></script>
+<script src="js/youth-nav.js?v=20261021-3"></script>
+<script src="assets/js/loader.js?v=3"></script>
+</body>
+</html>
