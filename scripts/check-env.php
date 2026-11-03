@@ -32,7 +32,7 @@ try {
         && getenv('DB_HOST') === false
         && getenv('DB_USER') === false
         && getenv('DB_PASSWORD') === false) {
-        $errors[] = 'Missing includes/config.local.php or Railway database environment variables.';
+        $errors[] = 'Missing includes/config.local.php, .env, or deployment database environment variables.';
     } else {
         $errors[] = 'Configuration error: ' . $exception->getMessage();
     }

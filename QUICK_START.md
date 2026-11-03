@@ -7,4 +7,4 @@
 5. Create the first administrator from the CLI: `php scripts/create_admin.php`.
 6. Open [http://localhost/SKalinga/](http://localhost/SKalinga/) and test admin login, masterlist import, and youth account activation.
 
-No sample account passwords are provided or seeded. See [README.md](README.md), [DEPLOY.md](DEPLOY.md), and [database/postgres/README.md](database/postgres/README.md) for local and Railway deployment details.
+No sample account passwords are provided or seeded. See [README.md](README.md), [DEPLOY.md](DEPLOY.md), and [database/postgres/README.md](database/postgres/README.md) for local and Render deployment details.

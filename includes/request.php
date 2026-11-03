@@ -13,7 +13,9 @@ function isHttps(): bool
     $isLocalProxy = $remoteAddr === '127.0.0.1' || $remoteAddr === '::1';
     $isRailwayProxy = getenv('RAILWAY_ENVIRONMENT_NAME') !== false
         || getenv('RAILWAY_PUBLIC_DOMAIN') !== false;
-    if (!$isLocalProxy && !$isRailwayProxy) {
+    $isRenderProxy = strtolower((string)getenv('RENDER')) === 'true'
+        || getenv('RENDER_EXTERNAL_HOSTNAME') !== false;
+    if (!$isLocalProxy && !$isRailwayProxy && !$isRenderProxy) {
         return false;
     }
 
@@ -53,7 +55,9 @@ function clientIp(): string
     if (!$isLocalProxy) {
         $isRailwayProxy = getenv('RAILWAY_ENVIRONMENT_NAME') !== false
             || getenv('RAILWAY_PUBLIC_DOMAIN') !== false;
-        if ($isRailwayProxy) {
+        $isRenderProxy = strtolower((string)getenv('RENDER')) === 'true'
+            || getenv('RENDER_EXTERNAL_HOSTNAME') !== false;
+        if ($isRailwayProxy || $isRenderProxy) {
             $forwardedFor = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? '';
             if (is_string($forwardedFor)) {
                 foreach (array_map('trim', explode(',', $forwardedFor)) as $candidate) {

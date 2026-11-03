@@ -20,7 +20,7 @@ SKalinga is a youth e-governance platform for Barangay San Antonio, Binan, Lagun
 
 Database setup and migration details are in [database/postgres/README.md](database/postgres/README.md).
 
-For first-time Railway deployment with Supabase, follow [DEPLOY.md](DEPLOY.md). It covers the Supabase Session Pooler, Railway environment variables and persistent upload volumes, the environment check, and admin creation.
+For a Render demo deployment with Supabase, follow [DEPLOY.md](DEPLOY.md). It covers the Supabase Session Pooler, Render environment variables, free-service limitations, the environment check, and admin creation.
 
 ## Authentication
 
@@ -82,7 +82,7 @@ The youth-facing page is read-only at `public-disclosure.html`. Administrators m
 - `POST api/reset_password.php` - verifies the OTP and updates the youth account password
 - `GET api/get_user_borrow_records.php` - returns borrowing history for the authenticated youth account
 
-Forgot-password OTP email settings (`EMAILJS_SERVICE_ID`, `EMAILJS_TEMPLATE_ID`, and `EMAILJS_PUBLIC_KEY`) are loaded from `.env` locally or Railway environment variables. In the EmailJS template, set **To Email** to `{{to_email}}` and include `{{otp}}` in the email body. The API also supplies `email`, `user_email`, and `recipient_email` as recipient aliases for templates using those variable names. Add `localhost` to the allowed domains in the EmailJS account security settings for local testing; set `EMAILJS_ORIGIN` to the deployed origin outside local development. OTPs expire after 15 minutes and are limited to five verification attempts. Admin and SK official accounts are not included in this youth-account recovery flow.
+Forgot-password OTP email settings (`EMAILJS_SERVICE_ID`, `EMAILJS_TEMPLATE_ID`, and `EMAILJS_PUBLIC_KEY`) are loaded from `.env` locally or deployment environment variables. In the EmailJS template, set **To Email** to `{{to_email}}` and include `{{otp}}` in the email body. The API also supplies `email`, `user_email`, and `recipient_email` as recipient aliases for templates using those variable names. Add `localhost` to the allowed domains in the EmailJS account security settings for local testing; set `EMAILJS_ORIGIN` to the deployed origin outside local development. OTPs expire after 15 minutes and are limited to five verification attempts. Admin and SK official accounts are not included in this youth-account recovery flow.
 
 ### Admin masterlist
 
@@ -130,4 +130,4 @@ Create the first administrator from the command line with `php scripts/create_ad
 - Database errors: verify `includes/config.local.php`, the PostgreSQL PHP extensions, and the Session Pooler connection.
 - Missing tables: apply [database/postgres/schema.sql](database/postgres/schema.sql) and all PostgreSQL migrations in order.
 - Admin page redirects: confirm the account role is `staff` or `superadmin` and that the browser session is current.
-- PHP errors: check the Railway service logs for deployed errors, or the XAMPP PHP/Apache error logs for local errors.
+- PHP errors: check the Render service logs for deployed errors, or the XAMPP PHP/Apache error logs for local errors.

@@ -8,4 +8,4 @@ This guide covers local Apache/PHP testing. The application uses Supabase Postgr
 4. Create an administrator from a terminal with `php scripts/create_admin.php`.
 5. Open `http://localhost/SKalinga/` and test the login and masterlist registration flows.
 
-Do not use the legacy MySQL dump or old documented test accounts. For Railway deployment with Supabase, follow [DEPLOY.md](DEPLOY.md).
+Do not use the legacy MySQL dump or old documented test accounts. For a Render demo deployment with Supabase, follow [DEPLOY.md](DEPLOY.md).

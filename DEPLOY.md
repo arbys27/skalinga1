@@ -1,32 +1,35 @@
-# Deploy SKalinga to Railway with Supabase
+# Deploy SKalinga to Render with Supabase
 
-Railway runs the PHP application in Apache, and Supabase provides PostgreSQL. The existing XAMPP setup and `http://localhost/SKalinga/` URL continue to work. Railway also serves the app at `/SKalinga/`; its root URL redirects there. Cloudflare Pages and Workers are not used.
+Render runs the PHP application in Apache, and Supabase provides PostgreSQL. Local XAMPP remains supported at `http://localhost/SKalinga/`. Render serves the app at `/SKalinga/` and redirects its root URL there. Cloudflare Pages and Workers are not used.
 
-## 1. Prepare Supabase
+## 1. Supabase
 
-1. Create a Supabase project (Singapore is a suitable region) and set a strong database password.
-2. In the Supabase SQL Editor, run `database/postgres/schema.sql`, then every SQL file in `database/postgres/migrations/` in numeric order.
-3. Open **Connect**, choose the **Session pooler**, and note its host and user. Use port **5432** and database `postgres`. Do not use the transaction pooler on port **6543**.
-4. Keep the Supabase `anon` and `service_role` API keys out of this application. PHP connects directly to PostgreSQL using its database credentials.
+The schema and migrations should already be applied:
 
-## 2. Deploy the application on Railway
+1. Use the Supabase **Session pooler** connection, port `5432`, database `postgres`.
+2. Do not use the transaction pooler on port `6543`.
+3. Keep the `anon` and `service_role` API keys out of this PHP application. It connects directly to PostgreSQL using its database credentials.
 
-1. Push this repository to a Git provider connected to your Railway account, or deploy it with the Railway CLI from the repository root. Railway builds the root `Dockerfile`, which runs Apache with the PHP PostgreSQL extensions enabled.
-2. In the Railway service, add these variables under **Variables**:
+## 2. Create the Render demo service
+
+1. In Render, choose **New → Web Service**.
+2. Connect GitHub and select the private repository `arbys27/skalinga1`, branch `main`.
+3. Render detects the root `Dockerfile`. Choose the **Free** instance type. The Docker image runs Apache and installs PHP PostgreSQL extensions.
+4. Add these variables in the service's **Environment** settings:
 
    | Variable | Value |
    |---|---|
    | `DB_HOST` | Supabase Session Pooler host |
-   | `DB_USER` | `postgres.<PROJECT_REF>` (the Session Pooler username shown by Supabase) |
+   | `DB_USER` | Session Pooler username shown by Supabase, e.g. `postgres.<PROJECT_REF>` |
    | `DB_PASSWORD` | Supabase database password |
    | `SITE_KEY` | Private random 64-character hexadecimal string |
    | `APP_ENV` | `production` |
-   | `EMAILJS_ORIGIN` | `https://<your-Railway-domain>` after the domain is generated |
+   | `EMAILJS_ORIGIN` | `https://<your-render-domain>` |
    | `EMAILJS_SERVICE_ID` | EmailJS service ID |
    | `EMAILJS_TEMPLATE_ID` | EmailJS password-reset template ID |
    | `EMAILJS_PUBLIC_KEY` | EmailJS public key |
 
-   If using SMS OTP, also set `SKALINGA_SMS_API_URL` and `SKALINGA_SMS_API_KEY` to the provider values. Never commit any of these values or put Supabase API keys in frontend code.
+   Add `SKALINGA_SMS_API_URL` and `SKALINGA_SMS_API_KEY` only if configuring an SMS provider. Never put actual secret values in GitHub or this chat.
 
    Generate `SITE_KEY` in PowerShell:
 
@@ -37,51 +40,53 @@ Railway runs the PHP application in Apache, and Supabase provides PostgreSQL. Th
    [BitConverter]::ToString($bytes).Replace('-', '').ToLower()
    ```
 
-3. Add a Railway **Volume** mounted at `/var/www/html/uploads`. This persists printing, incident, health announcement, and disclosure files. Add a second volume mounted at `/var/www/html/assets/images/events` for event images. On first startup, tracked sample event images are copied into an empty event-image volume. Keep the service to one replica unless session storage is externalized.
-4. In the service settings, set the health check path to `/healthz`. Railway supplies `PORT`; Apache listens on that port. Generate a public domain in **Networking** and wait for the deployment and health check to succeed.
-5. From the service's **Shell** (or Railway CLI shell attached to the running service), run:
+5. After creating the service, generate its `onrender.com` domain in **Settings**. Set `EMAILJS_ORIGIN` to the exact HTTPS origin and allow that origin in EmailJS.
+6. In **Settings**, set the health check path to `/healthz`. Render provides `PORT`; Apache listens on it. Wait for the first deployment to finish successfully.
+7. Test `https://<your-render-domain>/SKalinga/`.
 
-   ```sh
-   php scripts/check-env.php
+## Free-service limitations
+
+Render Free is suitable for a temporary demo, not reliable production use:
+
+- The service sleeps after 15 minutes without traffic; waking can take about a minute.
+- Its filesystem is ephemeral. Uploaded files, PHP session files, and other local changes are lost on restart, spin-down, or redeploy.
+- Free services cannot attach persistent disks. Do not use real or sensitive uploads for this demo.
+- Keep the service to one instance; sessions are stored as local PHP files.
+
+## 3. Check Supabase and create the administrator
+
+The Render free plan may not provide an interactive service shell. Run these commands from your local project folder instead, using XAMPP PHP with `pdo_pgsql` and `pgsql` enabled:
+
+1. Copy `.env.example` to `.env`. Fill in the same Supabase Session Pooler host, username, and database password as the Render variables. Use a private local `SITE_KEY`; it can differ from Render's. Fill in EmailJS settings if testing password reset.
+2. Open PowerShell in the project folder and run:
+
+   ```powershell
+   C:\xampp\php\php.exe scripts\check-env.php
+   C:\xampp\php\php.exe scripts\create_admin.php
    ```
 
-   It validates the PHP extensions, Supabase Session Pooler connection, expected tables, and RLS. If deployment has not finished, wait for the service to become healthy before running the command.
-6. Create the first admin account from that same service shell:
+   The checker verifies the live connection, expected tables, and RLS. The admin script prompts for an email and strong password and only runs in CLI mode. `.env` is ignored by Git; do not commit or share it.
+3. Sign in at the Render `/SKalinga/` URL and confirm account/database changes in Supabase Table Editor.
 
-   ```sh
-   php scripts/create_admin.php
-   ```
+## Local XAMPP
 
-   Enter the email and a strong password when prompted. The script refuses HTTP execution.
-7. Open `https://<your-Railway-domain>/SKalinga/`. Test admin/youth login, registration and OTP, events, printing, incidents, health announcements, disclosures, and verify database changes in the Supabase Table Editor.
-
-`EMAILJS_ORIGIN` must exactly match the Railway HTTPS origin allowed in EmailJS. If you change the public domain, update the variable and redeploy. Railway terminates HTTPS before forwarding to Apache; the app trusts forwarded scheme and visitor-IP headers only when Railway environment variables identify the deployment.
-
-## Local XAMPP remains available
-
-For local development, copy `.env.example` to `.env`, fill in the Supabase Session Pooler values, a separate `SITE_KEY`, and the EmailJS settings. `.env` is ignored by Git and blocked by Apache; never commit or share it. The legacy `includes/config.local.php` remains supported. Enable `pdo_pgsql` and `pgsql` in the XAMPP PHP configuration and restart Apache. Local XAMPP continues to serve `http://localhost/SKalinga/`.
-
-Run the local check with:
-
-```powershell
-C:\xampp\php\php.exe scripts\check-env.php
-```
+XAMPP continues to serve `http://localhost/SKalinga/`. Copy `.env.example` to `.env`, configure a separate `SITE_KEY` and the Supabase values, enable `pdo_pgsql` and `pgsql`, then restart Apache. The legacy ignored `includes/config.local.php` is also supported.
 
 ## Import the KK masterlist
 
-After creating the admin account, sign in and open **Admin Masterlist** (`admin-masterlist.html`). Download the CSV Template, fill in authorized records using the template headers and `YYYY-MM-DD` dates, and use **Import Masterlist** to upload it. Review the import result and confirm records are available before testing youth registration.
+After signing in as an admin, open **Admin Masterlist** (`admin-masterlist.html`). Download the CSV Template, fill in authorized records using the template headers and `YYYY-MM-DD` dates, and use **Import Masterlist** to upload it. Avoid uploading real personal records while using the Render Free demo.
 
 ## Troubleshooting
 
 | Symptom | Checks and action |
 |---|---|
-| **502 Bad Gateway** | Wait for the image build and health check. Confirm the Dockerfile deployment uses Railway's injected `PORT`; do not override the start command to use PHP's built-in server. Review the deployment logs for Apache startup failures. |
-| **429 Too Many Requests** | Login, masterlist verification, and OTP requests are rate limited. Wait before retrying and avoid repeated refreshes or OTP requests. |
-| **URL changes between deployments** | Confirm a Railway-generated domain is enabled under **Networking**. A Railway domain is stable for the service; changing or regenerating it requires updating `EMAILJS_ORIGIN`. |
-| **Login loops or session not retained** | Use the HTTPS Railway domain consistently. Confirm the app is running one replica and that forwarded HTTPS is reaching the app. Clear stale cookies if changing domains. |
-| **Connection refused / DB connection failed** | Confirm the Supabase project is active and use its Session Pooler hostname, port `5432`, database `postgres`, exact `postgres.<PROJECT_REF>` username, and database password. Check Railway deployment logs and rerun `php scripts/check-env.php` in the service shell. |
-| **`could not find driver`** | Ensure the latest Dockerfile build completed; it installs `pdo_pgsql` and `pgsql`. Redeploy after build failures and inspect the build logs. |
-| **Uploads disappear after redeploy** | Check that both Railway volumes are attached to the exact mount paths listed above. |
-| **Private upload URL returns 403** | This is expected for direct incident/printing file URLs. The authenticated `api/get_upload.php` endpoint serves private files. |
+| **Deploy fails or 502** | Check Render deploy logs. Confirm it detected the root Dockerfile and uses injected `PORT`; don't override the command to run PHP's built-in server. |
+| **First visit is slow** | Free service may be waking from sleep; wait about a minute and reload. |
+| **429 Too Many Requests** | Login, masterlist verification, and OTP requests are rate limited. Wait before retrying. |
+| **Login session disappears** | Free-service restarts/spin-downs clear PHP file sessions. Sign in again after a wake or redeploy. |
+| **Connection refused / DB connection failed** | Verify Supabase Session Pooler hostname, port `5432`, database `postgres`, exact username, password, and outbound connectivity. Run `php scripts/check-env.php` locally. |
+| **`could not find driver`** | Check Render build logs; the Dockerfile installs `pdo_pgsql` and `pgsql`. |
+| **Uploads disappear** | Expected on Render Free because storage is ephemeral. A paid service with a persistent disk or external object storage is needed to keep files. |
+| **Private file URL returns 403** | Expected for direct incident/printing file paths. The authenticated `api/get_upload.php` endpoint serves private files. |
 
-PHP errors are written to the Railway service logs. Sensitive application paths (including `database/`, `includes/`, `logs/`, and `scripts/`) and SQL/Markdown/log/backup files are blocked by Apache rules.
+PHP errors are available in Render service logs. Apache blocks sensitive paths (`database/`, `includes/`, `logs/`, and `scripts/`) and SQL/Markdown/log/backup files.
