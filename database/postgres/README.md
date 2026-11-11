@@ -6,6 +6,11 @@ in numeric order (`001` through `009`). The files are safe to re-run.
 Migration `007_freedom_wall.sql` creates the moderated youth Freedom Wall post
 table and indexes. Apply it before using the Freedom Wall pages or APIs.
 
+The admin board supports status/category/search filters, advisory safety flags,
+and approve, reject, hide, and unhide actions. Public posts are limited to
+approved, non-hidden entries; rejected posts and their reasons are visible only
+to the submitting youth.
+
 Migration `008_service_verification.sql` creates hashed, one-time service verification
 tokens, per-service expiry/OTP settings, and verification audit logs. It currently
 enables the print-claim service adapter; apply it before using the service verification

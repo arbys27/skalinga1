@@ -39,6 +39,37 @@ function freedomWallLength(string $value): int
     return $count === false ? strlen($value) : $count;
 }
 
+/**
+ * Safety flags are advisory only: moderators make the approval decision.
+ * The short blocklist and spam heuristics are intentionally kept here so the
+ * admin list can explain why a post needs attention without auto-rejecting it.
+ */
+function freedomWallAttentionFlags(string $title, string $body): array
+{
+    $text = trim($title . ' ' . $body);
+    $lowerText = function_exists('mb_strtolower')
+        ? mb_strtolower($text, 'UTF-8')
+        : strtolower($text);
+    $flags = [];
+    foreach (['kill', 'bomb', 'threat', 'fuck'] as $word) {
+        if (preg_match('/\b' . preg_quote($word, '/') . '\b/u', $lowerText) === 1) {
+            $flags[] = 'Contains a flagged word';
+            break;
+        }
+    }
+
+    $letters = preg_replace('/[^a-z]/i', '', $text);
+    $uppercase = preg_replace('/[^A-Z]/', '', $text);
+    if (strlen($letters) >= 20 && strlen($uppercase) / strlen($letters) >= 0.75) {
+        $flags[] = 'Excessive uppercase text';
+    }
+    if (preg_match('/(.)\1{5,}/u', $text) === 1) {
+        $flags[] = 'Repeated characters';
+    }
+
+    return array_values(array_unique($flags));
+}
+
 function freedomWallRequireMethod(string $method): void
 {
     if (($_SERVER['REQUEST_METHOD'] ?? '') !== $method) {

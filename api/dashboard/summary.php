@@ -134,6 +134,7 @@ foreach (['freedom_wall_posts', 'freedom_wall', 'freedom_wall_messages'] as $tab
         break;
     }
 }
+$metrics['freedom_wall_pending'] = $freedomPending;
 
 $attention = [];
 $attentionItems = [
@@ -151,7 +152,7 @@ if ($freedomPending > 0) {
     $attention[] = [
         'label' => 'Pending freedom wall posts',
         'count' => $freedomPending,
-        'href' => 'dashboard-settings.html',
+        'href' => 'dashboard-freedom-wall.html',
         'tone' => 'violet'
     ];
 }
@@ -248,6 +249,7 @@ unset($entry);
 $metrics['nav_events'] = $metrics['events_upcoming'] ?: null;
 $metrics['nav_printing'] = $metrics['print_pending'] ?: null;
 $metrics['nav_incidents'] = $metrics['incidents_open'] ?: null;
+$metrics['nav_freedom_wall'] = $freedomPending ?: null;
 
 jsonResponse([
     'success' => true,

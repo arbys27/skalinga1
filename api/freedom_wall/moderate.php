@@ -11,7 +11,7 @@ $input = freedomWallInput();
 $id = filter_var($input['id'] ?? null, FILTER_VALIDATE_INT);
 $action = isset($input['action']) && is_string($input['action']) ? trim($input['action']) : '';
 $reason = isset($input['reason']) && is_string($input['reason']) ? trim($input['reason']) : '';
-if (!$id || !in_array($action, ['approve', 'reject', 'hide'], true)) {
+if (!$id || !in_array($action, ['approve', 'reject', 'hide', 'unhide'], true)) {
     freedomWallResponse(['success' => false, 'message' => 'Invalid moderation request.'], 422);
 }
 if (freedomWallLength($reason) > 2000) {
@@ -51,7 +51,7 @@ try {
             $stmt->execute([$reason !== '' ? $reason : null, $auth['id'], $id]);
         }
         freedomWallLog($pdo, $auth, 'freedom_wall_' . $action, (int)$id);
-    } else {
+    } elseif ($action === 'hide') {
         if ($post['status'] !== 'approved') {
             $pdo->rollBack();
             freedomWallResponse(['success' => false, 'message' => 'Only approved posts can be hidden.'], 409);
@@ -63,6 +63,18 @@ try {
         );
         $stmt->execute([$reason !== '' ? $reason : null, $auth['id'], $id]);
         freedomWallLog($pdo, $auth, 'freedom_wall_hide', (int)$id);
+    } else {
+        if ($post['status'] !== 'approved' || !postgresBoolean($post['is_hidden'])) {
+            $pdo->rollBack();
+            freedomWallResponse(['success' => false, 'message' => 'Only hidden approved posts can be unhidden.'], 409);
+        }
+        $stmt = $pdo->prepare(
+            'UPDATE freedom_wall_posts
+             SET is_hidden = false, rejection_reason = NULL, moderated_by = ?, moderated_at = CURRENT_TIMESTAMP
+             WHERE id = ?'
+        );
+        $stmt->execute([$auth['id'], $id]);
+        freedomWallLog($pdo, $auth, 'freedom_wall_unhide', (int)$id);
     }
 
     $pdo->commit();
