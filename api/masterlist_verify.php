@@ -2,18 +2,9 @@
 
 require_once 'masterlist_common.php';
 require_once __DIR__ . '/security_helpers.php';
-require_once __DIR__ . '/../includes/turnstile.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     masterlistJsonResponse(['success' => false, 'message' => 'Method not allowed'], 405);
-}
-
-$verification = verifyTurnstile(
-    is_string($_POST['cf-turnstile-response'] ?? null) ? $_POST['cf-turnstile-response'] : '',
-    'masterlist_verify'
-);
-if (!$verification['success']) {
-    masterlistJsonResponse(['success' => false, 'message' => $verification['message']], 400);
 }
 
 require_once 'db_connect.php';

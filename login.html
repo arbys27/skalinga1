@@ -98,22 +98,12 @@
             <input class="otp-digit" aria-label="Digit 5" type="text" inputmode="numeric" maxlength="1" required>
             <input class="otp-digit" aria-label="Digit 6" type="text" inputmode="numeric" maxlength="1" required>
           </div>
-          <div class="turnstile-field">
-            <span class="turnstile-label">Security verification</span>
-            <div class="turnstile-slot" role="group" aria-label="Cloudflare security verification"></div>
-            <p class="turnstile-message" id="loginVerifyTurnstileMessage" aria-live="polite"></p>
-          </div>
-          <button class="submit" id="verifyLoginButton" type="submit" disabled>Verify and sign in</button>
+          <button class="submit" id="verifyLoginButton" type="submit">Verify and sign in</button>
         </form>
         <p class="message otp-status" id="otpMessage" role="status" aria-live="polite"></p>
         <form id="resendOtpForm">
-          <div class="turnstile-field">
-            <span class="turnstile-label">Security verification to resend</span>
-            <div class="turnstile-slot" role="group" aria-label="Cloudflare security verification"></div>
-            <p class="turnstile-message" id="loginResendTurnstileMessage" aria-live="polite"></p>
-          </div>
           <div class="otp-actions">
-            <button type="submit" id="resendLoginButton" disabled>Resend code in 60s</button>
+            <button type="submit" id="resendLoginButton">Resend code in 60s</button>
             <a href="#" id="differentAccountLink">Use a different account</a>
           </div>
         </form>
@@ -124,24 +114,14 @@
         <p class="reset-copy">Recover access to your youth account using the email address registered to it.</p>
         <form id="requestResetForm">
           <div class="field"><label for="resetEmail">Email address</label><div class="inp"><svg><use href="#m"/></svg><input id="resetEmail" name="email" type="email" autocomplete="email" placeholder="name@example.com" required></div></div>
-          <div class="turnstile-field">
-            <span class="turnstile-label">Security verification</span>
-            <div class="turnstile-slot" role="group" aria-label="Cloudflare security verification"></div>
-            <p class="turnstile-message" id="requestResetTurnstileMessage" aria-live="polite"></p>
-          </div>
-          <button class="submit" id="requestResetButton" type="submit" disabled>Send OTP</button>
+          <button class="submit" id="requestResetButton" type="submit">Send OTP</button>
           <p class="message" id="requestResetMessage" role="status" aria-live="polite"></p>
         </form>
         <form id="completeResetForm" hidden>
           <div class="field"><label for="resetOtp">6-digit OTP</label><div class="inp"><svg><use href="#k"/></svg><input id="resetOtp" name="otp_code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="000000" required></div></div>
           <div class="field"><label for="newPassword">New password</label><div class="inp"><svg><use href="#k"/></svg><input id="newPassword" name="password" type="password" autocomplete="new-password" minlength="8" placeholder="At least 8 characters" required></div></div>
           <div class="field"><label for="confirmPassword">Confirm new password</label><div class="inp"><svg><use href="#k"/></svg><input id="confirmPassword" type="password" autocomplete="new-password" minlength="8" placeholder="Repeat the new password" required></div></div>
-          <div class="turnstile-field">
-            <span class="turnstile-label">Security verification</span>
-            <div class="turnstile-slot" role="group" aria-label="Cloudflare security verification"></div>
-            <p class="turnstile-message" id="completeResetTurnstileMessage" aria-live="polite"></p>
-          </div>
-          <button class="submit" id="completeResetButton" type="submit" disabled>Change password</button>
+          <button class="submit" id="completeResetButton" type="submit">Change password</button>
           <p class="message" id="completeResetMessage" role="status" aria-live="polite"></p>
         </form>
         <div class="links"><button type="button" class="text-link" id="backToLogin">Back to sign in</button></div>
@@ -159,9 +139,8 @@ const redirect = new URLSearchParams(location.search).get('redirect') || '';
 const say=(el,text,ok)=>{el.textContent=text||'';el.classList.toggle('success',!!ok)};
 const postJSON=(url,body)=>fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(async r=>({ok:r.ok,result:await r.json()}));
 function resetFields(){['resetOtp','newPassword','confirmPassword'].forEach(i=>$(i).value='')}
-let loginChallenge, loginVerifyChallenge, loginResendChallenge, requestResetChallenge, completeResetChallenge, resendTimer;
+let loginChallenge, resendTimer;
 window.prepareTurnstileForm(form, 'login', submitButton, $('loginTurnstileMessage')).then(challenge=>{loginChallenge=challenge});
-window.prepareTurnstileForm(requestResetForm, 'forgot_password', $('requestResetButton'), $('requestResetTurnstileMessage')).then(challenge=>{requestResetChallenge=challenge});
 
 $('togglePassword').addEventListener('click',()=>{const p=$('password'),show=p.type==='password';p.type=show?'text':'password';$('togglePassword').setAttribute('aria-label',show?'Hide password':'Show password')});
 
@@ -175,8 +154,6 @@ form.addEventListener('submit',async e=>{
     if(result.status==='otp_required'){
       $('maskedEmail').textContent=result.maskedEmail||'your email';
       loginView.hidden=true;otpView.hidden=false;
-      loginVerifyChallenge=await window.prepareTurnstileForm($('otpForm'),'login_verify',$('verifyLoginButton'),$('loginVerifyTurnstileMessage'));
-      loginResendChallenge=await window.prepareTurnstileForm($('resendOtpForm'),'login_resend',$('resendLoginButton'),$('loginResendTurnstileMessage'));
       startResendCountdown(Number(result.resendAfter)||60);
       otpDigits[0].focus();
       return;
@@ -214,29 +191,29 @@ function startResendCountdown(seconds){
 $('otpForm').addEventListener('submit',async e=>{
   e.preventDefault();const button=$('verifyLoginButton');button.disabled=true;button.textContent='Verifying...';say($('otpMessage'),'');
   try{
-    const data=new FormData();data.set('otp',otpDigits.map(input=>input.value).join(''));data.set('cf-turnstile-response',loginVerifyChallenge.token());
+    const data=new FormData();data.set('otp',otpDigits.map(input=>input.value).join(''));
     const r=await fetch('api/login-verify.php',{method:'POST',body:data,credentials:'same-origin'}),result=await r.json();
     if(!r.ok||!result.success){say($('otpMessage'),result.message||'Unable to verify this code.');return}
     location.replace(result.redirect||'youth-portal.html');
   }catch(error){say($('otpMessage'),'Unable to verify this code. Please try again.')}
-  finally{loginVerifyChallenge?.reset();button.textContent='Verify and sign in'}
+  finally{button.textContent='Verify and sign in'}
 });
 $('resendOtpForm').addEventListener('submit',async e=>{
   e.preventDefault();const button=$('resendLoginButton');button.disabled=true;say($('otpMessage'),'');
   try{
-    const data=new FormData();data.set('cf-turnstile-response',loginResendChallenge.token());
+    const data=new FormData();
     const r=await fetch('api/login-resend.php',{method:'POST',body:data,credentials:'same-origin'}),result=await r.json();
     if(!r.ok||!result.success){say($('otpMessage'),result.message||'Unable to resend the code.');if(r.status===429&&result.message.includes('wait')){const match=result.message.match(/(\d+)\s+seconds/);if(match)startResendCountdown(Number(match[1]))}return}
     $('maskedEmail').textContent=result.maskedEmail||$('maskedEmail').textContent;
     say($('otpMessage'),result.message,true);startResendCountdown(Number(result.resendAfter)||60);
   }catch(error){say($('otpMessage'),'Unable to resend the code. Please try again.')}
-  finally{loginResendChallenge?.reset();if(button.textContent==='Sending...')button.textContent='Resend code'}
+  finally{if(button.textContent==='Sending...')button.textContent='Resend code'}
 });
 $('differentAccountLink').addEventListener('click',async e=>{
   e.preventDefault();clearInterval(resendTimer);
   try{await fetch('api/login-cancel.php',{method:'POST',credentials:'same-origin'})}catch(error){}
   otpView.hidden=true;loginView.hidden=false;otpDigits.forEach(input=>input.value='');
-  loginVerifyChallenge?.reset();loginResendChallenge?.reset();$('identifier').focus();
+  $('identifier').focus();
 });
 
 $('forgotPasswordLink').addEventListener('click',()=>{loginView.hidden=true;resetView.hidden=false;$('resetEmail').focus()});
@@ -248,13 +225,12 @@ $('backToLogin').addEventListener('click',()=>{
 requestResetForm.addEventListener('submit',async e=>{
   e.preventDefault();const btn=$('requestResetButton');btn.disabled=true;btn.textContent='Sending...';say(requestResetMessage,'');
   try{
-    const {ok,result}=await postJSON('api/request_password_reset.php',{email:$('resetEmail').value.trim(),'cf-turnstile-response':requestResetChallenge.token()});
+    const {ok,result}=await postJSON('api/request_password_reset.php',{email:$('resetEmail').value.trim()});
     if(!ok||!result.success){say(requestResetMessage,result.message||'Unable to send the OTP. Please try again.');return}
     requestResetForm.hidden=true;completeResetForm.hidden=false;say(completeResetMessage,result.message,true);
-    if(!completeResetChallenge){completeResetChallenge=await window.prepareTurnstileForm(completeResetForm,'reset_password',$('completeResetButton'),$('completeResetTurnstileMessage'))}
     $('resetOtp').focus();
   }catch(err){say(requestResetMessage,'Unable to connect. Please try again.')}
-  finally{requestResetChallenge?.reset();btn.textContent='Send OTP'}
+  finally{btn.textContent='Send OTP'}
 });
 
 completeResetForm.addEventListener('submit',async e=>{
@@ -262,18 +238,18 @@ completeResetForm.addEventListener('submit',async e=>{
   if(pw!==$('confirmPassword').value){say(completeResetMessage,'The passwords do not match.');return}
   const btn=$('completeResetButton');btn.disabled=true;btn.textContent='Updating...';say(completeResetMessage,'');
   try{
-    const {ok,result}=await postJSON('api/reset_password.php',{email:$('resetEmail').value.trim(),otp_code:$('resetOtp').value.trim(),password:pw,'cf-turnstile-response':completeResetChallenge.token()});
+    const {ok,result}=await postJSON('api/reset_password.php',{email:$('resetEmail').value.trim(),otp_code:$('resetOtp').value.trim(),password:pw});
     if(!ok||!result.success){say(completeResetMessage,result.message||'Unable to reset the password. Please try again.');return}
     resetView.hidden=true;loginView.hidden=false;requestResetForm.hidden=false;completeResetForm.hidden=true;
     say(requestResetMessage,'');say(completeResetMessage,'');
     $('identifier').value=$('resetEmail').value.trim();$('resetEmail').value='';resetFields();$('password').value='';
     say(message,result.message,true);$('password').focus();
   }catch(err){say(completeResetMessage,'Unable to connect. Please try again.')}
-  finally{completeResetChallenge?.reset();btn.textContent='Change password'}
+  finally{btn.textContent='Change password'}
 });
 
 if(new URLSearchParams(location.search).get('logout')==='1') history.replaceState({},document.title,'login.html');
-fetch('api/login-challenge-status.php',{credentials:'same-origin',cache:'no-store'}).then(async r=>{const d=await r.json();if(r.ok&&d.pending){$('maskedEmail').textContent=d.maskedEmail;loginView.hidden=true;otpView.hidden=false;loginVerifyChallenge=await window.prepareTurnstileForm($('otpForm'),'login_verify',$('verifyLoginButton'),$('loginVerifyTurnstileMessage'));loginResendChallenge=await window.prepareTurnstileForm($('resendOtpForm'),'login_resend',$('resendLoginButton'),$('loginResendTurnstileMessage'));startResendCountdown(d.resendAfter||60)}}).catch(()=>{});
+fetch('api/login-challenge-status.php',{credentials:'same-origin',cache:'no-store'}).then(async r=>{const d=await r.json();if(r.ok&&d.pending){$('maskedEmail').textContent=d.maskedEmail;loginView.hidden=true;otpView.hidden=false;startResendCountdown(d.resendAfter||60)}}).catch(()=>{});
 fetch('api/me.php').then(async r=>{const d=await r.json();if(r.ok&&d&&d.authenticated)location.href=d.role==='youth'?'youth-portal.html':'admin-dashboard.html';else if(d&&d.otp_required&&new URLSearchParams(location.search).get('reauth')==='1')say(message,'Your 30-minute verification period ended. Sign in again to continue.')}).catch(()=>{});
 </script>
 <script src="assets/js/loader.js?v=3"></script>

@@ -155,12 +155,7 @@ input:focus{outline:none;border-color:var(--g);box-shadow:0 0 0 4px rgba(34,139,
           <div class="field"><label for="fullName">Full name</label><div class="inp"><svg class="ic"><use href="#r-u"/></svg><input type="text" id="fullName" name="full_name" placeholder="First Middle Last" autocomplete="name" required></div></div>
           <div class="field"><label for="birthday">Birthday</label><div class="inp"><svg class="ic"><use href="#r-cal"/></svg><input type="date" id="birthday" name="birthday" required></div></div>
           <span id="verifyStatus" class="status-message" role="status"></span>
-          <div class="turnstile-field">
-            <span class="turnstile-label">Security verification</span>
-            <div class="turnstile-slot" role="group" aria-label="Cloudflare security verification"></div>
-            <p class="turnstile-message" id="verifyTurnstileMessage" aria-live="polite"></p>
-          </div>
-          <button type="submit" class="btn" id="verifySubmit" disabled>Find my record</button>
+          <button type="submit" class="btn" id="verifySubmit">Find my record</button>
         </form>
       </section>
 
@@ -185,21 +180,11 @@ input:focus{outline:none;border-color:var(--g);box-shadow:0 0 0 4px rgba(34,139,
           <div class="field"><label for="mobile">Mobile number</label><div class="inp"><svg class="ic"><use href="#r-ph"/></svg><input type="tel" id="mobile" name="mobile" placeholder="09XXXXXXXXX or +639XXXXXXXXX" autocomplete="tel" required></div><p class="hint">Enter a Philippine number in 09XXXXXXXXX, 9XXXXXXXXX, 639XXXXXXXXX, or +639XXXXXXXXX format.</p></div>
           <div id="phoneOtpControls" hidden>
            <div id="phoneOtpSendChallenge">
-            <div class="turnstile-field">
-              <span class="turnstile-label">Security verification to send code</span>
-              <div class="turnstile-slot" role="group" aria-label="Cloudflare security verification"></div>
-              <p class="turnstile-message" id="phoneOtpSendTurnstileMessage" aria-live="polite"></p>
-            </div>
-            <button type="button" class="back-link" id="sendPhoneOtp" disabled>Send phone verification code</button>
+            <button type="button" class="back-link" id="sendPhoneOtp">Send phone verification code</button>
            </div>
             <div class="field" id="phoneOtpField" hidden><label for="phoneOtp">6-digit verification code</label><div class="inp"><svg class="ic"><use href="#r-k"/></svg><input type="text" id="phoneOtp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="000000"></div></div>
            <div id="phoneOtpVerifyChallenge" hidden>
-            <div class="turnstile-field">
-              <span class="turnstile-label">Security verification to confirm code</span>
-              <div class="turnstile-slot" role="group" aria-label="Cloudflare security verification"></div>
-              <p class="turnstile-message" id="phoneOtpVerifyTurnstileMessage" aria-live="polite"></p>
-            </div>
-            <button type="button" class="back-link" id="verifyPhoneOtp" disabled hidden>Verify phone number</button>
+            <button type="button" class="back-link" id="verifyPhoneOtp" hidden>Verify phone number</button>
            </div>
             <span id="phoneOtpStatus" class="status-message" role="status" aria-live="polite"></span>
           </div>
@@ -227,9 +212,8 @@ input:focus{outline:none;border-color:var(--g);box-shadow:0 0 0 4px rgba(34,139,
 const $=id=>document.getElementById(id);
 const verifyForm=$('verifyForm'),activationForm=$('activationForm'),stepOne=$('stepOne'),stepTwo=$('stepTwo');
 const verifyStatus=$('verifyStatus'),activationStatus=$('activationStatus'),verifySubmit=$('verifySubmit'),activationSubmit=$('activationSubmit');
-let verifyChallenge, activationChallenge, phoneOtpSendChallenge, phoneOtpVerifyChallenge;
+let activationChallenge;
 let verifiedActivationMobile = '';
-window.prepareTurnstileForm(verifyForm,'masterlist_verify',verifySubmit,$('verifyTurnstileMessage')).then(challenge=>{verifyChallenge=challenge});
 
 function setStatus(el,message,type){el.textContent=message||'';el.className='status-message '+(type||'')}
 function setStep(n){
@@ -241,7 +225,6 @@ function setStep(n){
   if(!first&&!activationChallenge){
     window.prepareTurnstileForm(activationForm,'activate',activationSubmit,$('activationTurnstileMessage')).then(challenge=>{activationChallenge=challenge});
     $('phoneOtpControls').hidden=false;
-    window.prepareTurnstileForm($('phoneOtpSendChallenge'),'send_otp',$('sendPhoneOtp'),$('phoneOtpSendTurnstileMessage')).then(challenge=>{phoneOtpSendChallenge=challenge});
   }
   scrollTo({top:0,behavior:'smooth'});
   (first?$('voterId'):$('mobile')).focus({preventScroll:true});
@@ -252,7 +235,6 @@ verifyForm.addEventListener('submit',async e=>{
   e.preventDefault();verifySubmit.disabled=true;verifySubmit.textContent='Checking...';setStatus(verifyStatus,'','');
   try{
     const data = new FormData(verifyForm);
-    if (verifyChallenge && verifyChallenge.token()) data.set('cf-turnstile-response', verifyChallenge.token());
     const r=await fetch('api/masterlist_verify.php',{method:'POST',body:data}), result=await r.json();
     if(!result.success){setStatus(verifyStatus,result.message||'We could not find a matching record. Check your details and try again.','error');return}
     const p=result.profile,name=[p.first_name,p.middle_name,p.last_name].filter(Boolean).join(' ');
@@ -261,7 +243,7 @@ verifyForm.addEventListener('submit',async e=>{
     $('activationVoterId').value=$('voterId').value;$('activationFullName').value=$('fullName').value;$('activationBirthday').value=$('birthday').value;
     setStep(2);
   }catch(err){setStatus(verifyStatus,'Unable to verify your record. Please try again.','error')}
-  finally{verifyChallenge?.reset();verifySubmit.textContent='Find my record'}
+  finally{verifySubmit.textContent='Find my record'}
 });
 
 $('mobile').addEventListener('input',e=>{
@@ -290,13 +272,12 @@ $('sendPhoneOtp').addEventListener('click',async()=>{
   if(!phone){setStatus($('phoneOtpStatus'),'Enter a valid Philippine mobile number (09XXXXXXXXX).','error');return}
   const button=$('sendPhoneOtp');button.disabled=true;button.textContent='Sending code...';
   try{
-    const data=new FormData();data.set('phone',phone);data.set('cf-turnstile-response',phoneOtpSendChallenge.token());
+    const data=new FormData();data.set('phone',phone);
     data.set('csrf_token',await registrationCsrfToken());
     const r=await fetch('api/send_registration_otp.php',{method:'POST',body:data}),result=await r.json();
     if(!r.ok||!result.success){setStatus($('phoneOtpStatus'),result.message||'Unable to send a verification code.','error');return}
     $('mobile').value=result.normalizedPhone||phone;
     verifiedActivationMobile='';$('phoneOtpField').hidden=false;$('phoneOtpVerifyChallenge').hidden=false;$('verifyPhoneOtp').hidden=false;
-    phoneOtpVerifyChallenge=await window.prepareTurnstileForm($('phoneOtpVerifyChallenge'),'verify_registration_otp',$('verifyPhoneOtp'),$('phoneOtpVerifyTurnstileMessage'));
     setStatus($('phoneOtpStatus'),result.message,'success');$('phoneOtp').focus();
   }catch(err){setStatus($('phoneOtpStatus'),'Unable to send the verification code. Please try again.','error')}
   finally{phoneOtpSendChallenge?.reset();button.textContent='Send phone verification code'}
@@ -305,13 +286,13 @@ $('sendPhoneOtp').addEventListener('click',async()=>{
 $('verifyPhoneOtp').addEventListener('click',async()=>{
   const button=$('verifyPhoneOtp');button.disabled=true;button.textContent='Verifying...';
   try{
-    const data=new FormData();data.set('otp',$('phoneOtp').value.trim());data.set('cf-turnstile-response',phoneOtpVerifyChallenge.token());
+    const data=new FormData();data.set('otp',$('phoneOtp').value.trim());
     data.set('csrf_token',await registrationCsrfToken());
     const r=await fetch('api/verify_registration_otp.php',{method:'POST',body:data}),result=await r.json();
     if(!r.ok||!result.success){setStatus($('phoneOtpStatus'),result.message||'Unable to verify this code.','error');return}
     verifiedActivationMobile=result.normalizedPhone||normalizePhoneForBrowser($('mobile').value);$('mobile').value=verifiedActivationMobile;setStatus($('phoneOtpStatus'),'Mobile number verified. You can activate your account.','success');
   }catch(err){setStatus($('phoneOtpStatus'),'Unable to verify the code. Please try again.','error')}
-  finally{phoneOtpVerifyChallenge?.reset();button.textContent='Verify phone number'}
+  finally{button.textContent='Verify phone number'}
 });
 
 activationForm.addEventListener('submit',async e=>{

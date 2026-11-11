@@ -2,7 +2,6 @@
 
 require_once __DIR__ . '/security_helpers.php';
 require_once __DIR__ . '/../includes/sms.php';
-require_once __DIR__ . '/../includes/turnstile.php';
 require_once __DIR__ . '/db_connect.php';
 
 header('Content-Type: application/json; charset=utf-8');
@@ -15,16 +14,6 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
 
 securityStartSession();
 securityRequireCsrf();
-$verification = verifyTurnstile(
-    is_string($_POST['cf-turnstile-response'] ?? null) ? $_POST['cf-turnstile-response'] : '',
-    'send_otp'
-);
-if (!$verification['success']) {
-    http_response_code(400);
-    echo json_encode(['success' => false, 'message' => $verification['message']]);
-    exit;
-}
-
 $masterlistId = (int)($_SESSION['activation_masterlist_id'] ?? 0);
 if ($masterlistId <= 0) {
     http_response_code(403);
