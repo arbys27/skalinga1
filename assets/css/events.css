@@ -643,6 +643,54 @@
     gap: 16px;
   }
 
+  /* Shared youth-service sizing takes precedence over the legacy event layout. */
+  .page-header {
+    padding: 0 20px;
+  }
+
+  .filters-bar {
+    max-width: 900px;
+    margin: 0 auto 24px;
+    padding: 24px;
+    border: 1px solid rgba(168, 230, 207, 0.3);
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(93, 173, 226, 0.15);
+  }
+
+  .events-grid {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 0 40px;
+    gap: 16px;
+  }
+
+  @media (max-width: 768px) {
+    .filters-bar { padding: 20px; }
+    .events-grid { grid-template-columns: 1fr; padding: 0 0 32px; }
+    .page-header { padding: 0 16px; }
+  }
+
+  /* Keep the announcements page aligned with the shared youth service chrome. */
+  .page-header {
+    padding: 0 20px;
+  }
+
+  .filters-bar {
+    max-width: 900px;
+    margin: 0 auto 24px;
+    padding: 24px;
+    border: 1px solid rgba(168, 230, 207, 0.3);
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(93, 173, 226, 0.15);
+  }
+
+  .events-grid {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 0 40px;
+    gap: 16px;
+  }
+
   .search-filter {
     flex: 1 1 100%;
   }

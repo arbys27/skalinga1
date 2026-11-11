@@ -1,0 +1,167 @@
+.wrap {
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto 60px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.card {
+  padding: 28px;
+}
+
+.card h2 {
+  margin: 0 0 18px;
+  font: 700 24px 'Outfit', sans-serif;
+}
+
+.rules {
+  padding: 12px 14px;
+  border-left: 4px solid var(--accent-pink);
+  border-radius: 8px;
+  background: #fff0f5;
+  color: var(--text-gray);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+label {
+  display: block;
+  margin: 16px 0 7px;
+  font-weight: 600;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #ddd;
+  border-radius: 12px;
+  color: var(--text-dark);
+  background: white;
+  font: inherit;
+}
+
+textarea {
+  min-height: 145px;
+  resize: vertical;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 3px solid rgba(93, 173, 226, 0.25);
+  border-color: var(--sky-blue);
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.check input {
+  width: auto;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+
+.muted {
+  color: var(--text-gray);
+  font-size: 13px;
+}
+
+.list {
+  display: grid;
+  gap: 12px;
+}
+
+.post {
+  padding: 18px;
+}
+
+.post h3 {
+  margin: 8px 0;
+  font-size: 18px;
+  overflow-wrap: anywhere;
+}
+
+.post p {
+  margin: 0;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  color: var(--text-gray);
+  font-size: 12px;
+}
+
+.tag {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(168, 230, 207, 0.35);
+  color: var(--primary-green);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.notice {
+  padding: 12px;
+  border-radius: 10px;
+  background: rgba(168, 230, 207, 0.35);
+  color: var(--primary-green);
+}
+
+.notice.error {
+  background: #fff0f5;
+  color: #a52e54;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.tabs button {
+  padding: 9px 13px;
+  border: 1px solid rgba(168, 230, 207, 0.8);
+  border-radius: 99px;
+  background: white;
+  color: var(--primary-green);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.tabs button[aria-selected="true"] {
+  background: var(--primary-green);
+  color: white;
+}
+
+.hidden {
+  display: none !important;
+}
+
+@media (max-width: 760px) {
+  .grid { grid-template-columns: 1fr; }
+  .card { padding: 24px; }
+}

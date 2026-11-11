@@ -26,6 +26,8 @@ body {
 
 .app-container { flex: 1; display: flex; flex-direction: column; }
 
+.profile-nav-actions { display: none; }
+
 /* Top Bar */
 .top-bar {
   background: white;
