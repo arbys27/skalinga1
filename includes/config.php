@@ -34,6 +34,8 @@ function skalingaConfig(): array
             'MAIL_DRIVER',
             'LOGIN_OTP_MODE',
             'SMS_DRIVER',
+            'IPROG_API_TOKEN',
+            'IPROG_SMS_PROVIDER',
             'UNISMS_API_KEY',
             'UNISMS_SENDER_ID',
         ];
@@ -88,6 +90,8 @@ function skalingaConfig(): array
         'MAIL_DRIVER',
         'LOGIN_OTP_MODE',
         'SMS_DRIVER',
+        'IPROG_API_TOKEN',
+        'IPROG_SMS_PROVIDER',
         'UNISMS_API_KEY',
         'UNISMS_SENDER_ID',
     ] as $key) {
