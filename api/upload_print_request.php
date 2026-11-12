@@ -11,6 +11,7 @@ if (!isset($_SESSION['user_id'])) {
 
 require_once __DIR__ . '/db_connect.php';
 require_once __DIR__ . '/security_helpers.php';
+require_once __DIR__ . '/../includes/supabase_storage.php';
 securityRequireCsrf();
 
 $title = isset($_POST['document_title']) && is_string($_POST['document_title'])
@@ -19,7 +20,8 @@ $title = isset($_POST['document_title']) && is_string($_POST['document_title'])
 $printType = $_POST['print_type'] ?? '';
 $paperSize = $_POST['paper_size'] ?? '';
 $copies = filter_var($_POST['copies'] ?? null, FILTER_VALIDATE_INT);
-$filePath = null;
+$storageObjectPath = null;
+$storageUploaded = false;
 
 if ($title === '' || strlen($title) > 120
     || !in_array($printType, ['Black & White', 'Colored'], true)
@@ -46,8 +48,7 @@ $allowedTypes = [
     'docx' => ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/zip'],
     'jpg' => ['image/jpeg'],
     'jpeg' => ['image/jpeg'],
-    'png' => ['image/png'],
-    'txt' => ['text/plain']
+    'png' => ['image/png']
 ];
 
 if (!array_key_exists($extension, $allowedTypes) || $fileSize < 1 || $fileSize > 10 * 1024 * 1024) {
@@ -92,16 +93,9 @@ try {
         throw new RuntimeException('Member profile is incomplete.');
     }
 
-    $uploadDirectory = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . 'printing';
-    if (!is_dir($uploadDirectory) && !mkdir($uploadDirectory, 0755, true) && !is_dir($uploadDirectory)) {
-        throw new RuntimeException('Unable to prepare the document upload directory.');
-    }
-
-    $newFilename = bin2hex(random_bytes(16)) . '.' . $extension;
-    $filePath = $uploadDirectory . DIRECTORY_SEPARATOR . $newFilename;
-    if (!move_uploaded_file((string)$file['tmp_name'], $filePath)) {
-        throw new RuntimeException('Unable to save the uploaded document.');
-    }
+    $storageObjectPath = 'SK-' . date('Y') . '-' . bin2hex(random_bytes(12)) . '.' . $extension;
+    supabaseStorageUpload($storageObjectPath, (string)$file['tmp_name'], $mimeType);
+    $storageUploaded = true;
 
     $pdo->beginTransaction();
     $insert = $pdo->prepare(
@@ -115,7 +109,7 @@ try {
         $member['member_id'],
         $memberName,
         $title,
-        'uploads/printing/' . $newFilename,
+        $storageObjectPath,
         $originalName,
         $fileSize,
         $printType,
@@ -148,8 +142,12 @@ try {
     if ($pdo->inTransaction()) {
         $pdo->rollBack();
     }
-    if ($filePath !== null && is_file($filePath)) {
-        unlink($filePath);
+    if ($storageUploaded && $storageObjectPath !== null) {
+        try {
+            supabaseStorageDelete($storageObjectPath);
+        } catch (Throwable $cleanupException) {
+            error_log('[Print] Supabase Storage cleanup failed: ' . $cleanupException->getMessage());
+        }
     }
     http_response_code(400);
     echo json_encode(['success' => false, 'error' => $exception->getMessage()]);
@@ -157,8 +155,12 @@ try {
     if ($pdo->inTransaction()) {
         $pdo->rollBack();
     }
-    if ($filePath !== null && is_file($filePath)) {
-        unlink($filePath);
+    if ($storageUploaded && $storageObjectPath !== null) {
+        try {
+            supabaseStorageDelete($storageObjectPath);
+        } catch (Throwable $cleanupException) {
+            error_log('[Print] Supabase Storage cleanup failed: ' . $cleanupException->getMessage());
+        }
     }
     error_log('[Print] Verified request failed: ' . $exception->getMessage());
     http_response_code(500);

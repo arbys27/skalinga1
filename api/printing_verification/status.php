@@ -65,7 +65,7 @@ try {
             'paper_size' => (string)$request['paper_size'],
             'copies' => (int)$request['copies'],
             'file_name' => (string)$request['file_name'],
-            'file_url' => 'api/get_upload.php?type=printing&id=' . (int)$request['request_id'],
+            'file_url' => 'api/get_print_file.php?id=' . (int)$request['request_id'],
         ] : null,
     ]);
 } catch (Throwable $exception) {

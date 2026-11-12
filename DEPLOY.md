@@ -27,7 +27,7 @@ Apply all PostgreSQL migrations, including `database/postgres/migrations/011_log
 
 1. Use the Supabase **Session pooler** connection, port `5432`, database `postgres`.
 2. Do not use the transaction pooler on port `6543`.
-3. Keep the `anon` and `service_role` API keys out of this PHP application. It connects directly to PostgreSQL using its database credentials.
+3. Keep the `anon` key out of this PHP application. The server-side `service_role` key is required only for private Storage operations and must never be exposed to browsers or committed to Git.
 
 ## 2. Create the Render demo service
 
@@ -54,6 +54,9 @@ Apply all PostgreSQL migrations, including `database/postgres/migrations/011_log
    | `SMS_DRIVER` | `unisms` |
    | `UNISMS_API_KEY` | UniSMS bearer-token API key |
    | `UNISMS_SENDER_ID` | Sender ID approved for your UniSMS account |
+   | `SUPABASE_URL` | Supabase project URL, e.g. `https://<PROJECT_REF>.supabase.co` |
+   | `SUPABASE_SERVICE_ROLE_KEY` | Supabase service-role key; keep server-side and never expose it to browsers |
+   | `SUPABASE_STORAGE_BUCKET` | Private Storage bucket name; use `printing` |
 
    Never put actual secret values in GitHub or this chat. UniSMS is used only for the youth activation phone check. EmailJS private keys must remain server-side.
 

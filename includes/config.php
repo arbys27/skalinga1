@@ -38,6 +38,9 @@ function skalingaConfig(): array
             'IPROG_SMS_PROVIDER',
             'UNISMS_API_KEY',
             'UNISMS_SENDER_ID',
+            'SUPABASE_URL',
+            'SUPABASE_SERVICE_ROLE_KEY',
+            'SUPABASE_STORAGE_BUCKET',
         ];
         foreach ($dotenvKeys as $key) {
             if (isset($parsedConfig[$key]) && is_string($parsedConfig[$key])) {
@@ -94,6 +97,9 @@ function skalingaConfig(): array
         'IPROG_SMS_PROVIDER',
         'UNISMS_API_KEY',
         'UNISMS_SENDER_ID',
+        'SUPABASE_URL',
+        'SUPABASE_SERVICE_ROLE_KEY',
+        'SUPABASE_STORAGE_BUCKET',
     ] as $key) {
         $environmentValue = getenv($key);
         if ($environmentValue !== false && $environmentValue !== '') {

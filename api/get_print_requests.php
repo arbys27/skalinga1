@@ -54,7 +54,7 @@ try {
     foreach ($requests as &$request) {
         $request['file_path'] = empty($request['print_verified_at']) && empty($request['verified_at'])
             ? null
-            : 'api/get_upload.php?type=printing&id=' . (int)$request['request_id'];
+            : 'api/get_print_file.php?id=' . (int)$request['request_id'];
     }
     unset($request);
     

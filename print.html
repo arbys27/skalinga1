@@ -408,8 +408,8 @@ form.addEventListener('submit',async e=>{
   const file=fileIn.files[0],title=$('documentTitle').value.trim();
   if(!title){showToast('Give your document a title.','error');$('documentTitle').focus();return}
   if(!file){showToast('Please select a file to print.','error');return}
-  const ok=['application/pdf','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document','image/jpeg','image/png','text/plain'];
-  if(!ok.includes(file.type)){showToast('Only PDF, Word, JPG, PNG and TXT files are allowed.','error');return}
+  const ok=['application/pdf','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document','application/zip','image/jpeg','image/png'];
+  if(!ok.includes(file.type)){showToast('Only PDF, Word, JPG and PNG files are allowed.','error');return}
   if(file.size>10*1024*1024){showToast('File size exceeds the 10 MB limit.','error');return}
   const btn=$('submitPrintBtn');btn.disabled=true;btn.textContent='Uploading...';
   try{
