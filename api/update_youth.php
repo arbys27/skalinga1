@@ -12,6 +12,7 @@ header('Content-Type: application/json');
 require_once 'db_connect.php';
 require_once 'auth.php';
 require_once __DIR__ . '/security_helpers.php';
+require_once __DIR__ . '/youth_lifecycle.php';
 requireAdminApi();
 
 // Check if admin is authenticated
@@ -33,6 +34,7 @@ $phone = isset($_POST['contact']) ? trim($_POST['contact']) : '';
 $email = isset($_POST['email']) ? trim($_POST['email']) : '';
 $address = isset($_POST['address']) ? trim($_POST['address']) : '';
 $barangay = isset($_POST['barangay']) ? trim($_POST['barangay']) : 'San Antonio';
+$calculatedAge = youthAgeFromBirthday($birthday);
 
 // Admin info
 $admin_username = $_SESSION['admin_username'];
@@ -48,6 +50,12 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     echo json_encode(['success' => false, 'message' => 'A valid email address is required']);
     exit;
 }
+if ($calculatedAge === null || $calculatedAge < 15 || $calculatedAge > 30) {
+    http_response_code(400);
+    echo json_encode(['success' => false, 'message' => 'KK youth must be between 15 and 30 years old']);
+    exit;
+}
+$age = $calculatedAge;
 
 try {
     // Get user ID from member_id

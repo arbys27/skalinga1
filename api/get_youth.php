@@ -10,6 +10,7 @@ header('Content-Type: application/json');
 
 require_once 'db_connect.php';
 require_once 'auth.php';
+require_once __DIR__ . '/youth_lifecycle.php';
 requireAdminApi();
 
 // Check if admin is authenticated
@@ -20,11 +21,19 @@ if (!isset($_SESSION['admin_authenticated']) || $_SESSION['admin_authenticated']
 }
 
 $youth_id = isset($_GET['id']) ? $_GET['id'] : null;
+$status = $_GET['status'] ?? 'active';
+if (!$youth_id && !in_array($status, ['active', 'inactive', 'archived'], true)) {
+    http_response_code(400);
+    echo json_encode(['success' => false, 'message' => 'Invalid youth status filter']);
+    exit;
+}
 
 try {
+    runYouthLifecycle($pdo);
     if ($youth_id) {
         // Get specific youth member
-        $query = "SELECT u.id, u.email, u.member_id, u.status, u.created_at, 
+        $query = "SELECT u.id, u.email, u.member_id, u.status, u.status_reason, u.status_changed_at,
+                         u.last_login, u.created_at,
                          p.firstname, p.lastname, p.birthday, p.age, p.gender, 
                          p.phone, p.address, p.barangay, p.avatar_path
                   FROM users u
@@ -49,15 +58,17 @@ try {
         
     } else {
         // Get all youth members
-        $query = "SELECT u.id, u.email, u.member_id, u.status, u.created_at,
+        $query = "SELECT u.id, u.email, u.member_id, u.status, u.status_reason, u.status_changed_at,
+                         u.last_login, u.created_at,
                          p.firstname, p.lastname, p.birthday, p.age, p.gender,
                          p.phone, p.address, p.barangay
                   FROM users u
                   LEFT JOIN youth_profiles p ON u.id = p.user_id
+                  WHERE u.status = ?
                   ORDER BY u.created_at DESC";
         
         $stmt = $pdo->prepare($query);
-        $stmt->execute();
+        $stmt->execute([$status]);
         $youth = $stmt->fetchAll();
         
         echo json_encode([

@@ -36,6 +36,15 @@
     .report:empty { display: none; }
     .claimed { color: #228B57; font-weight: 700; }
     .unclaimed { color: #b46d18; font-weight: 700; }
+    .status-filters { display: flex; gap: 8px; margin: 0 0 16px; flex-wrap: wrap; }
+    .status-filter { border: 1px solid #dce2e8; border-radius: 999px; padding: 9px 16px; background: white; color: #68757d; cursor: pointer; font: inherit; font-weight: 600; }
+    .status-filter.active { border-color: #228B57; background: #e6f4ec; color: #1a6b43; }
+    .lifecycle-badge { display: inline-block; border-radius: 999px; padding: 4px 9px; font-size: 12px; font-weight: 600; text-transform: capitalize; }
+    .lifecycle-badge.active { background: #e6f4ec; color: #228B57; }
+    .lifecycle-badge.inactive { background: #fff4e0; color: #a56b08; }
+    .lifecycle-badge.archived { background: #fde9f0; color: #b62d61; }
+    .status-action { border: 0; border-radius: 6px; padding: 7px 10px; cursor: pointer; font-weight: 600; background: #fff4e0; color: #a56b08; }
+    .status-action.reactivate { background: #e6f4ec; color: #228B57; }
     .table-wrap { overflow-x: auto; }
     .masterlist-card { overflow: hidden; }
     .masterlist-card .card-body { padding: 0; }
@@ -60,6 +69,11 @@
           <div class="search-group"><input type="search" id="searchInput" class="search-input" placeholder="Search voter ID, name, or address"><select id="claimedFilter" class="filter-select" aria-label="Filter by account status"><option value="">All records</option><option value="0">Available for activation</option><option value="1">Already claimed</option></select></div>
           <div class="masterlist-actions"><button class="masterlist-button secondary" id="templateButton" type="button">CSV Template</button><button class="masterlist-button" id="toggleImport" type="button">Import Masterlist</button></div>
         </div>
+        <div class="status-filters" role="tablist" aria-label="Filter KK Masterlist by status">
+          <button class="status-filter active" type="button" data-status="active" role="tab" aria-selected="true">Active</button>
+          <button class="status-filter" type="button" data-status="inactive" role="tab" aria-selected="false">Inactive / Ghost</button>
+          <button class="status-filter" type="button" data-status="archived" role="tab" aria-selected="false">Archived (Age exceeded)</button>
+        </div>
         <section class="content-card import-panel" id="importPanel">
           <div class="card-header"><h3>Import KK Masterlist</h3><span class="status-badge pending">Preview first</span></div>
           <div class="card-body">
@@ -70,7 +84,7 @@
         </section>
         <section class="content-card masterlist-card">
           <div class="card-header"><h3>Official Youth Records</h3><span class="status-badge active" id="recordCount">Loading...</span></div>
-          <div class="card-body"><div class="table-wrap"><table class="admin-table"><thead><tr><th>Voter ID</th><th>Name</th><th>Birthday</th><th>Age / Sex</th><th>Address</th><th>Status</th></tr></thead><tbody id="masterlistBody"></tbody></table><div class="empty-state" id="emptyState" hidden><strong>No masterlist records found</strong>Try a different search or import the official CSV.</div></div></div>
+          <div class="card-body"><div class="table-wrap"><table class="admin-table"><thead><tr><th>Voter ID</th><th>Name</th><th>Birthday</th><th>Age / Sex</th><th>Address</th><th>Status / reason</th><th>Action</th></tr></thead><tbody id="masterlistBody"></tbody></table><div class="empty-state" id="emptyState" hidden><strong>No masterlist records found</strong>Try a different search or import the official CSV.</div></div></div>
         </section>
       </div>
     </main>
@@ -82,6 +96,7 @@
     const emptyState = document.getElementById('emptyState');
     const recordCount = document.getElementById('recordCount');
     let previewReady = false;
+    let currentStatus = 'active';
 
     function addCell(row, value, className) {
       const cell = document.createElement('td');
@@ -91,7 +106,7 @@
     }
 
     async function loadMasterlist() {
-      const params = new URLSearchParams({ search: document.getElementById('searchInput').value, claimed: document.getElementById('claimedFilter').value });
+      const params = new URLSearchParams({ search: document.getElementById('searchInput').value, claimed: document.getElementById('claimedFilter').value, status: currentStatus });
       const response = await fetch(`api/masterlist_list.php?${params}`);
       const data = await response.json();
       if (!data.success) throw new Error(data.message || 'Unable to load masterlist');
@@ -105,9 +120,61 @@
         addCell(row, record.birthday);
         addCell(row, `${record.age} / ${record.sex}`);
         addCell(row, `${record.address}, ${record.purok_or_barangay}`);
-        addCell(row, Number(record.is_claimed) === 1 ? 'Claimed' : 'Available', Number(record.is_claimed) === 1 ? 'claimed' : 'unclaimed');
+        const statusCell = document.createElement('td');
+        const accountState = document.createElement('div');
+        accountState.textContent = Number(record.is_claimed) === 1 ? 'Claimed account' : 'Available for activation';
+        accountState.className = Number(record.is_claimed) === 1 ? 'claimed' : 'unclaimed';
+        statusCell.appendChild(accountState);
+        const badge = document.createElement('span');
+        badge.className = `lifecycle-badge ${record.status}`;
+        badge.textContent = record.status;
+        statusCell.appendChild(badge);
+        if (record.status_reason) {
+          const reason = document.createElement('div');
+          reason.textContent = record.status_reason;
+          statusCell.appendChild(reason);
+        }
+        row.appendChild(statusCell);
+        const actionCell = document.createElement('td');
+        if (record.status !== 'archived') {
+          const action = document.createElement('button');
+          action.type = 'button';
+          action.className = `status-action${record.status === 'inactive' ? ' reactivate' : ''}`;
+          action.textContent = record.status === 'active' ? 'Mark inactive' : 'Reactivate';
+          action.addEventListener('click', () => changeMasterlistStatus(record.id, record.status));
+          actionCell.appendChild(action);
+        } else {
+          actionCell.textContent = '—';
+        }
+        row.appendChild(actionCell);
         body.appendChild(row);
       });
+    }
+
+    async function changeMasterlistStatus(id, status) {
+      const nextStatus = status === 'active' ? 'inactive' : 'active';
+      const reason = nextStatus === 'inactive' ? prompt('Why is this KK Masterlist record being marked inactive?') : '';
+      if (nextStatus === 'inactive' && (!reason || !reason.trim())) return;
+      const message = nextStatus === 'inactive'
+        ? 'Mark this record inactive? The personal information will be retained.'
+        : 'Reactivate this masterlist record?';
+      if (!window.confirm(message)) return;
+      const form = new FormData();
+      form.append('masterlist_id', id);
+      form.append('status', nextStatus);
+      if (reason) form.append('reason', reason.trim());
+      try {
+        const csrfResponse = await fetch('api/csrf_token.php', { credentials: 'same-origin', cache: 'no-store' });
+        const csrfData = await csrfResponse.json();
+        if (!csrfResponse.ok || !csrfData.success || !csrfData.csrf_token) throw new Error('Unable to prepare a secure request.');
+        form.append('csrf_token', csrfData.csrf_token);
+        const response = await fetch('api/update_youth_status.php', { method: 'POST', body: form });
+        const data = await response.json();
+        if (!response.ok || !data.success) throw new Error(data.message || 'Unable to update status.');
+        await loadMasterlist();
+      } catch (error) {
+        report.textContent = error.message;
+      }
     }
 
     function showReport(data) {
@@ -125,6 +192,16 @@
     document.getElementById('toggleImport').addEventListener('click', () => document.getElementById('importPanel').classList.toggle('open'));
     document.getElementById('searchInput').addEventListener('input', () => loadMasterlist().catch(error => { report.textContent = error.message; }));
     document.getElementById('claimedFilter').addEventListener('change', () => loadMasterlist().catch(error => { report.textContent = error.message; }));
+    document.querySelectorAll('.status-filter').forEach(button => button.addEventListener('click', () => {
+      if (currentStatus === button.dataset.status) return;
+      currentStatus = button.dataset.status;
+      document.querySelectorAll('.status-filter').forEach(tab => {
+        const selected = tab === button;
+        tab.classList.toggle('active', selected);
+        tab.setAttribute('aria-selected', selected ? 'true' : 'false');
+      });
+      loadMasterlist().catch(error => { report.textContent = error.message; });
+    }));
     document.getElementById('templateButton').addEventListener('click', () => {
       const content = 'voter_id,first_name,last_name,middle_name,birthday,age,sex,address,purok_or_barangay\n';
       const link = document.createElement('a');

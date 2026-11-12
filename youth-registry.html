@@ -133,6 +133,15 @@
         .btn-view:hover   { background: #d5e9f8; }
         .btn-edit:hover   { background: #ffeacc; }
         .btn-delete:hover { background: #fbd7d7; }
+        .status-filters { display: flex; gap: 8px; margin: 0 0 16px; flex-wrap: wrap; }
+        .status-filter { border: 1px solid var(--line); border-radius: 999px; padding: 9px 16px; background: var(--surface); color: var(--ink-soft); cursor: pointer; font: 600 13px 'IBM Plex Sans', sans-serif; }
+        .status-filter.active { border-color: var(--blue); background: #e8f3fc; color: #236d9e; }
+        .status-badge { display: inline-block; border-radius: 999px; padding: 4px 9px; font-size: 12px; font-weight: 600; text-transform: capitalize; }
+        .status-badge.active { background: #e6f4ec; color: #228B57; }
+        .status-badge.inactive { background: #fff4e0; color: #a56b08; }
+        .status-badge.archived { background: #fde9f0; color: #b62d61; }
+        .btn-status { background: #fff4e0; color: #a56b08; }
+        .btn-reactivate { background: #e6f4ec; color: #228B57; }
 
         .state-row td { padding: 56px 20px !important; text-align: center; color: var(--ink-soft); }
         .state-row i { display: block; font-size: 34px; margin-bottom: 12px; color: #c4cadb; }
@@ -288,6 +297,11 @@
                     <i class="fas fa-plus"></i> Register youth
                 </button>
             </div>
+            <div class="status-filters" role="tablist" aria-label="Filter youth by status">
+                <button class="status-filter active" type="button" data-status="active" role="tab" aria-selected="true">Active</button>
+                <button class="status-filter" type="button" data-status="inactive" role="tab" aria-selected="false">Inactive / Ghost</button>
+                <button class="status-filter" type="button" data-status="archived" role="tab" aria-selected="false">Archived (Age exceeded)</button>
+            </div>
 
             <!-- Table -->
             <div class="table-card">
@@ -299,6 +313,7 @@
                                 <th>Full name</th>
                                 <th>Contact number</th>
                                 <th>Full address</th>
+                                <th>Status / reason</th>
                                 <th style="text-align:right;">Actions</th>
                             </tr>
                         </thead>
@@ -578,6 +593,7 @@ updateDashboardDateTime();
 // Data Management
 // ────────────────────────────────────────────────
 let youthData = [];
+let currentStatus = 'active';
 
 function showLoadingRows() {
     const tbody = document.getElementById('youthTableBody');
@@ -594,7 +610,7 @@ function showLoadingRows() {
 async function loadYouthData() {
     showLoadingRows();
     try {
-        const response = await fetch('api/get_youth.php');
+        const response = await fetch(`api/get_youth.php?status=${encodeURIComponent(currentStatus)}`);
         const data = await response.json();
 
         if (data.success) {
@@ -631,7 +647,7 @@ function renderYouthTable(filtered = youthData) {
     if (!filtered.length) {
         const searching = document.getElementById('searchInput').value.trim() !== '';
         tbody.innerHTML = `
-            <tr class="state-row"><td colspan="5">
+            <tr class="state-row"><td colspan="6">
                 <i class="fas ${searching ? 'fa-search' : 'fa-user-friends'}"></i>
                 <strong>${searching ? 'No members match your search' : 'No youth members yet'}</strong>
                 ${searching ? 'Try a different name, ID, or number.' : 'Select “Register youth” to add the first member.'}
@@ -658,10 +674,14 @@ function renderYouthTable(filtered = youthData) {
             </td>
             <td>${esc(youth.phone || 'N/A')}</td>
             <td class="address-column" title="${esc(youth.address || 'N/A')}">${esc(youth.address || 'N/A')}</td>
+            <td>
+                <span class="status-badge ${esc(youth.status)}">${esc(youth.status)}</span>
+                ${youth.status_reason ? `<div class="person-sub">${esc(youth.status_reason)}</div>` : ''}
+            </td>
             <td class="action-buttons">
                 <button class="action-btn btn-view" onclick="viewYouth('${id}')" title="View details &amp; ID" aria-label="View ${esc(fullName)}"><i class="fas fa-eye"></i></button>
-                <button class="action-btn btn-edit" onclick="editYouth('${id}')" title="Edit member" aria-label="Edit ${esc(fullName)}"><i class="fas fa-pen"></i></button>
-                <button class="action-btn btn-delete" onclick="deleteYouth('${id}')" title="Delete member" aria-label="Delete ${esc(fullName)}"><i class="fas fa-trash"></i></button>
+                ${youth.status !== 'archived' ? `<button class="action-btn ${youth.status === 'active' ? 'btn-status' : 'btn-reactivate'}" onclick="changeYouthStatus('${id}', '${youth.status === 'active' ? 'inactive' : 'active'}')" title="${youth.status === 'active' ? 'Mark inactive' : 'Reactivate'}" aria-label="${youth.status === 'active' ? 'Mark inactive' : 'Reactivate'} ${esc(fullName)}"><i class="fas ${youth.status === 'active' ? 'fa-user-slash' : 'fa-user-check'}"></i></button>` : ''}
+                ${youth.status !== 'archived' ? `<button class="action-btn btn-edit" onclick="editYouth('${id}')" title="Edit member" aria-label="Edit ${esc(fullName)}"><i class="fas fa-pen"></i></button>` : ''}
             </td>`;
         tbody.appendChild(tr);
     });
@@ -678,6 +698,16 @@ function filterTable() {
     renderYouthTable(filtered);
 }
 document.getElementById('searchInput').addEventListener('input', filterTable);
+document.querySelectorAll('.status-filter').forEach(button => button.addEventListener('click', () => {
+    if (currentStatus === button.dataset.status) return;
+    currentStatus = button.dataset.status;
+    document.querySelectorAll('.status-filter').forEach(tab => {
+        const selected = tab === button;
+        tab.classList.toggle('active', selected);
+        tab.setAttribute('aria-selected', selected ? 'true' : 'false');
+    });
+    loadYouthData();
+}));
 
 // ────────────────────────────────────────────────
 // Modal Controls
@@ -841,26 +871,36 @@ function editYouth(member_id) {
 }
 
 // ────────────────────────────────────────────────
-// Delete Youth
+// Change Youth Status
 // ────────────────────────────────────────────────
-function deleteYouth(member_id) {
-    showConfirm('Are you sure you want to delete this youth member? This cannot be undone.', async () => {
+async function changeYouthStatus(member_id, status) {
+    const reason = status === 'inactive' ? prompt('Why is this youth being marked inactive?') : '';
+    if (status === 'inactive' && (!reason || !reason.trim())) return;
+    showConfirm(status === 'inactive'
+        ? 'Mark this youth inactive? Their record and personal information will be retained.'
+        : 'Reactivate this youth account?', async () => {
         const formData = new FormData();
         formData.append('member_id', member_id);
+        formData.append('status', status);
+        if (reason) formData.append('reason', reason.trim());
 
         try {
-            const response = await fetch('api/delete_youth.php', { method: 'POST', body: formData });
+            const csrfResponse = await fetch('api/csrf_token.php', { credentials: 'same-origin', cache: 'no-store' });
+            const csrfData = await csrfResponse.json();
+            if (!csrfResponse.ok || !csrfData.success || !csrfData.csrf_token) throw new Error('Unable to prepare a secure request.');
+            formData.append('csrf_token', csrfData.csrf_token);
+            const response = await fetch('api/update_youth_status.php', { method: 'POST', body: formData });
             const data = await response.json();
 
             if (data.success) {
-                showAlert('Youth member deleted successfully.', 'success');
+                showAlert(data.message, 'success');
                 loadYouthData();
             } else {
                 showAlert('Error: ' + (data.message || 'Unknown error'), 'error');
             }
         } catch (error) {
-            console.error('Delete error:', error);
-            showAlert('Failed to delete youth member', 'error');
+            console.error('Status update error:', error);
+            showAlert(error.message || 'Failed to update youth status', 'error');
         }
     });
 }
@@ -884,6 +924,8 @@ function viewYouth(member_id) {
             <div class="full"><dt>Email</dt><dd>${esc(youth.email || 'N/A')}</dd></div>
             <div class="full"><dt>Full address</dt><dd>${esc(youth.address || 'N/A')}</dd></div>
             <div class="full"><dt>Barangay</dt><dd>${esc(youth.barangay || 'N/A')}</dd></div>
+            <div><dt>Last login</dt><dd>${esc(youth.last_login ? new Date(youth.last_login).toLocaleDateString('en-US') : 'No recorded login')}</dd></div>
+            <div class="full"><dt>Status / reason</dt><dd>${esc(youth.status)}${youth.status_reason ? ` — ${esc(youth.status_reason)}` : ''}</dd></div>
         </dl>`;
 
     document.getElementById('viewName').textContent = `${youth.firstname} ${youth.lastname}`;
