@@ -135,9 +135,58 @@
 .box ul{display:grid;gap:10px;margin:14px 0;padding-left:22px;color:var(--ink);font-size:14.5px}.box li::marker{color:var(--g)}
 .x{position:absolute;top:14px;right:14px;display:grid;place-items:center;width:44px;height:44px;border:1px solid var(--ln);border-radius:50%;background:#fff;color:var(--mu);cursor:pointer}.x:hover{color:var(--pkd)}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+@media(max-width:767px){
+  .youth-home .hm{width:100%;padding:12px 0 24px}
+  .youth-home .hm-layout{gap:12px}
+  .youth-home .hero{min-height:0;padding:20px;border-radius:22px}
+  .youth-home .hero h1{margin-top:12px;font-size:clamp(30px,8vw,36px)}
+  .youth-home .note{margin-top:12px;font-size:12.5px}
+  .youth-home .card{padding:16px;border-radius:20px}
+  .youth-home .sh{gap:8px;margin-bottom:12px}
+  .youth-home .sh h2{font-size:clamp(20px,5.5vw,24px)}
+  .youth-home .sgrid{gap:10px}
+  .youth-home .tile{min-width:0;min-height:0;gap:4px;padding:12px;border-radius:17px}
+  .youth-home .tile .chip{width:40px;height:40px;margin-bottom:4px;border-radius:13px}
+  .youth-home .tile .chip .ic{width:21px;height:21px}
+  .youth-home .tile strong{font-size:14.5px;line-height:1.25;overflow-wrap:anywhere}
+  .youth-home .tile span.d{font-size:12.5px;line-height:1.4;overflow-wrap:anywhere}
+  .youth-home .tile .go{top:12px;right:12px;width:16px;height:16px}
+  .youth-home .wallet{padding:18px;border-radius:22px}
+  .youth-home .wtop{margin-bottom:16px}
+  .youth-home .wallet-name{margin-bottom:10px}
+  .youth-home .wbtn{margin-top:16px}
+  .youth-home .disc{gap:12px;padding:16px;border-radius:20px}
+  .youth-home .disc .ico{width:44px;height:44px;border-radius:15px}
+  .youth-home .help{gap:10px;padding:14px;border-radius:20px}
+  .youth-home .help button{min-height:44px;padding:0 12px}
+
+  .youth-home .topbar{gap:8px}
+  .youth-home .brand{gap:7px}
+  .youth-home .brand-logos img{width:32px;height:32px}
+  .youth-home .brand-copy strong{font-size:16px}
+  .youth-home .user-chip{display:flex;max-width:112px;min-height:44px;gap:5px;padding:0 9px;border-color:var(--line);background:#fff}
+  .youth-home .user-chip>span{display:block;font-size:11px}
+  .youth-home .user-chip>.icon{display:block;width:14px;height:14px}
+  .youth-home .bottom-tabs{min-height:calc(62px + env(safe-area-inset-bottom));padding:6px 6px calc(6px + env(safe-area-inset-bottom))}
+  .youth-home .bottom-tabs a{min-height:48px;font-size:11px}
+  .youth-home .bottom-tabs a .icon{width:20px;height:20px}
+  .youth-home .services-dock-toggle{width:58px;min-height:58px;margin-top:-19px;border-width:3px}
+  .youth-home .services-dock-toggle span{font-size:9px}
+  .youth-home .fab-container{right:12px;bottom:calc(76px + env(safe-area-inset-bottom))}
+}
+
+@media(max-width:359px){
+  .youth-home .hm{padding-top:10px}
+  .youth-home .hero{padding:18px}
+  .youth-home .card{padding:14px}
+  .youth-home .tile{padding:10px}
+  .youth-home .tile strong{font-size:14px}
+  .youth-home .user-chip{max-width:96px;padding:0 7px}
+}
 </style>
 </head>
-<body>
+<body class="youth-home">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
 <symbol id="h-cal" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
 <symbol id="h-box" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 8 9 5 9-5M3 8v9l9 5 9-5V8M12 13v9"/></symbol>
