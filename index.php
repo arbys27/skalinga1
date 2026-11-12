@@ -305,6 +305,11 @@ footer a:hover{color:var(--mint)}
   .hero{min-height:max(660px,100svh)}
   #hero-carousel > .wrap{padding-top:118px;padding-bottom:24px}
   .hero h1{font-size:clamp(40px,12vw,62px)}
+  .hero .tag{max-width:100%;font-size:12px}
+  .hero p.lead{max-width:100%;font-size:16px;overflow-wrap:anywhere}
+  .hero .cta{width:100%;flex-direction:column;align-items:flex-start;gap:10px}
+  .hero .cta .btn{width:fit-content;max-width:100%;min-height:50px;padding:0 18px;white-space:normal}
+  .hero .cta .btn-ghost{justify-content:center;text-align:center}
   .ctrl{padding-bottom:18px}
   .ctrl .wrap{gap:4px}
   .slide-note{display:none}
@@ -316,13 +321,22 @@ footer a:hover{color:var(--mint)}
   .svc{padding:16px;border-radius:20px}
   .svc h3{font-size:16px}
   .svc p{font-size:13px}
-  .card{flex-basis:min(86%,310px)}
+  .head{margin-bottom:24px}
+  #activities .head p{font-size:14px}
+  .rail{width:100%;max-width:100%;gap:12px;padding-bottom:10px}
+  .card{flex-basis:min(76vw,270px);border-radius:18px}
+  .card .pic{aspect-ratio:16/10}
+  .card .t{padding:13px 14px 15px}
+  .card h3{font-size:17px}
+  .card p{display:-webkit-box;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:2;font-size:13px;line-height:1.45}
+  .card .meta{gap:6px;margin-top:10px;font-size:11px}
 }
 @media(max-width:360px){
   .wrap{width:calc(100% - 28px)}
   .brand{font-size:16px}
   .nav>.wrap>.btn{padding:0 11px}
   .grid{grid-template-columns:1fr}
+  .hero .cta .btn{min-height:48px;padding-inline:15px;font-size:14px}
   .feature .shot{min-height:0}
   .ctrl .wrap{gap:4px}
   .dot{width:24px;flex-basis:24px}
