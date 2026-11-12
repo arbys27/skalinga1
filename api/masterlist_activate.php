@@ -22,7 +22,6 @@ securityStartSession();
 securityRequireCsrf();
 enforceMasterlistRateLimit($pdo, 'activate', 5);
 
-$voterId = normalizeMasterlistValue($_POST['voter_id'] ?? '');
 $fullName = submittedMasterlistName($_POST);
 $birthday = trim($_POST['birthday'] ?? '');
 $houseNumber = is_string($_POST['house_number'] ?? null) ? trim($_POST['house_number']) : '';
@@ -35,7 +34,7 @@ $email = trim($_POST['email'] ?? '');
 $password = is_string($_POST['password'] ?? null) ? $_POST['password'] : '';
 $confirmPassword = is_string($_POST['confirm_password'] ?? null) ? $_POST['confirm_password'] : '';
 
-if ($voterId === '' || $fullName === '' || !DateTime::createFromFormat('!Y-m-d', $birthday)) {
+if ($fullName === '' || !DateTime::createFromFormat('!Y-m-d', $birthday)) {
     masterlistJsonResponse(['success' => false, 'message' => 'Please complete the masterlist verification first.'], 400);
 }
 if ($houseNumber === '' || $streetName === '' || $subdivisionPurok === '' || $city === '' || $province === '') {
@@ -65,7 +64,13 @@ if ($password !== $confirmPassword) {
 
 try {
     $pdo->beginTransaction();
-    $record = masterlistFindRecord($pdo, $voterId, $fullName, $birthday, true);
+    $record = masterlistFindRecord(
+        $pdo,
+        $fullName,
+        $birthday,
+        true,
+        (int)$_SESSION['activation_masterlist_id']
+    );
 
     if (!$record || (int)$record['id'] !== (int)$_SESSION['activation_masterlist_id']) {
         $pdo->rollBack();

@@ -12,18 +12,17 @@ require_once 'db_connect.php';
 try {
     enforceMasterlistRateLimit($pdo, 'masterlist_verify');
 
-    $voterId = normalizeMasterlistValue($_POST['voter_id'] ?? '');
     $fullName = submittedMasterlistName($_POST);
     $birthday = trim($_POST['birthday'] ?? '');
 
-    if ($voterId === '' || $fullName === '' || !DateTime::createFromFormat('!Y-m-d', $birthday)) {
+    if ($fullName === '' || !DateTime::createFromFormat('!Y-m-d', $birthday)) {
         masterlistJsonResponse([
             'success' => false,
-            'message' => 'Please provide a valid voter ID, first name, last name, and birthday.'
+            'message' => 'Please provide a valid first name, last name, and birthday.'
         ], 400);
     }
 
-    $record = masterlistFindRecord($pdo, $voterId, $fullName, $birthday);
+    $record = masterlistFindRecord($pdo, $fullName, $birthday);
     if (!$record) {
         masterlistJsonResponse([
             'success' => false,

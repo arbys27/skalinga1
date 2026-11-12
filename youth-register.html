@@ -156,7 +156,6 @@ input:focus{outline:none;border-color:var(--g);box-shadow:0 0 0 4px rgba(34,139,
       <section id="stepOne" class="view">
         <p class="note">Use the details exactly as they appear on the KK Masterlist.</p>
         <form id="verifyForm">
-          <div class="field"><label for="voterId">Voter ID</label><div class="inp"><svg class="ic"><use href="#r-id"/></svg><input type="text" id="voterId" name="voter_id" autocomplete="off" required></div></div>
           <div class="form-grid">
             <div class="field"><label for="firstName">First Name</label><div class="inp"><svg class="ic"><use href="#r-u"/></svg><input type="text" id="firstName" name="first_name" placeholder="Enter first name" autocomplete="given-name" maxlength="100" required></div></div>
             <div class="field"><label for="middleName">Middle Name</label><div class="inp"><svg class="ic"><use href="#r-u"/></svg><input type="text" id="middleName" name="middle_name" placeholder="Enter middle name" autocomplete="additional-name" maxlength="100"></div></div>
@@ -183,7 +182,6 @@ input:focus{outline:none;border-color:var(--g);box-shadow:0 0 0 4px rgba(34,139,
           </div>
         </div>
         <form id="activationForm">
-          <input type="hidden" id="activationVoterId" name="voter_id">
           <input type="hidden" id="activationFirstName" name="first_name">
           <input type="hidden" id="activationMiddleName" name="middle_name">
           <input type="hidden" id="activationLastName" name="last_name">
@@ -247,7 +245,7 @@ function setStep(n){
     $('phoneOtpControls').hidden=false;
   }
   scrollTo({top:0,behavior:'smooth'});
-  (first?$('voterId'):$('mobile')).focus({preventScroll:true});
+  (first?$('firstName'):$('mobile')).focus({preventScroll:true});
 }
 const prettyDate=v=>{const d=new Date(`${v}T00:00:00`);return isNaN(d)?(v||''):d.toLocaleDateString(undefined,{month:'long',day:'numeric',year:'numeric'})};
 
@@ -260,7 +258,6 @@ verifyForm.addEventListener('submit',async e=>{
     const p=result.profile,name=[p.first_name,p.middle_name,p.last_name].filter(Boolean).join(' ');
     $('profileName').textContent=name;$('avatar').textContent=(p.first_name||name||'?').trim().charAt(0).toUpperCase();
     $('profileBirthday').textContent=prettyDate(p.birthday);$('profileAge').textContent=p.age;$('profileSex').textContent=p.sex;$('profileAddress').textContent=p.address;
-    $('activationVoterId').value=$('voterId').value;
     $('activationFirstName').value=$('firstName').value.trim();
     $('activationMiddleName').value=$('middleName').value.trim();
     $('activationLastName').value=$('lastName').value.trim();

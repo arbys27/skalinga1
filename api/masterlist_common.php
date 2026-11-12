@@ -99,24 +99,34 @@ function masterlistNameMatches(array $record, string $submittedName): bool
     return $submittedName !== '' && ($submittedName === $fullName || $submittedName === $shortName);
 }
 
-function masterlistFindRecord(PDO $pdo, string $voterId, string $fullName, string $birthday, bool $forUpdate = false): ?array
+function masterlistFindRecord(
+    PDO $pdo,
+    string $fullName,
+    string $birthday,
+    bool $forUpdate = false,
+    ?int $masterlistId = null
+): ?array
 {
     $sql = 'SELECT id, voter_id, first_name, last_name, middle_name, birthday, age, sex, address,
                    purok_or_barangay, is_claimed, claimed_by_user_id
             FROM kk_masterlist
-            WHERE LOWER(voter_id) = ? AND birthday = ?
-            LIMIT 1';
+            WHERE birthday = ?';
+    $params = [$birthday];
+    if ($masterlistId !== null) {
+        $sql .= ' AND id = ?';
+        $params[] = $masterlistId;
+    }
     if ($forUpdate) {
         $sql .= ' FOR UPDATE';
     }
 
     $stmt = $pdo->prepare($sql);
-    $stmt->execute([normalizeMasterlistValue($voterId), $birthday]);
-    $record = $stmt->fetch();
+    $stmt->execute($params);
+    $records = $stmt->fetchAll();
+    $matches = array_values(array_filter(
+        $records,
+        static fn(array $record): bool => masterlistNameMatches($record, $fullName)
+    ));
 
-    if (!$record || !masterlistNameMatches($record, $fullName)) {
-        return null;
-    }
-
-    return $record;
+    return count($matches) === 1 ? $matches[0] : null;
 }
