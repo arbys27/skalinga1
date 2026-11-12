@@ -27,7 +27,7 @@ if (!$requestId || $requestId < 1 || !in_array($status, $allowedStatuses, true))
 try {
     $pdo->beginTransaction();
     $requestQuery = $pdo->prepare(
-        'SELECT request_id, member_id, status
+        'SELECT request_id, member_id, status, print_verified_at, verified_at
          FROM printing_requests
          WHERE request_id = ?
          LIMIT 1
@@ -37,6 +37,11 @@ try {
     $request = $requestQuery->fetch(PDO::FETCH_ASSOC);
     if (!$request) {
         throw new RuntimeException('Print request not found.');
+    }
+    if ($status === 'Completed'
+        && empty($request['print_verified_at'])
+        && empty($request['verified_at'])) {
+        throw new RuntimeException('This print request must be verified by the youth before completion.');
     }
 
     $claimedAt = $status === 'Claimed' ? date('Y-m-d H:i:s') : null;

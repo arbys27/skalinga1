@@ -108,7 +108,7 @@ try {
         "INSERT INTO printing_requests
             (member_id, member_name, document_title, file_path, file_name, file_size,
              print_type, paper_size, copies, status, created_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'AwaitingVerification', CURRENT_TIMESTAMP)"
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending', CURRENT_TIMESTAMP)"
          . " RETURNING request_id"
     );
     $insert->execute([
@@ -123,6 +123,16 @@ try {
         $copies
     ]);
     $requestId = (int)$insert->fetchColumn();
+    $pdo->prepare(
+        'INSERT INTO activity_logs (user_id, role, action, identifier, ip_address)
+         VALUES (?, ?, ?, ?, ?)'
+    )->execute([
+        (int)$_SESSION['user_id'],
+        'youth',
+        'print_request_submitted',
+        'print:' . (string)$requestId,
+        securityClientIp(),
+    ]);
     $pdo->commit();
 
     echo json_encode([

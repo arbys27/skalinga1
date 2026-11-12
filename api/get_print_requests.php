@@ -39,7 +39,9 @@ try {
             pr.created_at,
             pr.updated_at,
             pr.claimed_at,
-            pr.notes
+            pr.notes,
+            pr.print_verified_at,
+            pr.verified_at
         FROM printing_requests pr
         LEFT JOIN users u ON u.member_id = pr.member_id
         LEFT JOIN youth_profiles yp ON yp.user_id = u.id
@@ -50,7 +52,9 @@ try {
     
     $requests = $stmt->fetchAll(PDO::FETCH_ASSOC);
     foreach ($requests as &$request) {
-        $request['file_path'] = 'api/get_upload.php?type=printing&id=' . (int)$request['request_id'];
+        $request['file_path'] = empty($request['print_verified_at']) && empty($request['verified_at'])
+            ? null
+            : 'api/get_upload.php?type=printing&id=' . (int)$request['request_id'];
     }
     unset($request);
     

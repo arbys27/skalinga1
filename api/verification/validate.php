@@ -8,6 +8,9 @@ $admin = requireAdminApi();
 securityRequireCsrf();
 $input = verificationInput();
 $token = verificationTokenInput($input);
+$requestedServiceRef = is_scalar($input['request_id'] ?? null)
+    ? trim((string)$input['request_id'])
+    : null;
 $tokenHash = hash('sha256', $token ?? (is_string($input['token'] ?? null) ? trim($input['token']) : 'invalid'));
 
 try {
@@ -26,6 +29,15 @@ try {
         );
         $pdo->commit();
         verificationResponse(['success' => false, 'message' => 'This verification token is invalid or no longer active.'], 409);
+    }
+    if ($requestedServiceRef !== null && $requestedServiceRef !== (string)$record['service_ref']) {
+        verificationAudit(
+            $pdo, 'scan', 'request_mismatch', (int)$record['id'], $tokenHash,
+            (int)$record['user_id'], (int)$admin['id'],
+            (string)$record['service_type'], $requestedServiceRef
+        );
+        $pdo->commit();
+        verificationResponse(['success' => false, 'message' => 'This QR does not belong to the selected print request.'], 409);
     }
 
     if (verificationIsExpired((string)$record['expires_at'])) {
@@ -52,7 +64,7 @@ try {
          JOIN users u ON u.member_id = pr.member_id AND u.id = ?
          LEFT JOIN youth_profiles yp ON yp.user_id = u.id
          LEFT JOIN kk_masterlist km ON km.id = u.masterlist_id
-         WHERE pr.request_id = ? AND pr.status IN ('Completed', 'AwaitingVerification')
+         WHERE pr.request_id = ? AND pr.status IN ('Completed', 'Pending', 'AwaitingVerification')
          LIMIT 1
          FOR UPDATE OF pr"
     );
@@ -73,12 +85,51 @@ try {
         verificationResponse(['success' => false, 'message' => 'The linked service request is no longer available.'], 409);
     }
 
-    $markScanned = $pdo->prepare(
-        'UPDATE service_verification_tokens
-         SET scanned_by_admin_id = ?, updated_at = CURRENT_TIMESTAMP
-         WHERE id = ?'
-    );
-    $markScanned->execute([(int)$admin['id'], (int)$record['id']]);
+    $verificationCode = null;
+    if ((string)$record['service_type'] === 'print'
+        && in_array((string)$request['status'], ['Pending', 'AwaitingVerification'], true)) {
+        if (is_string($record['code_hash'] ?? null)
+            && $record['code_hash'] !== ''
+            && is_string($record['code_expires_at'] ?? null)
+            && !verificationIsExpired($record['code_expires_at'])) {
+            $pdo->rollBack();
+            verificationResponse([
+                'success' => false,
+                'message' => 'A verification code is already active for this request. Ask the youth to enter it.',
+            ], 409);
+        }
+        $verificationCode = str_pad((string)random_int(0, 99), 2, '0', STR_PAD_LEFT);
+        $markScanned = $pdo->prepare(
+            "UPDATE service_verification_tokens
+             SET scanned_by_admin_id = ?, code_hash = ?, code_expires_at = CURRENT_TIMESTAMP + INTERVAL '5 minutes',
+                 code_attempts = 0, code_verified_at = NULL, updated_at = CURRENT_TIMESTAMP
+             WHERE id = ? AND status = 'active'"
+        );
+        $markScanned->execute([
+            (int)$admin['id'],
+            otpCodeHash($verificationCode),
+            (int)$record['id'],
+        ]);
+    } else {
+        $markScanned = $pdo->prepare(
+            'UPDATE service_verification_tokens
+             SET scanned_by_admin_id = ?, updated_at = CURRENT_TIMESTAMP
+             WHERE id = ?'
+        );
+        $markScanned->execute([(int)$admin['id'], (int)$record['id']]);
+    }
+    if ($markScanned->rowCount() !== 1) {
+        $pdo->rollBack();
+        verificationResponse(['success' => false, 'message' => 'This verification token is no longer active.'], 409);
+    }
+    if ($verificationCode !== null) {
+        $linkRequest = $pdo->prepare(
+            'UPDATE printing_requests
+             SET print_verification_token_id = ?, updated_at = CURRENT_TIMESTAMP
+             WHERE request_id = ? AND status IN (\'Pending\', \'AwaitingVerification\')'
+        );
+        $linkRequest->execute([(int)$record['id'], (int)$record['service_ref']]);
+    }
     verificationAudit(
         $pdo, 'scan', 'success', (int)$record['id'], $tokenHash, (int)$record['user_id'],
         (int)$admin['id'], (string)$record['service_type'], (string)$record['service_ref']
@@ -92,6 +143,8 @@ try {
             'youth_name' => $request['display_name'],
             'status' => $request['status'],
             'service' => verificationServiceLabel((string)$record['service_type'], $request),
+            'code_expires_in' => $verificationCode !== null ? 300 : null,
+            'verification_code' => $verificationCode,
         ],
     ]);
 } catch (Throwable $exception) {

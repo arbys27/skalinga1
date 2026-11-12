@@ -20,12 +20,19 @@ if (!in_array($type, ['printing', 'incident'], true) || !$id || $id < 1) {
 
 try {
     if ($type === 'printing') {
-        $stmt = $pdo->prepare('SELECT member_id, file_path FROM printing_requests WHERE request_id = ?');
+        $stmt = $pdo->prepare(
+            'SELECT member_id, file_path, print_verified_at, verified_at
+             FROM printing_requests WHERE request_id = ?'
+        );
         $stmt->execute([$id]);
         $record = $stmt->fetch(PDO::FETCH_ASSOC);
         $filePath = $record['file_path'] ?? '';
         if (!$record) {
             http_response_code(404);
+            exit;
+        }
+        if (empty($record['print_verified_at']) && empty($record['verified_at'])) {
+            http_response_code(403);
             exit;
         }
 

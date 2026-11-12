@@ -84,7 +84,7 @@ function verificationServiceRequest(
         return null;
     }
 
-    $status = $purpose === 'submit' ? 'AwaitingVerification' : 'Completed';
+    $status = $purpose === 'submit' ? 'Pending' : 'Completed';
     $sql = "SELECT request_id, member_id, member_name, document_title, status
             FROM printing_requests
             WHERE request_id = ? AND member_id = ? AND status = ?
@@ -101,7 +101,8 @@ function verificationServiceRequest(
 function verificationLoadToken(PDO $pdo, string $tokenHash, bool $forUpdate = false): ?array
 {
     $sql = 'SELECT id, user_id, service_type, service_ref, status, expires_at,
-                   scanned_by_admin_id, otp_required, otp_hash, otp_expires_at, otp_attempts
+                   scanned_by_admin_id, otp_required, otp_hash, otp_expires_at, otp_attempts,
+                   code_hash, code_expires_at, code_attempts, code_verified_at
             FROM service_verification_tokens
             WHERE token_hash = ?
             LIMIT 1';

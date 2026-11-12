@@ -72,6 +72,18 @@ table.pt{width:100%;border-collapse:collapse;font-size:14px}
 .ab{display:flex;gap:6px}
 .ib{display:grid;place-items:center;width:38px;height:38px;border:0;border-radius:12px;background:#f1f6f3;color:var(--ink);cursor:pointer;transition:background .15s,color .15s}
 .ib:hover{background:var(--g);color:#fff}.ib.scan:hover{background:var(--pk);color:var(--ink)}.ib.del:hover{background:#d64545;color:#fff}
+.process-note{margin:0 0 16px;padding:12px 14px;border-radius:14px;background:#fff4d6;color:#7a5600;font-size:13px;font-weight:600}
+.scan-token{width:100%;min-height:50px;padding:0 14px;border:1.5px solid var(--ln);border-radius:14px;background:#fff;color:var(--ink);font:inherit}
+.scan-token:focus{outline:none;border-color:var(--g);box-shadow:0 0 0 4px rgba(34,139,87,.14)}
+.scan-camera{display:block;width:100%;max-height:300px;margin:14px 0;border-radius:16px;background:#10251c}
+.scan-camera[hidden],.scan-result[hidden],.code-screen[hidden]{display:none}
+.scan-result,.code-screen{margin-top:16px;padding:16px;border:1px solid var(--ln);border-radius:16px;background:#f8fbf9}
+.scan-result p,.code-screen p{margin:7px 0;color:var(--mu);font-size:14px}
+.code-number{margin:10px 0;font:800 clamp(56px,15vw,92px)/1 var(--mono);letter-spacing:.18em;text-align:center;color:var(--gd)}
+.code-expiry{font-size:13px!important;text-align:center}
+.admin-status{min-height:24px;margin-top:14px;font-weight:700}.admin-status.error{color:#b42345}.admin-status.success{color:#167447}
+.detail-actions{display:flex;justify-content:center;margin-top:20px}
+.detail-actions .btn{min-width:190px}
 .empty{padding:44px 20px;text-align:center;color:var(--mu)}
 .empty i{display:block;margin-bottom:10px;font-size:30px;color:#b9d9c8}
 @media(max-width:860px){
@@ -189,6 +201,47 @@ table.pt{width:100%;border-collapse:collapse;font-size:14px}
   </div>
 </div>
 
+<!-- Print verification -->
+<div class="pm-modal" id="processModal" role="dialog" aria-modal="true" aria-labelledby="processTitle">
+  <div class="box">
+    <button class="cl" id="closeProcess" type="button" aria-label="Close process"><i class="fas fa-xmark"></i></button>
+    <h2 id="processTitle">Process print request</h2>
+    <p class="lead" id="processLead">Scan the youth's fresh digital ID QR code or paste the token manually.</p>
+    <div id="scanStage">
+      <input class="scan-token" id="processToken" type="text" autocomplete="off" spellcheck="false" maxlength="512" placeholder="Paste the 64-character token or scan a QR">
+      <div class="fa-end">
+        <button class="btn green" id="validateProcessToken" type="button"><i class="fas fa-check"></i>Validate token</button>
+        <button class="btn soft" id="startProcessCamera" type="button"><i class="fas fa-camera"></i>Use camera</button>
+      </div>
+      <video class="scan-camera" id="processCamera" playsinline muted hidden></video>
+    </div>
+    <div class="scan-result" id="processScanResult" hidden>
+      <p><strong>Youth:</strong> <span id="processYouth"></span></p>
+      <p><strong>Request:</strong> <span id="processRequest"></span></p>
+      <p><strong>Service:</strong> <span id="processService"></span></p>
+    </div>
+    <div class="code-screen" id="processCodeScreen" hidden>
+      <p><strong>Read this code aloud to the youth</strong></p>
+      <div class="code-number" id="processCode">00</div>
+      <p class="code-expiry" id="processCodeExpiry">Code expires in 5:00</p>
+      <p id="processCodeStatus">Waiting for the youth to enter the code.</p>
+    </div>
+    <div id="processStatus" class="admin-status" role="status" aria-live="polite"></div>
+  </div>
+</div>
+
+<!-- Verified print details -->
+<div class="pm-modal" id="printDetailsModal" role="dialog" aria-modal="true" aria-labelledby="printDetailsTitle">
+  <div class="box">
+    <button class="cl" id="closePrintDetails" type="button" aria-label="Close print details"><i class="fas fa-xmark"></i></button>
+    <h2 id="printDetailsTitle">Print details</h2>
+    <p class="lead">Verification succeeded. Review the request before completing it.</p>
+    <dl class="det" id="verifiedDetailsContent"></dl>
+    <div class="docs" id="verifiedDocument"></div>
+    <div class="detail-actions"><button class="btn pink" id="finishPrintButton" type="button"><i class="fas fa-check"></i>Finished / Completed</button></div>
+  </div>
+</div>
+
 <div id="toastContainer" aria-live="polite"></div>
 
 <script>
@@ -205,6 +258,8 @@ const openM=id=>{$(id).classList.add('on');document.body.style.overflow='hidden'
 const closeM=id=>{$(id).classList.remove('on');if(!document.querySelector('.pm-modal.on'))document.body.style.overflow=''};
 $('closeViewDetails').onclick=()=>closeM('viewDetailsModal');
 $('closeDocumentViewer').onclick=()=>closeM('documentViewerModal');
+$('closeProcess').onclick=()=>closeProcessModal();
+$('closePrintDetails').onclick=()=>closeM('printDetailsModal');
 document.querySelectorAll('.pm-modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeM(m.id)}));
 addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.pm-modal.on').forEach(m=>closeM(m.id))});
 function showConfirm(message,onConfirm,label='Delete'){
@@ -245,7 +300,7 @@ function renderPrintTable(list){
   const tb=$('printingTableBody');
   if(!list.length){tb.innerHTML=`<tr><td colspan="6" class="empty nl"><i class="fas fa-print"></i>No print requests found</td></tr>`;return}
   tb.innerHTML=list.map(r=>{
-    const done=r.status==='Completed',id=esc(r.request_id),name=r.member_name||'Unknown';
+    const done=r.status==='Completed',pending=r.status==='Pending',id=esc(r.request_id),name=r.member_name||'Unknown';
     const link=r.file_path&&safeUrl(r.file_path)?`<a class="file" href="${esc(r.file_path)}" target="_blank" rel="noopener" download><i class="fas ${fileIcon(r.file_name)}"></i><span>${esc(r.file_name||'Document')}</span></a>`:'—';
     return `<tr>
       <td data-l="Youth" class="nl"><div class="who"><span class="av">${esc(name.charAt(0).toUpperCase())}</span><div><b>${esc(name)}</b><span class="mono">${esc(r.member_id)}</span></div></div></td>
@@ -256,7 +311,7 @@ function renderPrintTable(list){
       <td class="ab-td nl"><div class="ab">
         ${r.file_path&&safeUrl(r.file_path)?`<button class="ib" type="button" data-act="document" data-id="${id}" aria-label="Preview document" title="Preview document"><i class="fas fa-eye"></i></button>`:''}
         <button class="ib" type="button" data-act="view" data-id="${id}" aria-label="View details" title="View details"><i class="fas fa-circle-info"></i></button>
-        ${done?'':`<button class="ib" type="button" data-act="complete" data-id="${id}" aria-label="Mark completed" title="Mark completed"><i class="fas fa-check"></i></button>`}
+        ${pending?`<button class="ib scan" type="button" data-act="process" data-id="${id}" aria-label="Process request" title="Process request"><i class="fas fa-qrcode"></i></button>`:done?'':`<button class="ib" type="button" data-act="complete" data-id="${id}" aria-label="Mark completed" title="Mark completed"><i class="fas fa-check"></i></button>`}
         <button class="ib del" type="button" data-act="delete" data-id="${id}" aria-label="Delete request" title="Delete request"><i class="fas fa-trash"></i></button></div></td></tr>`;
   }).join('');
 }
@@ -270,10 +325,127 @@ $('statusChips').addEventListener('click',e=>{const b=e.target.closest('.chip');
 $('printingTableBody').addEventListener('click',e=>{
   const b=e.target.closest('[data-act]');if(!b)return;
   if(b.dataset.act==='document'){viewDocument(b.dataset.id);return}
+  if(b.dataset.act==='process'){openProcessModal(b.dataset.id);return}
   ({view:viewDetails,complete:id=>updateStatus(id,'Completed'),delete:deleteRequest})[b.dataset.act](b.dataset.id);
 });
 $('refreshBtn').onclick=async()=>{const b=$('refreshBtn');b.classList.add('spin');b.disabled=true;await loadPrintRequests();b.classList.remove('spin');b.disabled=false;notify('Requests refreshed')};
 const recOf=id=>printRequests.find(r=>String(r.request_id)===String(id));
+
+/* ---- process verification ---- */
+let processRequestId=null,processToken='',processPoller=null,processTimer=null,processStream=null,processDetector=null,processFrame=0;
+function processStatus(message,type=''){$('processStatus').textContent=message;$('processStatus').className=`admin-status ${type}`}
+function processTokenValue(value){
+  const text=String(value||'').trim();
+  if(/^[a-f0-9]{64}$/i.test(text))return text;
+  try{const url=new URL(text);const token=url.searchParams.get('t')||'';return/^[a-f0-9]{64}$/i.test(token)?token:''}catch{return''}
+}
+async function stopProcessCamera(){
+  if(processFrame)cancelAnimationFrame(processFrame);processFrame=0;
+  if(processStream)processStream.getTracks().forEach(track=>track.stop());
+  processStream=null;$('processCamera').srcObject=null;$('processCamera').hidden=true;
+}
+function closeProcessModal(){
+  clearInterval(processPoller);clearInterval(processTimer);processPoller=null;processTimer=null;
+  stopProcessCamera();processRequestId=null;processToken='';closeM('processModal');
+}
+function resetProcessModal(id){
+  const request=recOf(id);processRequestId=Number(id);processToken='';
+  $('processToken').value='';$('processScanResult').hidden=true;$('processCodeScreen').hidden=true;
+  $('processStatus').textContent='';$('processStatus').className='admin-status';
+  $('processLead').textContent=`Scan ${request?.member_name||'the youth'}'s fresh digital ID QR code or paste the token manually.`;
+}
+function showProcessCode(code,expiresIn){
+  $('processCode').textContent=String(code||'').padStart(2,'0');
+  $('processCodeScreen').hidden=false;$('processScanResult').hidden=false;
+  clearInterval(processTimer);
+  const expiresAt=Date.now()+Math.max(1,Number(expiresIn||300))*1000;
+  const tick=()=>{
+    const left=Math.max(0,Math.ceil((expiresAt-Date.now())/1000));
+    $('processCodeExpiry').textContent=left?`Code expires in ${Math.floor(left/60)}:${String(left%60).padStart(2,'0')}`:'Code expired. Close and scan a new QR.';
+    if(!left){clearInterval(processTimer);clearInterval(processPoller);processStatus('The verification code expired. Scan a new QR to try again.','error')}
+  };
+  tick();processTimer=setInterval(tick,1000);
+}
+async function validateProcessToken(token=processTokenValue($('processToken').value)){
+  if(!token){processStatus('Enter a valid service token or scan its QR.','error');return}
+  if(!processRequestId){processStatus('This print request is no longer selected.','error');return}
+  try{
+    $('validateProcessToken').disabled=true;processStatus('Validating token...');
+    const response=await fetch('api/verification/validate.php',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-CSRF-Token':await getCsrfToken()},body:JSON.stringify({token,request_id:Number(processRequestId)})});
+    const data=await response.json();
+    if(!response.ok||!data.success)throw new Error(data.message||'The verification token could not be validated.');
+    const request=recOf(processRequestId);
+    if(!request){throw new Error('Request details could not be loaded.')}
+    processToken=token;
+    $('processYouth').textContent=data.verification.youth_name||request.member_name||'Youth member';
+    $('processRequest').textContent=reqRef(processRequestId);
+    $('processService').textContent=data.verification.service||'Print request';
+    $('processScanResult').hidden=false;
+    if(data.verification.verification_code===undefined||data.verification.verification_code===null){
+      throw new Error('This token did not create a print verification code. Scan the youth QR again.');
+    }
+    showProcessCode(data.verification.verification_code,data.verification.code_expires_in||300);
+    processStatus('Code generated. Read it aloud to the youth.','success');
+    clearInterval(processPoller);processPoller=setInterval(pollProcessStatus,2500);
+  }catch(error){processStatus(error.message,'error')}finally{$('validateProcessToken').disabled=false}
+}
+async function pollProcessStatus(){
+  if(!processRequestId)return;
+  try{
+    const response=await fetch(`api/printing_verification/status.php?request_id=${encodeURIComponent(processRequestId)}`,{credentials:'same-origin',cache:'no-store'});
+    const data=await response.json();
+    if(!response.ok||!data.success)throw new Error(data.message||'Unable to check verification status.');
+    if(data.verified||data.code_verified){
+      clearInterval(processPoller);clearInterval(processTimer);
+      processStatus('Youth confirmed the code. Review the print details.','success');
+      showVerifiedDetails(data.details);
+    }
+  }catch(error){console.error('Print verification polling failed:',error)}
+}
+function showVerifiedDetails(details){
+  if(!details){processStatus('Verification succeeded but request details are unavailable.','error');return}
+  const requestId=details.request_id||processRequestId;
+  closeProcessModal();
+  $('verifiedDetailsContent').innerHTML=[
+    ['Youth name',details.member_name],['Member ID',details.member_id],['Document title',details.document_title],
+    ['Print type',details.print_type],['Paper size',details.paper_size],['Copies',details.copies]
+  ].map(([key,value])=>`<div><dt>${esc(key)}</dt><dd>${esc(value)}</dd></div>`).join('');
+  const url=details.file_url&&safeUrl(details.file_url)?details.file_url:'';
+  $('verifiedDocument').innerHTML=`<i class="fas ${fileIcon(details.file_name)}"></i><div style="flex:1;min-width:0"><b>${esc(details.file_name||'Document')}</b><span>Verified document</span></div>${url?`<a class="btn soft" href="${esc(url)}" target="_blank" rel="noopener" download="${esc(details.file_name||'')}"><i class="fas fa-download"></i>Download</a>`:''}`;
+  $('finishPrintButton').dataset.requestId=String(requestId||'');
+  openM('printDetailsModal');
+}
+function openProcessModal(id){
+  const request=recOf(id);
+  if(!request||request.status!=='Pending'){notify('Only pending requests can be processed.','error');return}
+  resetProcessModal(id);openM('processModal');$('processToken').focus();
+}
+$('validateProcessToken').onclick=()=>validateProcessToken();
+$('processToken').addEventListener('keydown',event=>{if(event.key==='Enter')validateProcessToken()});
+$('startProcessCamera').onclick=async()=>{
+  if(!('BarcodeDetector' in window)||!navigator.mediaDevices?.getUserMedia){processStatus('Camera QR scanning is not supported here. Paste the token manually.','error');return}
+  try{
+    processDetector=new BarcodeDetector({formats:['qr_code']});
+    processStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+    $('processCamera').hidden=false;$('processCamera').srcObject=processStream;await $('processCamera').play();
+    const scan=async()=>{
+      if(!processDetector||!processStream)return;
+      try{
+        const codes=await processDetector.detect($('processCamera'));
+        if(codes.length&&codes[0].rawValue){$('processToken').value=codes[0].rawValue;await stopProcessCamera();await validateProcessToken(codes[0].rawValue);return}
+      }catch(error){await stopProcessCamera();processStatus('Camera scan failed. Paste the token manually.','error');return}
+      processFrame=requestAnimationFrame(scan);
+    };
+    scan();
+  }catch(error){await stopProcessCamera();processStatus('Unable to access the camera. Paste the token manually.','error')}
+};
+$('finishPrintButton').onclick=async()=>{
+  const id=$('finishPrintButton').dataset.requestId;
+  if(!id)return;
+  $('finishPrintButton').disabled=true;
+  if(await updateStatus(id,'Completed'))closeM('printDetailsModal');
+  $('finishPrintButton').disabled=false;
+};
 
 /* ---- view ---- */
 function viewDetails(id){
@@ -283,8 +455,11 @@ function viewDetails(id){
     .map(([k,v])=>`<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('')+`<div><dt>Status</dt><dd><span class="pill ${done?'completed':'pending'}">${done?'Completed':'Pending'}</span></dd></div>`;
   const ok=r.file_path&&safeUrl(r.file_path);
   $('docPreview').innerHTML=`<i class="fas ${fileIcon(r.file_name)}"></i><div style="flex:1;min-width:0"><b>${esc(r.file_name||'Document')}</b><span>${esc(ext(r.file_name).toUpperCase()||'FILE')} document</span></div>${ok?`<a class="btn soft" href="${esc(r.file_path)}" target="_blank" rel="noopener" download="${esc(r.file_name||'')}"><i class="fas fa-download"></i>Download</a>`:''}`;
-  $('viewActions').innerHTML=done?'':`<button class="btn pink" type="button" id="vComplete"><i class="fas fa-check"></i>Mark completed</button>`;
-  if(!done)$('vComplete').onclick=async()=>{if(await updateStatus(id,'Completed'))closeM('viewDetailsModal')};
+  $('viewActions').innerHTML=done?'':r.status==='Pending'
+    ?`<button class="btn pink" type="button" id="vProcess"><i class="fas fa-qrcode"></i>Process request</button>`
+    :`<button class="btn pink" type="button" id="vComplete"><i class="fas fa-check"></i>Mark completed</button>`;
+  if(!done&&r.status==='Pending')$('vProcess').onclick=()=>{closeM('viewDetailsModal');openProcessModal(id)};
+  if(!done&&r.status!=='Pending')$('vComplete').onclick=async()=>{if(await updateStatus(id,'Completed'))closeM('viewDetailsModal')};
   openM('viewDetailsModal');
 }
 function viewDocument(id){

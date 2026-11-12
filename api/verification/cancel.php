@@ -64,7 +64,7 @@ try {
                      ELSE notes || E'\\nCancelled by youth before verification.'
                  END,
                  updated_at = CURRENT_TIMESTAMP
-             WHERE request_id = ? AND status = 'AwaitingVerification'"
+             WHERE request_id = ? AND status IN ('Pending', 'AwaitingVerification')"
         );
         $requestUpdate->execute([(int)$token['service_ref']]);
         if ($requestUpdate->rowCount() === 1) {
