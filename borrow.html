@@ -165,11 +165,35 @@
   <div class="pr-box" role="dialog" aria-modal="true" aria-labelledby="borrowIdTitle">
     <button class="x" id="closeModal" type="button" aria-label="Close digital ID"><svg class="ic"><use href="#b-x"/></svg></button>
     <h2 id="borrowIdTitle">Borrowing request verification</h2>
-    <p id="idHelp">Show this QR and short code to the SK Office staff. The code expires with the QR.</p>
+    <p id="idHelp">Show this QR to the SK Office staff. After they scan it, enter the two-digit code they provide.</p>
+    <div class="digital-youth-id-card">
+      <section class="dyid-front" aria-label="Digital Youth ID for borrowing or return verification">
+        <div class="dyid-header">
+          <img src="assets/images/sklogo.jpg" alt="SK Logo" class="dyid-logo">
+          <div class="dyid-brand"><span>SKalinga Youth Services</span><strong>SK San Antonio</strong></div>
+          <span class="dyid-classification" id="verificationServiceLabel">Borrow service</span>
+        </div>
+        <span class="dyid-hologram" aria-hidden="true">SK</span>
+        <div class="dyid-main">
+          <div class="dyid-person"><div class="dyid-details">
+            <span class="dyid-field-label">Youth member</span>
+            <h4 class="dyid-name" id="verificationYouthName">Loading...</h4>
+            <span class="dyid-number-stamp"><span>Member number</span><strong id="verificationMemberId">Loading...</strong></span>
+            <span class="dyid-detail"><span>Request</span><strong id="verificationRequestType">Loading...</strong></span>
+          </div></div>
+          <div class="dyid-qr-panel"><div class="dyid-qr-box" id="verificationQr" role="img" aria-label="Short-lived borrow or return QR"></div><span class="dyid-qr-caption">Fresh QR · expires in 3 minutes</span></div>
+        </div>
+        <div class="dyid-footer"><span>Present to SK staff</span><span>Single-use verification</span></div>
+      </section>
+    </div>
     <div id="verificationState" class="empty">Preparing your secure verification...</div>
-    <div id="verificationQr" style="display:grid;place-items:center;margin:14px auto;min-height:180px"></div>
-    <p style="text-align:center"><strong>Short code</strong><br><code id="verificationCode" style="font-size:32px;letter-spacing:.2em"></code></p>
+    <form id="borrowCodeForm" hidden>
+      <label for="borrowVerificationCode">Two-digit code from staff</label>
+      <input id="borrowVerificationCode" inputmode="numeric" autocomplete="one-time-code" maxlength="2" pattern="[0-9]{2}" required>
+      <button class="btn pink" id="borrowCodeSubmit" type="submit">Verify code</button>
+    </form>
     <p id="verificationExpiry" class="hint" style="text-align:center"></p>
+    <div style="display:flex;justify-content:center;gap:8px"><button class="btn soft" id="regenerateBorrowVerification" type="button">Generate new QR</button><button class="btn soft" id="cancelBorrowVerification" type="button">Cancel request</button></div>
   </div>
 </div>
 
@@ -250,29 +274,79 @@ async function loadBorrowHistory(){
     $('currentList').innerHTML=msg;$('borrowList').innerHTML=msg;
   }
 }
-async function refreshBorrowHistory(){$('borrowList').innerHTML='<div class="sk"></div><div class="sk"></div>';await loadBorrowHistory()}
+let pendingRequests=[];
+async function loadBorrowRequests(){
+  try{
+    const r=await fetch(`api/get_user_borrow_requests.php?t=${Date.now()}`,{credentials:'same-origin',cache:'no-store'}),d=await r.json();
+    if(!r.ok||!d.success)throw new Error(d.message||'Unable to load request status.');
+    pendingRequests=Array.isArray(d.data)?d.data:[];
+  }catch(error){console.error('Borrow request status could not be loaded:',error);pendingRequests=[]}
+}
+function renderPendingRequests(){
+  const pending=pendingRequests.filter(request=>request.status==='Pending');
+  if(pending.length)$('currentList').insertAdjacentHTML('afterbegin',pending.map(request=>`<div class="empty" style="border:1px solid var(--ln);border-radius:16px;margin-bottom:10px">Your ${esc(request.service_type)} request is waiting for SK Office staff to process.</div>`).join(''));
+}
+async function refreshBorrowHistory(){$('borrowList').innerHTML='<div class="sk"></div><div class="sk"></div>';await Promise.all([loadBorrowHistory(),loadBorrowRequests()]);renderPendingRequests()}
 
 /* ---- Borrowing request availability notice ---- */
-const modal=$('digitalIdModal');let verificationMode='borrow',csrfToken='';
+const modal=$('digitalIdModal');let verificationMode='borrow',csrfToken='',verificationTokenId=null,verificationTimer=null,verificationPoller=null,verificationCodeShown=false;
 async function getCsrf(){if(csrfToken)return csrfToken;const r=await fetch('api/csrf_token.php',{credentials:'same-origin'}),d=await r.json();if(!r.ok||!d.success)throw new Error(d.message||'Unable to prepare secure request.');csrfToken=d.csrf_token;return csrfToken}
+function stopVerificationPolling(){clearInterval(verificationTimer);clearInterval(verificationPoller);verificationTimer=null;verificationPoller=null}
 async function openVerification(mode){
   verificationMode=mode;modal.hidden=false;$('borrowIdTitle').textContent=mode==='return'?'Return item verification':'Borrowing request verification';
-  $('verificationState').textContent='Preparing your secure verification...';$('verificationQr').replaceChildren();$('verificationCode').textContent='';$('verificationExpiry').textContent='';
+  $('verificationServiceLabel').textContent=mode==='return'?'Return service':'Borrow service';
+  $('verificationRequestType').textContent=mode==='return'?'Return borrowed items':'Borrow resources';
+  $('verificationYouthName').textContent=currentUser.name||'Youth member';
+  $('verificationMemberId').textContent=currentUser.member_id||'Unavailable';
+  stopVerificationPolling();verificationTokenId=null;verificationCodeShown=false;
+  $('verificationState').textContent='Preparing your secure verification...';$('verificationQr').replaceChildren();$('borrowCodeForm').hidden=true;$('borrowVerificationCode').value='';$('verificationExpiry').textContent='';
   try{
     const csrf=await getCsrf(),r=await fetch('api/verification/generate.php',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({service_type:mode,purpose:'claim'})}),d=await r.json();
     if(!r.ok||!d.success)throw new Error(d.message||'Unable to generate verification.');
-    $('verificationState').textContent='Show this QR to staff, then provide the short code.';
+    verificationTokenId=Number(d.token_id);
+    $('verificationState').textContent='Waiting for staff to scan your QR.';
     new QRCode($('verificationQr'),{text:d.token,width:180,height:180,colorDark:'#0F4D31',colorLight:'#ffffff'});
-    $('verificationCode').textContent=d.verification_code||'--';
     const until=Date.now()+Number(d.expires_in||180)*1000;
-    const tick=()=>{const left=Math.max(0,Math.ceil((until-Date.now())/1000));$('verificationExpiry').textContent=left?'Expires in '+left+' seconds':'Expired. Close this window and generate a new code.';if(left)setTimeout(tick,1000)};tick();
+    const tick=()=>{const left=Math.max(0,Math.ceil((until-Date.now())/1000));$('verificationExpiry').textContent=left?'QR expires in '+left+' seconds':'QR expired. Generate a new one to continue.';if(!left){stopVerificationPolling();$('borrowVerificationCode').disabled=true;$('borrowCodeSubmit').disabled=true}};tick();verificationTimer=setInterval(tick,1000);
+    verificationPoller=setInterval(pollBorrowVerification,2000);
   }catch(e){$('verificationState').textContent=e.message||'Unable to generate verification.'}
 }
+async function pollBorrowVerification(){
+  if(!verificationTokenId)return;
+  try{
+    const r=await fetch(`api/verification/borrow_return_status.php?token_id=${encodeURIComponent(verificationTokenId)}`,{credentials:'same-origin',cache:'no-store'}),d=await r.json();
+    if(!r.ok||!d.success)throw new Error(d.message||'Unable to check verification status.');
+    if(d.request_status==='Pending'){
+      stopVerificationPolling();$('verificationState').textContent='Verified. Your request is pending staff processing.';$('borrowCodeForm').hidden=true;$('verificationQr').replaceChildren();$('verificationExpiry').textContent='You can close this window. Staff will process your request at the SK Office.';verificationTokenId=null;await refreshBorrowHistory();return;
+    }
+    if(d.scanned){$('verificationState').textContent='Your QR was scanned. Enter the two-digit code provided by staff.';$('borrowCodeForm').hidden=false;if(!verificationCodeShown){verificationCodeShown=true;$('borrowVerificationCode').focus()}}
+  }catch(e){console.error('Borrow verification status check failed:',e)}
+}
+async function confirmBorrowVerification(event){
+  event.preventDefault();
+  if(!verificationTokenId)return;
+  const code=$('borrowVerificationCode').value.trim();
+  if(!/^\d{2}$/.test(code)){ $('borrowVerificationCode').setCustomValidity('Enter exactly two digits.');$('borrowVerificationCode').reportValidity();return }
+  $('borrowVerificationCode').setCustomValidity('');$('borrowCodeSubmit').disabled=true;
+  try{
+    const r=await fetch('api/verification/confirm_borrow_return.php',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-CSRF-Token':await getCsrf()},body:JSON.stringify({token_id:verificationTokenId,code})}),d=await r.json();
+    if(!r.ok||!d.success)throw new Error(d.message||'The code could not be verified.');
+    stopVerificationPolling();verificationTokenId=null;$('borrowCodeForm').hidden=true;$('verificationQr').replaceChildren();$('verificationState').textContent='Verified. Your request is pending staff processing.';$('verificationExpiry').textContent='You can close this window. Staff will process your request at the SK Office.';await refreshBorrowHistory();
+  }catch(e){$('borrowCodeSubmit').disabled=false;$('verificationState').textContent=e.message||'The code could not be verified.'}
+}
 function openId(){openVerification('borrow')}
-const closeM=()=>{modal.hidden=true};
+const closeM=()=>{modal.hidden=true;stopVerificationPolling()};
 $('requestBorrowBtn').onclick=openId;
 $('returnBtn').onclick=()=>openVerification('return');
 $('closeModal').onclick=closeM;
+$('borrowCodeForm').addEventListener('submit',confirmBorrowVerification);
+$('borrowVerificationCode').addEventListener('input',()=>{$('borrowVerificationCode').value=$('borrowVerificationCode').value.replace(/\D/g,'').slice(0,2)});
+$('regenerateBorrowVerification').onclick=()=>openVerification(verificationMode);
+$('cancelBorrowVerification').onclick=async()=>{
+  if(!verificationTokenId){closeM();return}
+  try{const r=await fetch('api/verification/cancel.php',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-CSRF-Token':await getCsrf()},body:JSON.stringify({token_id:verificationTokenId})}),d=await r.json();if(!r.ok||!d.success)throw new Error(d.message||'Unable to cancel verification.');verificationTokenId=null;closeM();$('verificationState').textContent='Request cancelled.'}
+  catch(e){$('verificationState').textContent=e.message||'Unable to cancel verification.'}
+};
 modal.addEventListener('click',e=>{if(e.target===modal)closeM()});
 document.addEventListener('click',e=>{
   if(e.target.closest('[data-return]'))openVerification('return');
@@ -281,7 +355,7 @@ document.addEventListener('click',e=>{
 
 /* ---- history drawer ---- */
 const drawer=$('historyDrawer'),scrim=$('scrim');let lastFocus=null;
-function openH(){lastFocus=document.activeElement;drawer.classList.add('on');scrim.classList.add('on');document.body.style.overflow='hidden';$('closeHistory').focus();loadBorrowHistory()}
+function openH(){lastFocus=document.activeElement;drawer.classList.add('on');scrim.classList.add('on');document.body.style.overflow='hidden';$('closeHistory').focus();refreshBorrowHistory()}
 function closeH(){if(!drawer.classList.contains('on'))return;drawer.classList.remove('on');scrim.classList.remove('on');document.body.style.overflow='';if(lastFocus)lastFocus.focus()}
 $('openHistory').onclick=openH;$('closeHistory').onclick=closeH;scrim.onclick=closeH;
 $('newFromHistory').onclick=()=>{closeH();openId()};
@@ -290,7 +364,7 @@ document.querySelectorAll('.chip').forEach(b=>b.addEventListener('click',()=>{
 }));
 addEventListener('keydown',e=>{if(e.key==='Escape'){closeM();closeH()}});
 
-document.addEventListener('DOMContentLoaded',()=>{loadUserProfile();loadBorrowHistory()});
+document.addEventListener('DOMContentLoaded',()=>{loadUserProfile();refreshBorrowHistory()});
 </script>
 <script src="js/auth-guard.js" data-roles="youth"></script>
 <script src="js/youth-nav.js?v=20261021-3"></script>

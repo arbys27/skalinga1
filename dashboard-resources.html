@@ -126,6 +126,13 @@ table.lt{width:100%;border-collapse:collapse;font-size:14px}
 .det{display:grid;gap:8px;margin:0}
 .det div{display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px dashed var(--ln);font-size:14px}
 .det div:last-child{border:0}.det dt{color:var(--mu)}.det dd{margin:0;font-weight:600;text-align:right;overflow-wrap:anywhere}
+#processRequestFields fieldset{max-height:42vh;overflow:auto;margin:0 0 16px;padding:10px 12px;border:1px solid var(--ln);border-radius:14px}
+#processRequestFields legend{padding:0 6px;font-size:13px;font-weight:700}
+.loan{display:grid;grid-template-columns:20px minmax(0,1fr) 90px;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--ln);font-size:13px}
+.loan:last-child{border-bottom:0}
+.loan input[type=checkbox]{width:18px;height:18px;accent-color:var(--g)}
+.loan input[type=number]{width:90px;min-height:38px;padding:7px;border:1px solid var(--ln);border-radius:9px;font:inherit}
+.loan input:disabled{opacity:.55}
 .fa-end{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
 #toastContainer{position:fixed;z-index:10000;right:20px;bottom:20px;display:grid;gap:10px;width:min(360px,calc(100% - 40px))}
 .toast{padding:14px 16px;border-radius:14px;background:#fff;border-left:4px solid var(--g);box-shadow:0 12px 32px rgba(22,48,63,.2);font-size:14px;font-weight:600}
@@ -152,18 +159,14 @@ table.lt{width:100%;border-collapse:collapse;font-size:14px}
 
       <div class="bar">
         <label class="find"><span style="position:absolute;width:1px;height:1px;overflow:hidden">Search records</span><i class="fas fa-magnifying-glass"></i><input type="search" id="searchInput" placeholder="Search by item or borrower" autocomplete="off"></label>
-        <div class="acts">
-          <a class="btn pink" href="admin-borrow-return.html?service=borrow"><i class="fas fa-qrcode"></i>Borrow scanner</a>
-          <a class="btn soft" href="admin-borrow-return.html?service=return"><i class="fas fa-qrcode"></i>Return scanner</a>
-        </div>
       </div>
 
       <div class="row2">
         <div class="tabs" role="group" aria-label="View">
           <button type="button" data-view="records" aria-pressed="true">Active / Overdue</button>
           <button type="button" data-view="inventory" aria-pressed="false">Inventory</button>
-          <a class="tabs-link" href="admin-borrow-return.html?service=borrow">Borrow</a>
-          <a class="tabs-link" href="admin-borrow-return.html?service=return">Return</a>
+          <button type="button" data-scan="borrow">Borrow</button>
+          <button type="button" data-scan="return">Return</button>
         </div>
         <div class="chips" id="statusChips" role="group" aria-label="Filter by status">
           <button class="chip" type="button" data-s="" aria-pressed="true">All<em id="cAll">0</em></button>
@@ -174,6 +177,14 @@ table.lt{width:100%;border-collapse:collapse;font-size:14px}
       </div>
 
       <div class="tw" id="recordsView">
+        <h3 style="padding:14px 16px 0;margin:0">Pending requests</h3>
+        <div class="scroll">
+          <table class="lt admin-table" aria-label="Pending borrow and return requests">
+            <thead><tr><th>Request</th><th>Youth</th><th>Submitted</th><th>Action</th></tr></thead>
+            <tbody id="borrowRequestsBody"><tr><td colspan="4" class="empty">Loading requests...</td></tr></tbody>
+          </table>
+        </div>
+        <h3 style="padding:18px 16px 0;margin:0">Borrowed items</h3>
         <div class="scroll">
           <table class="lt admin-table" id="lendingTable">
             <thead><tr><th>Item</th><th>Qty</th><th>Borrower</th><th>Borrowed</th><th>Due</th><th>Status</th><th>Actions</th></tr></thead>
@@ -184,6 +195,32 @@ table.lt{width:100%;border-collapse:collapse;font-size:14px}
       <div class="inv" id="inventoryView" hidden></div>
     </div>
   </main>
+</div>
+
+<!-- Shared scanner modal for the borrow and return actions -->
+<div class="lm-modal" id="verificationScanModal" role="dialog" aria-modal="true" aria-labelledby="verificationScanTitle">
+  <div class="box">
+    <button class="cl" id="closeVerificationScan" type="button" aria-label="Close"><i class="fas fa-xmark"></i></button>
+    <h2 id="verificationScanTitle">Scan youth verification QR</h2>
+    <p class="lead">Scan the one-time QR on the youth’s digital service ID. The two-digit code appears here for the youth to enter.</p>
+    <div class="f"><label for="verificationTokenInput">QR token</label><input id="verificationTokenInput" type="text" maxlength="512" autocomplete="off" placeholder="Scan QR or paste token"></div>
+    <video id="verificationCamera" playsinline muted hidden style="width:100%;margin-top:12px;border-radius:12px;background:#10251c"></video>
+    <div class="fa-end"><button class="btn soft" id="startVerificationCamera" type="button">Use camera</button><button class="btn green" id="validateVerificationToken" type="button">Validate QR</button></div>
+    <div id="verificationScanResult" class="found" hidden></div>
+    <p id="verificationScanStatus" role="status" aria-live="polite"></p>
+  </div>
+</div>
+
+<!-- Process a youth's verified pending request -->
+<div class="lm-modal" id="processRequestModal" role="dialog" aria-modal="true" aria-labelledby="processRequestTitle">
+  <div class="box">
+    <button class="cl" id="closeProcessRequest" type="button" aria-label="Close"><i class="fas fa-xmark"></i></button>
+    <h2 id="processRequestTitle">Process request</h2>
+    <p class="lead" id="processRequestYouth"></p>
+    <form id="processRequestForm"><div id="processRequestFields"></div>
+      <div class="fa-end"><button class="btn soft" type="button" data-close="processRequestModal">Cancel</button><button class="btn pink" id="processRequestSubmit" type="submit">Complete request</button></div>
+    </form>
+  </div>
 </div>
 
 <!-- Add item -->
@@ -204,49 +241,13 @@ table.lt{width:100%;border-collapse:collapse;font-size:14px}
 <div class="lm-modal" id="editItemModal" role="dialog" aria-modal="true" aria-labelledby="editItemTitle">
   <div class="box">
     <button class="cl" id="closeEditItemModal" type="button" aria-label="Close"><i class="fas fa-xmark"></i></button>
-    <h2 id="editItemTitle">Edit inventory item</h2><p class="lead">Update item details or add stock without changing items currently on loan.</p>
+    <h2 id="editItemTitle">Edit inventory item</h2><p class="lead">Update item details or adjust stock without changing items currently on loan.</p>
     <form id="editItemForm">
       <input type="hidden" id="editItemId">
       <div class="f"><label for="editItemName">Item name *</label><input type="text" id="editItemName" required></div>
       <div class="f"><label for="editItemDescription">Description</label><textarea id="editItemDescription"></textarea></div>
-      <div class="f"><label for="restockQuantity">Add stock quantity</label><input type="number" id="restockQuantity" min="0" value="0" required></div>
+      <div class="f"><label for="restockQuantity">Stock adjustment (negative to remove stock)</label><input type="number" id="restockQuantity" step="1" value="0" required></div>
       <div class="fa-end"><button class="btn soft" type="button" data-close="editItemModal">Cancel</button><button class="btn green" type="submit" id="editItemSave">Save changes</button></div>
-    </form>
-  </div>
-</div>
-
-<!-- Borrow -->
-<div class="lm-modal" id="borrowModal" role="dialog" aria-modal="true" aria-labelledby="borrowModalTitle">
-  <div class="box">
-    <button class="cl" id="closeBorrowModal" type="button" aria-label="Close"><i class="fas fa-xmark"></i></button>
-    <h2 id="borrowModalTitle">Record a borrowing</h2><p class="lead">Enter the member number and borrowing details.</p>
-    <div id="borrowForm">
-      <form id="borrowFormElement">
-        <div class="f"><label for="borrowYouthId">Member ID *</label><input type="text" id="borrowYouthId" maxlength="50" required></div>
-        <div class="f"><label for="borrowItem">Item to borrow *</label><select id="borrowItem" required></select></div>
-        <div class="f"><label for="borrowQuantity">Quantity *</label><input type="number" id="borrowQuantity" min="1" value="1" required></div>
-        <div class="two">
-          <div class="f"><label for="borrowDate">Borrow date *</label><input type="date" id="borrowDate" required></div>
-          <div class="f"><label for="dueDate">Due date *</label><input type="date" id="dueDate" required></div>
-        </div>
-        <div class="quick" aria-label="Quick due date"><button type="button" data-days="1">Tomorrow</button><button type="button" data-days="3">3 days</button><button type="button" data-days="7">1 week</button></div>
-        <div class="fa-end"><button class="btn soft" type="button" data-close="borrowModal">Cancel</button><button class="btn pink" type="submit" id="borrowSave">Confirm borrow</button></div>
-      </form>
-    </div>
-  </div>
-</div>
-
-<!-- Return by youth ID -->
-<div class="lm-modal" id="returnScanModal" role="dialog" aria-modal="true" aria-labelledby="returnScanTitle">
-  <div class="box">
-    <button class="cl" id="closeReturnScanModal" type="button" aria-label="Close"><i class="fas fa-xmark"></i></button>
-    <h2 id="returnScanTitle">Return an item</h2><p class="lead">Find the member’s active loan and record its condition on return.</p>
-    <div class="scanbox"><div class="f"><label for="returnYouthId" style="position:absolute;width:1px;height:1px;overflow:hidden">Youth ID</label><input type="text" id="returnYouthId" placeholder="SK-2024-XXXX" autocomplete="off" style="text-transform:uppercase"></div><button id="lookupReturnYouthBtn" class="btn green" type="button">Look up</button></div>
-    <div id="returnYouthInfo" class="found" hidden></div>
-    <form id="returnForm" hidden>
-      <div class="f"><label for="returnBorrowId">Item to return *</label><select id="returnBorrowId" required></select></div>
-      <div class="f"><label for="returnCondition">Condition after return *</label><textarea id="returnCondition" maxlength="500" placeholder="Describe the item's condition after return" required></textarea></div>
-      <div class="fa-end"><button class="btn soft" type="button" data-close="returnScanModal">Cancel</button><button class="btn pink" type="submit" id="returnSave">Confirm return</button></div>
     </form>
   </div>
 </div>
@@ -274,9 +275,9 @@ table.lt{width:100%;border-collapse:collapse;font-size:14px}
 <script>
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
-const youthIdFromScan=value=>(String(value||'').toUpperCase().match(/SK-\d{4}-\d{4}/)||[])[0]||'';
-let itemsData=[],lendingData=[],statusFilter='',view='records',lookingUp=false,lookTimer;
+let itemsData=[],lendingData=[],pendingRequests=[],statusFilter='',view='records';
 let csrfToken='';
+let scannerService='borrow',scannerStream=null,scannerDetector=null,scannerFrame=0,processingRequest=null;
 
 async function getCsrfToken(){
   if(csrfToken)return csrfToken;
@@ -295,9 +296,9 @@ function notify(msg,type='success'){
 
 /* ---- modals ---- */
 const openM=id=>{$(id).classList.add('on');document.body.style.overflow='hidden'};
-const closeM=id=>{$(id).classList.remove('on');if(!document.querySelector('.lm-modal.on'))document.body.style.overflow=''};
+const closeM=id=>{$(id).classList.remove('on');if(id==='verificationScanModal')stopVerificationCamera();if(!document.querySelector('.lm-modal.on'))document.body.style.overflow=''};
 document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>closeM(b.dataset.close)));
-[['closeItemModal','addItemModal'],['closeEditItemModal','editItemModal'],['closeBorrowModal','borrowModal'],['closeReturnScanModal','returnScanModal'],['closeViewLending','viewLendingModal']].forEach(([b,m])=>$(b).onclick=()=>closeM(m));
+[['closeItemModal','addItemModal'],['closeEditItemModal','editItemModal'],['closeViewLending','viewLendingModal'],['closeVerificationScan','verificationScanModal'],['closeProcessRequest','processRequestModal']].forEach(([b,m])=>$(b).onclick=()=>closeM(m));
 document.querySelectorAll('.lm-modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeM(m.id)}));
 addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.lm-modal.on').forEach(m=>closeM(m.id))});
 
@@ -317,6 +318,7 @@ setInterval(updateDashboardDateTime,30000);updateDashboardDateTime();
 async function getJSON(url){try{const r=await fetch(url),d=await r.json();if(d.success)return d.data||[];console.error(url,d.error)}catch(e){console.error(url,e)}return[]}
 const loadResources=async()=>itemsData=await getJSON('api/get_resources.php');
 const loadBorrowRecords=async()=>lendingData=await getJSON('api/get_borrow_records.php');
+const loadPendingRequests=async()=>pendingRequests=await getJSON('api/get_borrow_requests.php');
 const dayOf=d=>{const x=new Date(d);return isNaN(x)?null:new Date(x.getFullYear(),x.getMonth(),x.getDate())};
 function statusOf(r){
   if(r.status==='Returned'||r.return_date)return 'Returned';
@@ -345,9 +347,17 @@ function renderLendingTable(list=lendingData){
       <td data-l="Status"><span class="pill ${st.toLowerCase()}">${st}</span></td>
       <td class="ab-td"><div class="ab">
         <button class="ib" type="button" data-act="view" data-id="${id}" aria-label="View details" title="View details"><i class="fas fa-eye"></i></button>
-        ${st!=='Returned'?`<button class="ib ret" type="button" data-act="return" data-id="${id}" aria-label="Mark as returned" title="Mark as returned"><i class="fas fa-rotate-left"></i></button>`:''}
-        <button class="ib del" type="button" data-act="delete" data-id="${id}" aria-label="Delete record" title="Delete record"><i class="fas fa-trash"></i></button></div></td></tr>`;
+        ${st==='Returned'?`<button class="ib del" type="button" data-act="delete" data-id="${id}" aria-label="Delete record" title="Delete record"><i class="fas fa-trash"></i></button>`:''}</div></td></tr>`;
   }).join('');
+}
+function renderPendingRequests(){
+  const body=$('borrowRequestsBody');
+  if(!pendingRequests.length){body.innerHTML='<tr><td colspan="4" class="empty">No pending borrow or return requests</td></tr>';return}
+  body.innerHTML=pendingRequests.map(r=>`<tr>
+    <td data-l="Request"><span class="pill ${r.service_type==='return'?'overdue':'borrowed'}">${r.service_type==='return'?'Return':'Borrow'}</span></td>
+    <td data-l="Youth"><div class="who"><b>${esc(r.borrower_name)}</b><span class="mono">${esc(r.member_id)}</span></div></td>
+    <td data-l="Submitted">${esc(fmt(r.requested_at))}</td>
+    <td class="ab-td"><button class="btn green" type="button" data-process-request="${Number(r.request_id)}">Process</button></td></tr>`).join('');
 }
 function renderInventory(){
   const q=$('searchInput').value.toLowerCase().trim(),list=itemsData.filter(i=>`${i.name} ${i.description||''}`.toLowerCase().includes(q));
@@ -360,6 +370,7 @@ function renderInventory(){
 }
 function filterLending(){
   renderStats();
+  renderPendingRequests();
   if(view==='inventory'){renderInventory();return}
   const q=$('searchInput').value.toLowerCase().trim();
   renderLendingTable(lendingData.filter(r=>`${r.item_name} ${r.member_id} ${r.borrower_name}`.toLowerCase().includes(q)&&(!statusFilter||statusOf(r)===statusFilter)));
@@ -367,15 +378,18 @@ function filterLending(){
 $('searchInput').addEventListener('input',filterLending);
 $('statusChips').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;statusFilter=b.dataset.s;document.querySelectorAll('.chip').forEach(x=>x.setAttribute('aria-pressed',x===b));filterLending()});
 document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{
+  if(b.dataset.scan){openVerificationScanner(b.dataset.scan);return}
   view=b.dataset.view;document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-pressed',x===b));
   $('recordsView').hidden=view!=='records';$('inventoryView').hidden=view!=='inventory';$('statusChips').hidden=view!=='records';filterLending();
 }));
 $('lendingTableBody').addEventListener('click',e=>{
   const b=e.target.closest('[data-act]');if(!b)return;
-  ({view:viewLending,return:returnItem,delete:deleteLending})[b.dataset.act](b.dataset.id);
+  ({view:viewLending,delete:deleteLending})[b.dataset.act](b.dataset.id);
 });
 document.addEventListener('click',e=>{
   if(e.target.closest('#addItemBtn')){$('itemForm').reset();openM('addItemModal');$('itemName').focus();return}
+  const pending=e.target.closest('[data-process-request]');
+  if(pending){openProcessRequest(Number(pending.dataset.processRequest));return}
   const edit=e.target.closest('[data-edit-item]');
   if(edit){
     const item=itemsData.find(i=>String(i.item_id)===edit.dataset.editItem);
@@ -384,7 +398,8 @@ document.addEventListener('click',e=>{
     openM('editItemModal');$('editItemName').focus();
   }
 });
-const refresh=async()=>{await Promise.all([loadResources(),loadBorrowRecords()]);populateBorrowItemDropdown();filterLending()};
+const refresh=async()=>{await Promise.all([loadResources(),loadBorrowRecords(),loadPendingRequests()]);filterLending()};
+setInterval(async()=>{await loadPendingRequests();renderPendingRequests()},15000);
 
 /* ---- add item ---- */
 $('itemForm').addEventListener('submit',async e=>{
@@ -403,7 +418,7 @@ $('itemForm').addEventListener('submit',async e=>{
 $('editItemForm').addEventListener('submit',async e=>{
   e.preventDefault();
   const item_id=$('editItemId').value,name=$('editItemName').value.trim(),description=$('editItemDescription').value.trim(),restock_quantity=parseInt($('restockQuantity').value,10);
-  if(!item_id||!name||!Number.isInteger(restock_quantity)||restock_quantity<0){notify('Enter a valid item name and a non-negative stock quantity.','warning');return}
+  if(!item_id||!name||!Number.isInteger(restock_quantity)){notify('Enter a valid item name and whole-number stock adjustment.','warning');return}
   $('editItemSave').disabled=true;
   try{
     const r=await fetch('api/update_resource.php',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-CSRF-Token':await getCsrfToken()},body:JSON.stringify({item_id,name,description,restock_quantity})}),d=await r.json();
@@ -412,99 +427,122 @@ $('editItemForm').addEventListener('submit',async e=>{
   finally{$('editItemSave').disabled=false}
 });
 
-/* ---- borrow and return ---- */
-function resetScan(){
-  $('borrowFormElement').reset();
-  populateBorrowItemDropdown();
-  setDefaultDates();
+/* ---- shared QR verification and request processing ---- */
+function openVerificationScanner(type){
+  scannerService=type;
+  $('verificationScanTitle').textContent=type==='return'?'Scan Return QR':'Scan Borrow QR';
+  $('verificationTokenInput').value='';
+  $('verificationScanResult').hidden=true;
+  $('verificationScanStatus').textContent='Scan the one-time QR on the youth’s digital service ID.';
+  openM('verificationScanModal');
 }
-if($('recordBorrowBtn'))$('recordBorrowBtn').onclick=()=>{resetScan();openM('borrowModal');setTimeout(()=>$('borrowYouthId').focus(),50)};
-if($('scanReturnBtn'))$('scanReturnBtn').onclick=()=>{resetReturnScan();openM('returnScanModal');setTimeout(()=>$('returnYouthId').focus(),50)};
-function populateBorrowItemDropdown(){
-  const s=$('borrowItem');if(!s)return;
-  const avail=itemsData.filter(i=>Number(i.available)>0);
-  s.innerHTML='<option value="" disabled selected>Select item</option>'+(avail.length?avail.map(i=>`<option value="${esc(i.item_id)}">${esc(i.name)} (${esc(i.available)}/${esc(i.quantity)} available)</option>`).join(''):'<option disabled>No items available</option>');
+function tokenFromScan(value){
+  const text=String(value||'').trim();
+  if(/^[a-f0-9]{64}$/i.test(text))return text;
+  try{const u=new URL(text);const token=u.searchParams.get('t')||'';return/^[a-f0-9]{64}$/i.test(token)?token:''}catch{return''}
 }
-$('borrowItem').addEventListener('change',()=>{
-  const it=itemsData.find(i=>String(i.item_id)===$('borrowItem').value);
-  if(it){$('borrowQuantity').max=it.available;if(+$('borrowQuantity').value>it.available)$('borrowQuantity').value=it.available}
-});
-function resetReturnScan(){
-  $('returnYouthId').value='';$('returnYouthInfo').hidden=true;$('returnYouthInfo').innerHTML='';
-  $('returnForm').hidden=true;$('returnForm').reset();$('returnBorrowId').innerHTML='';
+function stopVerificationCamera(){
+  if(scannerFrame)cancelAnimationFrame(scannerFrame);
+  scannerFrame=0;
+  if(scannerStream)scannerStream.getTracks().forEach(track=>track.stop());
+  scannerStream=null;
+  $('verificationCamera').srcObject=null;
+  $('verificationCamera').hidden=true;
 }
-function showReturnLoans(memberId,selectedBorrowId=''){
-  const active=lendingData.filter(r=>String(r.member_id).toUpperCase()===memberId&&statusOf(r)!=='Returned');
-  $('returnBorrowId').innerHTML=(selectedBorrowId?'':'<option value="" disabled selected>Select a borrowed item</option>')+active.map(r=>`<option value="${esc(r.borrow_id)}"${String(r.borrow_id)===String(selectedBorrowId)?' selected':''}>${esc(r.item_name)} × ${esc(r.quantity||1)} — due ${esc(fmt(r.due_date))}</option>`).join('');
-  $('returnForm').hidden=!active.length;
-  if(!active.length)notify('No active borrowed items were found for this Youth ID.','warning');
-  if(active.length)$('returnCondition').focus();
-}
-function showReturnYouth(memberId,name,phone=''){
-  $('returnYouthInfo').innerHTML=`<span class="av">${esc(name.charAt(0).toUpperCase())}</span><div><b>${esc(name)}</b><span><span class="mono">${esc(memberId)}</span>${phone?' · '+esc(phone):''}</span></div>`;
-  $('returnYouthInfo').hidden=false;
-  showReturnLoans(memberId);
-}
-async function lookupReturnYouth(){
-  const memberId=youthIdFromScan($('returnYouthId').value);
-  if(!memberId){notify('Please scan or enter a Youth ID.','warning');return}
-  $('returnYouthId').value=memberId;
-  $('lookupReturnYouthBtn').disabled=true;
+async function validateBorrowReturnQr(){
+  const token=tokenFromScan($('verificationTokenInput').value);
+  if(!token){$('verificationScanStatus').textContent='Enter or scan a valid one-time QR token.';return}
+  $('validateVerificationToken').disabled=true;
+  $('verificationScanStatus').textContent='Validating QR...';
   try{
-    const r=await fetch('api/get_user.php?member_id='+encodeURIComponent(memberId)),d=await r.json();
-    if(!r.ok||!d.success||!d.user){notify(d.error||'Youth ID not found. Please verify and try again.','error');return}
-    const y=d.user,name=y.name||`${y.firstname||''} ${y.lastname||''}`.trim()||'Youth';
-    showReturnYouth(memberId,name,y.phone||'');
-  }catch(err){console.error(err);notify('Could not look up this Youth ID. Check your connection and try again.','error')}
-  finally{$('lookupReturnYouthBtn').disabled=false}
+    const response=await fetch('api/verification/validate.php',{
+      method:'POST',credentials:'same-origin',
+      headers:{'Content-Type':'application/json','X-CSRF-Token':await getCsrfToken()},
+      body:JSON.stringify({token,service_type:scannerService})
+    });
+    const data=await response.json();
+    if(!response.ok||!data.success)throw new Error(data.message||'Unable to validate this QR.');
+    const v=data.verification;
+    $('verificationScanResult').innerHTML=`<div class="av">${esc(String(v.youth_name||'Y').charAt(0).toUpperCase())}</div><div><b>${esc(v.youth_name||'Youth')}</b><span class="mono">${esc(v.member_id||'')}</span><p><strong>${scannerService==='borrow'?'BORROW':'RETURN'} CODE: <span style="font-size:28px;letter-spacing:.15em">${esc(v.verification_code)}</span></strong></p><span>Ask the youth to enter this code in their Borrow Resources screen. The request will then appear under Pending requests.</span>${scannerService==='return'?`<p>Active items: ${v.items.map(item=>`${esc(item.item_name)} × ${esc(item.quantity)}`).join(', ')}</p>`:''}</div>`;
+    $('verificationScanResult').hidden=false;
+    $('verificationScanStatus').textContent='QR verified. Share the displayed two-digit code with the youth.';
+  }catch(error){$('verificationScanStatus').textContent=error.message||'Unable to validate this QR.'}
+  finally{$('validateVerificationToken').disabled=false}
 }
-$('lookupReturnYouthBtn').onclick=lookupReturnYouth;
-$('returnYouthId').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();lookupReturnYouth()}});
-$('returnYouthId').addEventListener('input',function(){
-  clearTimeout(lookTimer);
-  if(youthIdFromScan(this.value))lookTimer=setTimeout(lookupReturnYouth,400);
-});
-$('returnForm').addEventListener('submit',async e=>{
-  e.preventDefault();
-  const borrow_id=parseInt($('returnBorrowId').value,10),return_condition=$('returnCondition').value.trim();
-  if(!Number.isInteger(borrow_id)||!return_condition){notify('Select an item and describe its condition.','warning');return}
-  $('returnSave').disabled=true;
+$('validateVerificationToken').onclick=validateBorrowReturnQr;
+$('verificationTokenInput').addEventListener('keydown',event=>{if(event.key==='Enter')validateBorrowReturnQr()});
+$('startVerificationCamera').onclick=async()=>{
   try{
-    const csrf=await getCsrfToken();
-    const r=await fetch('api/return_resource.php',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({borrow_id,return_condition})}),d=await r.json();
-    if(!r.ok||!d.success){notify('Error: '+(d.error||'Unable to return item.'),'error');return}
-    notify('Item returned successfully.');closeM('returnScanModal');resetReturnScan();await refresh();
-  }catch(err){console.error(err);notify('Failed to return item. Please try again.','error')}
-  finally{$('returnSave').disabled=false}
-});
-
-function setDefaultDates(days=1){
-  const t=new Date(),d=new Date(t);d.setDate(d.getDate()+days);
-  const f=x=>`${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`;
-  $('borrowDate').value=f(t);$('dueDate').value=f(d);
+    if(!('BarcodeDetector'in window))throw new Error('QR camera scanning is not supported in this browser. Paste the token manually.');
+    scannerStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+    $('verificationCamera').hidden=false;
+    $('verificationCamera').srcObject=scannerStream;
+    await $('verificationCamera').play();
+    scannerDetector=new BarcodeDetector({formats:['qr_code']});
+    const scan=async()=>{
+      if(!scannerStream)return;
+      const codes=await scannerDetector.detect($('verificationCamera'));
+      if(codes[0]){
+        $('verificationTokenInput').value=codes[0].rawValue;
+        stopVerificationCamera();
+        await validateBorrowReturnQr();
+        return;
+      }
+      scannerFrame=requestAnimationFrame(scan);
+    };
+    scan();
+  }catch(error){$('verificationScanStatus').textContent=error.message||'Unable to start the camera.'}
+};
+$('closeVerificationScan').addEventListener('click',stopVerificationCamera);
+document.querySelectorAll('[data-close="verificationScanModal"]').forEach(button=>button.addEventListener('click',stopVerificationCamera));
+async function openProcessRequest(requestId){
+  try{
+    const response=await fetch(`api/get_borrow_request_details.php?request_id=${encodeURIComponent(requestId)}`,{credentials:'same-origin',cache:'no-store'});
+    const data=await response.json();
+    if(!response.ok||!data.success)throw new Error(data.message||'Unable to load the pending request.');
+    processingRequest=data.request;
+    $('processRequestTitle').textContent=processingRequest.service_type==='return'?'Process return':'Process borrowing';
+    const borrower=pendingRequests.find(request=>Number(request.request_id)===requestId);
+    $('processRequestYouth').textContent=`${borrower?.borrower_name||processingRequest.member_id} · ${processingRequest.member_id}`;
+    if(processingRequest.service_type==='borrow'){
+      const available=itemsData.filter(item=>Number(item.available)>0);
+      if(!available.length)throw new Error('No inventory is currently available.');
+      const tomorrow=new Date();
+      tomorrow.setDate(tomorrow.getDate()+1);
+      const due=`${tomorrow.getFullYear()}-${String(tomorrow.getMonth()+1).padStart(2,'0')}-${String(tomorrow.getDate()).padStart(2,'0')}`;
+      $('processRequestFields').innerHTML=`<fieldset><legend>Select items and quantities</legend>${available.map(item=>`<label class="loan"><input type="checkbox" name="borrowItems" value="${esc(item.item_id)}"> ${esc(item.name)} — ${esc(item.available)} available <input aria-label="Quantity for ${esc(item.name)}" type="number" name="quantity-${esc(item.item_id)}" min="1" max="${Number(item.available)}" value="1" disabled></label>`).join('')}</fieldset><div class="f"><label for="processDueDate">Due date</label><input id="processDueDate" type="date" min="${due}" value="${due}" required></div>`;
+      $('processRequestFields').querySelectorAll('[name="borrowItems"]').forEach(input=>input.addEventListener('change',()=>{input.parentElement.querySelector('[type="number"]').disabled=!input.checked}));
+    }else{
+      if(!data.items.length)throw new Error('No active items were found to return.');
+      $('processRequestFields').innerHTML=`<fieldset><legend>Select items being returned</legend>${data.items.map(item=>`<label class="loan"><input type="checkbox" name="returnBorrowIds" value="${Number(item.borrow_id)}"> ${esc(item.item_name)} × ${esc(item.quantity)} — due ${esc(fmt(item.due_date))} (${esc(item.status)})</label>`).join('')}</fieldset><div class="f"><label for="processReturnCondition">Condition after return</label><textarea id="processReturnCondition" maxlength="500" required></textarea></div>`;
+    }
+    openM('processRequestModal');
+  }catch(error){notify(error.message||'Unable to process request.','error')}
 }
-document.querySelectorAll('.quick button').forEach(b=>b.addEventListener('click',()=>{
-  const base=new Date(`${$('borrowDate').value}T00:00:00`);if(isNaN(base))return;
-  base.setDate(base.getDate()+Number(b.dataset.days));
-  $('dueDate').value=`${base.getFullYear()}-${String(base.getMonth()+1).padStart(2,'0')}-${String(base.getDate()).padStart(2,'0')}`;
-}));
-
-/* ---- borrow ---- */
-$('borrowFormElement').addEventListener('submit',async e=>{
-  e.preventDefault();
-  const item_id=$('borrowItem').value,member_id=$('borrowYouthId').value.trim(),quantity=parseInt($('borrowQuantity').value,10),bd=$('borrowDate').value,due_date=$('dueDate').value;
-  if(!item_id||!member_id||!Number.isInteger(quantity)||!bd||!due_date||!(quantity>=1)){notify('Enter the member ID and complete all borrowing details.','warning');return}
-  if(new Date(due_date)<=new Date(bd)){notify('Due date must be after borrow date','warning');return}
-  const item=itemsData.find(i=>String(i.item_id)===String(item_id));
-  if(!item){notify('Item not found','error');return}
-  if(Number(item.available)<quantity){notify(`Only ${item.available} unit(s) available. Please adjust the quantity.`,'warning');return}
-  $('borrowSave').disabled=true;
+$('processRequestForm').addEventListener('submit',async event=>{
+  event.preventDefault();
+  if(!processingRequest)return;
+  const isReturn=processingRequest.service_type==='return';
+  const selectedItems=[...document.querySelectorAll(isReturn?'[name="returnBorrowIds"]:checked':'[name="borrowItems"]:checked')];
+  if(!selectedItems.length){notify(isReturn?'Select at least one item to return.':'Select at least one item to borrow.','warning');return}
+  const body=isReturn
+    ?{request_id:Number(processingRequest.request_id),borrow_ids:selectedItems.map(input=>Number(input.value)),return_condition:$('processReturnCondition').value.trim()}
+    :{request_id:Number(processingRequest.request_id),items:selectedItems.map(input=>({item_id:input.value,quantity:Number(input.parentElement.querySelector('[type="number"]').value)})),due_date:$('processDueDate').value};
+  $('processRequestSubmit').disabled=true;
   try{
-    const csrf=await getCsrfToken();
-    const r=await fetch('api/borrow_resource.php',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({item_id,member_id,quantity,due_date})}),d=await r.json();
-    if(d.success){notify('Item borrowed successfully!');closeM('borrowModal');resetScan();await refresh()}else notify('Error: '+d.error,'error');
-  }catch(err){console.error(err);notify('Failed to borrow item. Please try again.','error')}
-  $('borrowSave').disabled=false;
+    const response=await fetch(`api/verification/complete_${isReturn?'return':'borrow'}.php`,{
+      method:'POST',credentials:'same-origin',
+      headers:{'Content-Type':'application/json','X-CSRF-Token':await getCsrfToken()},
+      body:JSON.stringify(body)
+    });
+    const data=await response.json();
+    if(!response.ok||!data.success)throw new Error(data.message||'Unable to complete the request.');
+    notify(data.message);
+    closeM('processRequestModal');
+    processingRequest=null;
+    await refresh();
+  }catch(error){notify(error.message||'Unable to complete the request.','error')}
+  finally{$('processRequestSubmit').disabled=false}
 });
 
 /* ---- return / delete / view ---- */
@@ -515,25 +553,13 @@ async function post(url,borrow_id,okMsg,failMsg){
   }catch(err){console.error(err);notify(failMsg,'error')}
 }
 const recOf=id=>lendingData.find(r=>String(r.borrow_id)===String(id));
-function returnItem(id){
-  const record=recOf(id);
-  if(!record){notify('Borrowing record not found. Refresh and try again.','error');return}
-  closeM('viewLendingModal');resetReturnScan();
-  const memberId=String(record.member_id||'').toUpperCase();
-  $('returnYouthId').value=memberId;
-  $('returnYouthInfo').innerHTML=`<span class="av">${esc(String(record.borrower_name||'Y').charAt(0).toUpperCase())}</span><div><b>${esc(record.borrower_name||'Youth')}</b><span class="mono">${esc(memberId)}</span></div>`;
-  $('returnYouthInfo').hidden=false;
-  showReturnLoans(memberId,id);
-  openM('returnScanModal');$('returnCondition').focus();
-}
 function deleteLending(id){closeM('viewLendingModal');showConfirm('Delete this lending record? This cannot be undone.',()=>post('api/delete_borrow_record.php',Number(id),'Lending record deleted successfully!','Failed to delete record. Please try again.'),'Delete')}
 function viewLending(id){
   const r=recOf(id);if(!r){notify('Record not found','error');return}
   const st=statusOf(r),dt=d=>{const x=new Date(d);return isNaN(x)?'—':x.toLocaleString()};
   $('lendingDetails').innerHTML=[['Item',r.item_name],['Quantity',r.quantity||1],['Borrower',r.borrower_name],['Member ID',r.member_id],['Borrowed',dt(r.borrow_date)],['Due',dt(r.due_date)],['Returned',r.return_date?dt(r.return_date):'Not yet returned']]
     .map(([k,v])=>`<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('')+`<div><dt>Status</dt><dd><span class="pill ${st.toLowerCase()}">${st}</span></dd></div>`+(r.return_condition?`<div><dt>Condition on return</dt><dd>${esc(r.return_condition)}</dd></div>`:'')+(r.description?`<div><dt>Item notes</dt><dd>${esc(r.description)}</dd></div>`:'');
-  $('viewActions').innerHTML=st!=='Returned'?`<button class="btn pink" type="button" id="vReturn"><i class="fas fa-rotate-left"></i>Mark as returned</button>`:'';
-  if(st!=='Returned')$('vReturn').onclick=()=>returnItem(id);
+  $('viewActions').innerHTML=st!=='Returned'?`<p class="lead">To return this item, the youth must submit a Return request from their portal.</p>`:'';
   openM('viewLendingModal');
 }
 
@@ -544,7 +570,7 @@ async function loadUserProfile(){
     else{console.error('Error loading user profile:',d.error);$('userFullName').textContent='Guest User'}}
   catch(e){console.error('Error fetching user profile:',e);$('userFullName').textContent='Guest User'}
 }
-window.addEventListener('load',async()=>{setDefaultDates();await getCsrfToken().catch(error=>console.error(error));await loadUserProfile();await refresh()});
+window.addEventListener('load',async()=>{await getCsrfToken().catch(error=>console.error(error));await loadUserProfile();await refresh()});
 </script>
 <script src="js/auth-guard.js" data-roles="admin,sk_official"></script>
 <script src="assets/js/loader.js?v=3"></script>

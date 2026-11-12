@@ -41,12 +41,13 @@ try {
 
     $borrowId = intval($data['borrow_id']);
 
-    // Check if borrow record exists
-    $stmt = $pdo->prepare("SELECT item_id, status, quantity FROM borrow_records WHERE borrow_id = ?");
+    $pdo->beginTransaction();
+    $stmt = $pdo->prepare("SELECT item_id, status, quantity FROM borrow_records WHERE borrow_id = ? FOR UPDATE");
     $stmt->execute([$borrowId]);
     $record = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$record) {
+        $pdo->rollBack();
         http_response_code(404);
         echo json_encode([
             'success' => false,
@@ -55,20 +56,15 @@ try {
         exit;
     }
 
-    // Begin transaction
-    $pdo->beginTransaction();
-
     try {
-        // If status is Borrowed, we need to restore the available count
-        if ($record['status'] === 'Borrowed') {
-            $deleteQuantity = intval($record['quantity'] ?? 1);
-            $stmt = $pdo->prepare("
-                UPDATE resources
-                SET available = available + ?
-                WHERE item_id = ?
-            ");
-
-            $stmt->execute([$deleteQuantity, $record['item_id']]);
+        if ($record['status'] !== 'Returned') {
+            $pdo->rollBack();
+            http_response_code(409);
+            echo json_encode([
+                'success' => false,
+                'error' => 'Active items must be returned through a verified return request.'
+            ]);
+            exit;
         }
 
         // Delete the borrow record
@@ -89,6 +85,9 @@ try {
     }
 
 } catch (PDOException $e) {
+    if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
     error_log('[Borrow] Record deletion failed: ' . $e->getMessage());
     http_response_code(500);
     echo json_encode([
@@ -96,6 +95,9 @@ try {
         'error' => 'Unable to delete the borrow record.'
     ]);
 } catch (Exception $e) {
+    if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
     error_log('[Borrow] Record deletion failed: ' . $e->getMessage());
     http_response_code(500);
     echo json_encode([

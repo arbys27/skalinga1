@@ -5,75 +5,99 @@ verificationRequireMethod('POST');
 $admin = requireAdminApi();
 securityRequireCsrf();
 $input = verificationInput();
-$token = verificationTokenInput($input);
-$code = is_string($input['code'] ?? null) ? trim($input['code']) : '';
-$itemId = is_string($input['item_id'] ?? null) ? trim($input['item_id']) : '';
-$quantity = filter_var($input['quantity'] ?? null, FILTER_VALIDATE_INT);
+$requestId = filter_var($input['request_id'] ?? null, FILTER_VALIDATE_INT);
+$items = $input['items'] ?? null;
 $dueDate = is_string($input['due_date'] ?? null) ? trim($input['due_date']) : '';
 $date = DateTimeImmutable::createFromFormat('!Y-m-d', $dueDate);
 $errors = DateTimeImmutable::getLastErrors();
-if ($token === null || !preg_match('/^\d{2}$/', $code) || $itemId === '' || strlen($itemId) > 50
-    || !$quantity || $quantity < 1 || !$date || ($errors !== false && ($errors['warning_count'] || $errors['error_count']))
+if (!$requestId || $requestId < 1 || !is_array($items) || !$items || count($items) > 20
+    || !$date || ($errors !== false && ($errors['warning_count'] || $errors['error_count']))
     || $date->format('Y-m-d') !== $dueDate || $date < new DateTimeImmutable('today')) {
-    verificationResponse(['success' => false, 'message' => 'Valid token, code, item, quantity, and future due date are required.'], 400);
+    verificationResponse(['success' => false, 'message' => 'A valid pending request, selected items, quantities, and due date are required.'], 400);
 }
-$hash = hash('sha256', $token);
+$requestedItems = [];
+foreach ($items as $item) {
+    if (!is_array($item) || !is_string($item['item_id'] ?? null)) {
+        verificationResponse(['success' => false, 'message' => 'Each selected inventory item must include an item ID and quantity.'], 400);
+    }
+    $itemId = trim($item['item_id']);
+    $quantity = filter_var($item['quantity'] ?? null, FILTER_VALIDATE_INT);
+    if ($itemId === '' || strlen($itemId) > 50 || !$quantity || $quantity < 1 || isset($requestedItems[$itemId])) {
+        verificationResponse(['success' => false, 'message' => 'Selected inventory items and quantities must be valid and unique.'], 400);
+    }
+    $requestedItems[$itemId] = $quantity;
+}
+ksort($requestedItems, SORT_STRING);
 try {
     $pdo->beginTransaction();
-    $record = verificationLoadToken($pdo, $hash, true);
-    if (!$record || $record['status'] !== 'active' || $record['service_type'] !== 'borrow'
-        || (int)$record['scanned_by_admin_id'] !== (int)$admin['id']
-        || verificationIsExpired((string)$record['expires_at'])) {
-        throw new RuntimeException('This borrow verification is invalid, expired, or not scanned by this staff account.');
+    $requestQuery = $pdo->prepare(
+        "SELECT br.request_id, br.user_id, br.member_id, br.verification_token_id,
+                svt.service_ref, svt.user_id AS token_user_id, svt.service_type AS token_service_type,
+                svt.status AS token_status, svt.code_verified_at
+         FROM borrow_requests br
+         JOIN service_verification_tokens svt ON svt.id = br.verification_token_id
+         WHERE br.request_id = ? AND br.service_type = 'borrow' AND br.status = 'Pending'
+         LIMIT 1 FOR UPDATE OF br"
+    );
+    $requestQuery->execute([$requestId]);
+    $request = $requestQuery->fetch(PDO::FETCH_ASSOC);
+    if (!$request || (int)$request['user_id'] !== (int)$request['service_ref']
+        || (int)$request['token_user_id'] !== (int)$request['user_id']
+        || $request['token_service_type'] !== 'borrow' || $request['token_status'] !== 'used'
+        || $request['code_verified_at'] === null) {
+        throw new RuntimeException('This pending borrow request is invalid or already processed.');
     }
-    if (!is_string($record['code_hash']) || !hash_equals($record['code_hash'], otpCodeHash($code))
-        || verificationIsExpired((string)$record['code_expires_at']) || (int)$record['code_attempts'] >= 5) {
-        $attempt = min(5, (int)$record['code_attempts'] + 1);
-        $pdo->prepare('UPDATE service_verification_tokens SET code_attempts = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
-            ->execute([$attempt, (int)$record['id']]);
-        throw new RuntimeException('The short verification code is incorrect, expired, or locked.');
+    $placeholders = implode(',', array_fill(0, count($requestedItems), '?'));
+    $resource = $pdo->prepare("SELECT item_id, available FROM resources WHERE item_id IN ($placeholders) ORDER BY item_id FOR UPDATE");
+    $resource->execute(array_keys($requestedItems));
+    $stocks = [];
+    foreach ($resource->fetchAll(PDO::FETCH_ASSOC) as $stock) {
+        $stocks[(string)$stock['item_id']] = (int)$stock['available'];
     }
-    $user = verificationBorrowUser($pdo, 'borrow', (string)$record['service_ref'], (int)$record['user_id'], true);
-    if (!$user) {
-        throw new RuntimeException('The youth account is no longer eligible.');
+    if (count($stocks) !== count($requestedItems)) {
+        throw new RuntimeException('One or more selected inventory items no longer exist.');
     }
-    $resource = $pdo->prepare('SELECT name, available FROM resources WHERE item_id = ? FOR UPDATE');
-    $resource->execute([$itemId]);
-    $stock = $resource->fetch(PDO::FETCH_ASSOC);
-    if (!$stock || (int)$stock['available'] < $quantity) {
-        throw new RuntimeException('The requested quantity is not available.');
+    foreach ($requestedItems as $itemId => $quantity) {
+        if ($stocks[$itemId] < $quantity) {
+            throw new RuntimeException('Not enough stock is available for ' . $itemId . '.');
+        }
     }
+    $userQuery = $pdo->prepare(
+        "SELECT COALESCE(NULLIF(TRIM(CONCAT_WS(' ', yp.firstname, yp.lastname)), ''), u.member_id) AS display_name
+         FROM users u LEFT JOIN youth_profiles yp ON yp.user_id = u.id
+         WHERE u.id = ? AND u.status = 'active'"
+    );
+    $userQuery->execute([(int)$request['user_id']]);
+    $name = $userQuery->fetchColumn();
+    if (!is_string($name) || $name === '') throw new RuntimeException('The youth account is no longer active.');
     $insert = $pdo->prepare(
         "INSERT INTO borrow_records
             (item_id, member_id, borrower_name, quantity, due_date, status, borrow_verification_token_id, borrowed_by_admin_id)
          VALUES (?, ?, ?, ?, ?, 'Borrowed', ?, ?) RETURNING borrow_id"
     );
-    $insert->execute([$itemId, $user['member_id'], $user['display_name'], $quantity, $dueDate, $record['id'], $admin['id']]);
-    $borrowId = (int)$insert->fetchColumn();
     $stockUpdate = $pdo->prepare('UPDATE resources SET available = available - ?, updated_at = CURRENT_TIMESTAMP WHERE item_id = ? AND available >= ?');
-    $stockUpdate->execute([$quantity, $itemId, $quantity]);
-    if ($stockUpdate->rowCount() !== 1) {
-        throw new RuntimeException('Inventory could not be updated.');
+    $borrowIds = [];
+    foreach ($requestedItems as $itemId => $quantity) {
+        $insert->execute([$itemId, $request['member_id'], $name, $quantity, $dueDate, $request['verification_token_id'], $admin['id']]);
+        $borrowIds[] = (int)$insert->fetchColumn();
+        $stockUpdate->execute([$quantity, $itemId, $quantity]);
+        if ($stockUpdate->rowCount() !== 1) throw new RuntimeException('Inventory availability changed. Refresh and retry.');
     }
-    $use = $pdo->prepare(
-        "UPDATE service_verification_tokens
-         SET status = 'used', used_at = CURRENT_TIMESTAMP, code_hash = NULL, code_expires_at = NULL,
-             scanned_by_admin_id = ?, updated_at = CURRENT_TIMESTAMP
-         WHERE id = ? AND status = 'active'"
+    $finish = $pdo->prepare(
+        "UPDATE borrow_requests SET status = 'Completed', processed_at = CURRENT_TIMESTAMP,
+            processed_by_admin_id = ?, updated_at = CURRENT_TIMESTAMP WHERE request_id = ? AND status = 'Pending'"
     );
-    $use->execute([$admin['id'], $record['id']]);
-    if ($use->rowCount() !== 1) {
-        throw new RuntimeException('This verification was already completed.');
-    }
-    verificationAudit($pdo, 'confirm', 'success', (int)$record['id'], $hash, (int)$record['user_id'],
-        (int)$admin['id'], 'borrow', (string)$record['service_ref']);
+    $finish->execute([(int)$admin['id'], $requestId]);
+    if ($finish->rowCount() !== 1) throw new RuntimeException('This request was already processed.');
+    verificationAudit($pdo, 'process_request', 'success', (int)$request['verification_token_id'], null,
+        (int)$request['user_id'], (int)$admin['id'], 'borrow', (string)$requestId);
     $pdo->commit();
-    verificationResponse(['success' => true, 'message' => 'Borrow recorded successfully.', 'borrow_id' => $borrowId]);
+    verificationResponse(['success' => true, 'message' => 'Borrowing completed.', 'borrow_ids' => $borrowIds]);
 } catch (RuntimeException $exception) {
     if ($pdo->inTransaction()) $pdo->rollBack();
     verificationResponse(['success' => false, 'message' => $exception->getMessage()], 409);
 } catch (Throwable $exception) {
     if ($pdo->inTransaction()) $pdo->rollBack();
-    error_log('[Borrow Verification] Completion failed: ' . $exception->getMessage());
-    verificationResponse(['success' => false, 'message' => 'Unable to complete the borrow right now.'], 500);
+    error_log('[Borrow Verification] Admin processing failed: ' . $exception->getMessage());
+    verificationResponse(['success' => false, 'message' => 'Unable to process this borrowing request.'], 500);
 }

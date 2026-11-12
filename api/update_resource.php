@@ -35,9 +35,9 @@ try {
     $description = trim($description);
     $nameLength = preg_match_all('/./us', $name);
 
-    if ($itemId === '' || $name === '' || $nameLength === false || $nameLength > 255 || $restockQuantity === false || $restockQuantity === null || $restockQuantity < 0) {
+    if ($itemId === '' || $name === '' || $nameLength === false || $nameLength > 255 || $restockQuantity === false || $restockQuantity === null) {
         http_response_code(400);
-        echo json_encode(['success' => false, 'error' => 'A valid item, name, and non-negative restock quantity are required.']);
+        echo json_encode(['success' => false, 'error' => 'A valid item, name, and whole-number stock adjustment are required.']);
         exit;
     }
 
@@ -59,13 +59,19 @@ try {
             WHERE item_id = ? AND quantity + ? >= 0 AND available + ? >= 0
         ');
         $stmt->execute([$name, $description, $restockQuantity, $restockQuantity, $itemId, $restockQuantity, $restockQuantity]);
+        if ($stmt->rowCount() !== 1) {
+            $pdo->rollBack();
+            http_response_code(409);
+            echo json_encode(['success' => false, 'error' => 'Stock cannot be reduced below the quantity currently on loan.']);
+            exit;
+        }
         $pdo->commit();
 
         echo json_encode([
             'success' => true,
             'message' => 'Inventory item updated successfully.',
             'item_id' => $itemId,
-            'restocked' => $restockQuantity
+            'stock_adjustment' => $restockQuantity
         ]);
     } catch (Exception $e) {
         if ($pdo->inTransaction()) {

@@ -11,6 +11,9 @@ $token = verificationTokenInput($input);
 $requestedServiceRef = is_scalar($input['request_id'] ?? null)
     ? trim((string)$input['request_id'])
     : null;
+$requestedServiceType = is_string($input['service_type'] ?? null)
+    ? trim($input['service_type'])
+    : null;
 $tokenHash = hash('sha256', $token ?? (is_string($input['token'] ?? null) ? trim($input['token']) : 'invalid'));
 
 try {
@@ -38,6 +41,14 @@ try {
         );
         $pdo->commit();
         verificationResponse(['success' => false, 'message' => 'This QR does not belong to the selected print request.'], 409);
+    }
+    if ($requestedServiceType !== null && $requestedServiceType !== (string)$record['service_type']) {
+        verificationAudit(
+            $pdo, 'scan', 'service_type_mismatch', (int)$record['id'], $tokenHash,
+            (int)$record['user_id'], (int)$admin['id'], (string)$record['service_type'], $requestedServiceType
+        );
+        $pdo->commit();
+        verificationResponse(['success' => false, 'message' => 'This QR is for a different service. Select the matching Borrow or Return action.'], 409);
     }
 
     if (verificationIsExpired((string)$record['expires_at'])) {
@@ -78,12 +89,25 @@ try {
                 verificationResponse(['success' => false, 'message' => 'This youth has no active borrowed items.'], 409);
             }
         }
+        if (is_string($record['code_hash'] ?? null)
+            && $record['code_hash'] !== ''
+            && is_string($record['code_expires_at'] ?? null)
+            && !verificationIsExpired($record['code_expires_at'])) {
+            $pdo->rollBack();
+            verificationResponse(['success' => false, 'message' => 'A code is already active for this QR. Ask the youth to enter the code already provided.'], 409);
+        }
+        $verificationCode = str_pad((string)random_int(0, 99), 2, '0', STR_PAD_LEFT);
         $markScanned = $pdo->prepare(
-            'UPDATE service_verification_tokens
-             SET scanned_by_admin_id = ?, updated_at = CURRENT_TIMESTAMP
-             WHERE id = ? AND status = \'active\''
+            "UPDATE service_verification_tokens
+             SET scanned_by_admin_id = ?, code_hash = ?, code_expires_at = CURRENT_TIMESTAMP + INTERVAL '5 minutes',
+                 code_attempts = 0, code_verified_at = NULL, updated_at = CURRENT_TIMESTAMP
+             WHERE id = ? AND status = 'active'"
         );
-        $markScanned->execute([(int)$admin['id'], (int)$record['id']]);
+        $markScanned->execute([(int)$admin['id'], otpCodeHash($verificationCode), (int)$record['id']]);
+        if ($markScanned->rowCount() !== 1) {
+            $pdo->rollBack();
+            verificationResponse(['success' => false, 'message' => 'This verification token is no longer active.'], 409);
+        }
         verificationAudit($pdo, 'scan', 'success', (int)$record['id'], $tokenHash, (int)$record['user_id'],
             (int)$admin['id'], (string)$record['service_type'], (string)$record['service_ref']);
         $pdo->commit();
@@ -95,7 +119,8 @@ try {
                 'member_id' => (string)$user['member_id'],
                 'items' => $active,
                 'verification_code_required' => true,
-                'code_expires_in' => 180,
+                'verification_code' => $verificationCode,
+                'code_expires_in' => 300,
             ],
         ]);
     }

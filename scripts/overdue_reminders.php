@@ -9,7 +9,7 @@ try {
     $mark = $pdo->prepare(
         "UPDATE borrow_records
          SET status = 'Overdue', updated_at = CURRENT_TIMESTAMP
-         WHERE status = 'Borrowed' AND due_date < CURRENT_TIMESTAMP"
+         WHERE status = 'Borrowed' AND due_date::date < CURRENT_DATE"
     );
     $mark->execute();
     $pdo->commit();
@@ -28,6 +28,7 @@ $query = $pdo->query(
      WHERE br.status = 'Overdue'
        AND br.overdue_notified_at IS NULL
        AND br.overdue_notification_attempts < 5
+       AND br.due_date::date < CURRENT_DATE
      ORDER BY br.due_date
      LIMIT 100"
 );

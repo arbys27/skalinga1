@@ -74,8 +74,23 @@ try {
             'success' => false,
             'message' => $serviceType === 'print' && $purpose === 'submit'
                 ? 'This print request is not awaiting verification for your account.'
-                : 'This request is not an eligible, unclaimed print request for your account.',
+                : ($serviceType === 'print'
+                    ? 'This request is not an eligible, unclaimed print request for your account.'
+                    : 'Unable to verify this youth account for the requested service.'),
         ], 404);
+    }
+    if ($serviceType === 'return') {
+        $activeItems = $pdo->prepare(
+            "SELECT 1 FROM borrow_records
+             WHERE member_id = ? AND status IN ('Borrowed', 'Overdue')
+             LIMIT 1"
+        );
+        $activeItems->execute([(string)$user['member_id']]);
+        if (!$activeItems->fetchColumn()) {
+            verificationAudit($pdo, 'generate', 'no_active_loans', null, null, (int)$auth['id'], null, $serviceType, $serviceRef);
+            $pdo->commit();
+            verificationResponse(['success' => false, 'message' => 'You do not have any active items to return.'], 409);
+        }
     }
 
     $rateQuery = $pdo->prepare(
@@ -113,16 +128,11 @@ try {
         verificationResponse(['success' => false, 'message' => 'Verification is not configured for this service.'], 400);
     }
 
-    $shortCode = null;
-    if (in_array($serviceType, ['borrow', 'return'], true)) {
-        $shortCode = str_pad((string)random_int(0, 99), 2, '0', STR_PAD_LEFT);
-    }
     $insert = $pdo->prepare(
         'INSERT INTO service_verification_tokens
             (user_id, service_type, service_ref, token_hash, expires_at, otp_required,
              code_hash, code_expires_at)
-         VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP + (CAST(? AS integer) * INTERVAL \'1 second\'), ?, ?,
-                 CASE WHEN ? IS NULL THEN NULL ELSE CURRENT_TIMESTAMP + INTERVAL \'3 minutes\' END)
+         VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP + (CAST(? AS integer) * INTERVAL \'1 second\'), ?, NULL, NULL)
          RETURNING id, expires_at'
     );
     $insert->execute([
@@ -132,8 +142,6 @@ try {
         $tokenHash,
         (int)$settings['token_ttl_seconds'],
         $purpose === 'submit' ? true : postgresBoolean($settings['otp_required']),
-        $shortCode === null ? null : otpCodeHash($shortCode),
-        $shortCode,
     ]);
     $created = $insert->fetch(PDO::FETCH_ASSOC);
     verificationAudit(
@@ -156,7 +164,6 @@ try {
         'expires_at' => $created['expires_at'],
         'expires_in' => (int)$settings['token_ttl_seconds'],
         'otp_required' => $purpose === 'submit' ? true : postgresBoolean($settings['otp_required']),
-        'verification_code' => $shortCode,
         'purpose' => $purpose,
         'request' => [
             'request_id' => $serviceType === 'print' ? (int)$request['request_id'] : null,
