@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SKalinga - Report Issues</title>
   <link rel="icon" type="image/x-icon" href="/SKalinga/assets/icons/favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="/SKalinga/assets/icons/favicon-32x32.png">
@@ -10,325 +10,351 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/SKalinga/assets/icons/apple-touch-icon.png">
   <link rel="manifest" href="/SKalinga/assets/icons/site.webmanifest">
   <meta name="msapplication-config" content="/SKalinga/assets/icons/browserconfig.xml">
-  <meta name="theme-color" content="#FF6B9D">
+  <meta name="theme-color" content="#228B57">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="assets/css/global.css">
+  <link rel="stylesheet" href="assets/css/portal.css">
+  <link rel="stylesheet" href="assets/css/report.css">
 
   <!-- Professional Loader System -->
   <link rel="stylesheet" href="assets/css/loader.css?v=3">
-
-  <style>
-    #toastContainer {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        z-index: 9999;
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    }
-
-    .toast {
-        background: white;
-        padding: 14px 18px;
-        border-radius: 8px;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        font-weight: 500;
-        border-left: 4px solid;
-    }
-
-    .toast.success {
-        border-left-color: #27AE60;
-    }
-
-    .toast.success .toast-icon {
-        color: #27AE60;
-    }
-
-    .toast.error {
-        border-left-color: #E74C3C;
-    }
-
-    .toast.error .toast-icon {
-        color: #E74C3C;
-    }
-
-    .toast.warning {
-        border-left-color: #F39C12;
-    }
-
-    .toast.warning .toast-icon {
-        color: #F39C12;
-    }
-
-    .toast.info {
-        border-left-color: #5DADE2;
-    }
-
-    .toast.info .toast-icon {
-        color: #5DADE2;
-    }
-
-    .toast-icon {
-        font-size: 18px;
-        flex-shrink: 0;
-    }
-
-    .toast-message {
-        flex: 1;
-        color: #333;
-    }
-
-    .toast.removing {
-        animation: slideOutRight 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-    }
-
-    @keyframes slideInRight {
-        from {
-            transform: translateX(400px);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
-    }
-
-    @keyframes slideOutRight {
-        from {
-            transform: translateX(0);
-            opacity: 1;
-        }
-        to {
-            transform: translateX(400px);
-            opacity: 0;
-        }
-    }
-
-    @media (max-width: 768px) {
-        #toastContainer {
-            top: 10px;
-            right: 10px;
-            left: 10px;
-        }
-
-        .toast {
-            max-width: 100%;
-        }
-    }
-  </style>
-  <link rel="stylesheet" href="assets/css/skalinga-ui.css?v=20261021-3">
 </head>
-<body>
+<body class="service-page">
 
 <div class="app-container">
 
-  <header class="page-header">
-    <p class="eyebrow">YOUTH SERVICES</p>
-    <h1>Report Issues</h1>
-    <p>Submit incident reports, safety concerns, bullying, environmental problems, or request emergency assistance</p>
+  <!-- Unified Portal Navigation -->
+  <nav class="portal-nav">
+    <a class="portal-brand" href="youth-portal.html">
+      <span class="brand-logos">
+        <img src="assets/images/logosanantonio.jpg" alt="San Antonio Logo">
+        <img src="assets/images/sklogo.jpg" alt="SK Logo">
+      </span>
+      <span><strong>SKalinga</strong><small>Youth Portal</small></span>
+    </a>
+    <div class="portal-links" aria-label="Main navigation">
+      <a href="youth-portal.html">Home</a>
+      <a href="events.html">Events</a>
+      <a href="borrow.html">Borrow</a>
+      <a href="print.html">Print</a>
+      <a href="health.html">Health</a>
+      <a class="active" href="report.html">Report</a>
+      <a href="public-disclosure.html">Documents</a>
+      <a href="profile.html">Profile</a>
+    </div>
+    <a class="profile-link" href="profile.html">My profile <span aria-hidden="true">→</span></a>
+  </nav>
+
+  <!-- Hero Banner -->
+  <header class="report-hero">
+    <h1>Report issues</h1>
+    <p>Submit incident reports, safety concerns, bullying, environmental problems, or request<br class="desktop-only"> emergency assistance directly to the SK Office.</p>
+    <div class="hero-steps">
+      <span><b>1</b> Describe incident</span>
+      <span><b>2</b> Set urgency &amp; photos</span>
+      <span><b>3</b> SK Office review</span>
+    </div>
+    <button type="button" class="history-button" onclick="document.getElementById('reportsHistory').scrollIntoView({ behavior: 'smooth' });">
+      <span>◷</span> View my submitted reports
+    </button>
   </header>
 
-  <!-- Main Content -->
-  <section class="report-section">
-    <form id="reportForm" class="report-form card-soft">
-      <div class="form-group">
-        <label for="category">Issue category</label>
-        <select id="category" name="category" required>
-          <option value="" disabled selected>Select type of issue</option>
-          <option value="safety">Safety / Security Concern</option>
-          <option value="bullying">Bullying or Harassment</option>
-          <option value="environment">Environmental Problem</option>
-          <option value="health">Health / Sanitation Issue</option>
-          <option value="infrastructure">Damaged Facility</option>
-          <option value="emergency">Emergency Assistance</option>
-          <option value="other">Other</option>
-        </select>
-      </div>
+  <!-- Main 2-Column Layout -->
+  <section class="report-layout">
+    <!-- Left Column: Report Form -->
+    <div class="request-card">
+      <h2>New issue report</h2>
+      <p class="card-intro">Provide accurate details so our team can respond appropriately.</p>
 
-      <div class="form-group">
-        <label for="description">Describe the issue</label>
-        <textarea id="description" name="description" rows="5" placeholder="What happened, where, when, who is involved..." required></textarea>
-      </div>
-
-      <div class="form-group">
-        <label for="location">Location</label>
-        <input type="text" id="location" name="location" placeholder="e.g., Barangay Covered Court, Poblacion" required>
-      </div>
-
-      <div class="form-group">
-        <label>Urgency level</label>
-        <div class="urgency-options">
-          <label><input type="radio" name="urgency" value="low" checked> Low</label>
-          <label><input type="radio" name="urgency" value="medium"> Medium</label>
-          <label><input type="radio" name="urgency" value="high"> High / Urgent</label>
-          <label><input type="radio" name="urgency" value="emergency"> Emergency</label>
+      <form id="reportForm" class="report-form">
+        <div class="form-group choice-group">
+          <label id="category-label" for="category">Issue category *</label>
+          <div class="choice-grid two" role="group" aria-labelledby="category-label">
+            <button type="button" class="choice-card selected" aria-pressed="true" data-select="category" data-value="safety" data-label="Safety / Security">
+              <strong>Safety &amp; Security</strong>
+              <small>Hazards, peace &amp; order</small>
+            </button>
+            <button type="button" class="choice-card" aria-pressed="false" data-select="category" data-value="bullying" data-label="Bullying / Harassment">
+              <strong>Bullying / Harassment</strong>
+              <small>Youth protection</small>
+            </button>
+            <button type="button" class="choice-card" aria-pressed="false" data-select="category" data-value="environment" data-label="Environmental Problem">
+              <strong>Environmental</strong>
+              <small>Waste, drainage, trees</small>
+            </button>
+            <button type="button" class="choice-card" aria-pressed="false" data-select="category" data-value="health" data-label="Health / Sanitation">
+              <strong>Health &amp; Sanitation</strong>
+              <small>Hygiene, public health</small>
+            </button>
+            <button type="button" class="choice-card" aria-pressed="false" data-select="category" data-value="infrastructure" data-label="Damaged Facility">
+              <strong>Damaged Facility</strong>
+              <small>Courts, lights, roads</small>
+            </button>
+            <button type="button" class="choice-card" aria-pressed="false" data-select="category" data-value="emergency" data-label="Emergency Assistance">
+              <strong>Emergency</strong>
+              <small>Immediate urgent help</small>
+            </button>
+            <button type="button" class="choice-card span-two" aria-pressed="false" data-select="category" data-value="other" data-label="Other Concern">
+              <strong>Other Concern</strong>
+              <small>General community issue</small>
+            </button>
+          </div>
+          <select class="select-source" id="category" name="category" required>
+            <option value="safety" selected>Safety / Security Concern</option>
+            <option value="bullying">Bullying or Harassment</option>
+            <option value="environment">Environmental Problem</option>
+            <option value="health">Health / Sanitation Issue</option>
+            <option value="infrastructure">Damaged Facility</option>
+            <option value="emergency">Emergency Assistance</option>
+            <option value="other">Other</option>
+          </select>
         </div>
-      </div>
 
-      <div class="form-group">
-        <label>Attach photos (optional)</label>
-        <button type="button" id="photoUploadArea" class="file-dropzone report-upload-area" aria-label="Add report photos">
-          <input type="file" id="photo" name="photo" accept="image/*" multiple style="display: none;">
-          <div class="dropzone-icon"><svg class="icon" aria-hidden="true"><use href="#icon-file"></use></svg></div>
-          <p class="dropzone-label">Tap to add photos</p>
-          <p class="dropzone-help">You can select multiple photos at once</p>
-          <p id="selectedFilesCount"></p>
-        </button>
-        <div id="photoPreviewGrid"></div>
-      </div>
+        <div class="form-group choice-group">
+          <label id="urgency-label">Urgency level *</label>
+          <div class="choice-grid four" role="group" aria-labelledby="urgency-label">
+            <button type="button" class="choice-card urgency-card selected" aria-pressed="true" data-urgency="low" data-label="Low">
+              <strong>Low</strong>
+              <small>Minor</small>
+            </button>
+            <button type="button" class="choice-card urgency-card" aria-pressed="false" data-urgency="medium" data-label="Medium">
+              <strong>Medium</strong>
+              <small>Moderate</small>
+            </button>
+            <button type="button" class="choice-card urgency-card" aria-pressed="false" data-urgency="high" data-label="High / Urgent">
+              <strong>High</strong>
+              <small>Urgent</small>
+            </button>
+            <button type="button" class="choice-card urgency-card emergency-opt" aria-pressed="false" data-urgency="emergency" data-label="Emergency">
+              <strong>Emergency</strong>
+              <small>Critical</small>
+            </button>
+          </div>
+          <div class="select-source" aria-hidden="true">
+            <input type="radio" name="urgency" value="low" checked>
+            <input type="radio" name="urgency" value="medium">
+            <input type="radio" name="urgency" value="high">
+            <input type="radio" name="urgency" value="emergency">
+          </div>
+        </div>
 
-      <div class="form-actions">
-        <button type="submit" class="btn-primary">Submit report</button>
-      </div>
-    </form>
+        <div class="form-group">
+          <label for="location">Location *</label>
+          <input type="text" id="location" name="location" placeholder="e.g., Barangay Covered Court, Poblacion" required>
+        </div>
 
-    <div class="reports-history card-soft" id="reportsHistory" style="display: none; margin-top: 60px;">
-      <div class="report-history-header">
-        <h2>Your submitted reports</h2>
-      </div>
-      <div class="reports-list" id="reportsList" aria-live="polite"></div>
+        <div class="form-group">
+          <label for="description">Describe the issue *</label>
+          <textarea id="description" name="description" rows="5" placeholder="What happened, where, when, and who is involved..." required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Attach photos (optional)</label>
+          <input type="file" id="photo" name="photo" accept="image/jpeg,image/png,image/gif,.jpg,.jpeg,.png,.gif" multiple class="file-input-hidden" tabindex="-1" aria-hidden="true">
+          <button type="button" id="photoUploadArea" class="file-dropzone" aria-label="Add report photos">
+            <span class="upload-icon">↥</span>
+            <strong>Tap to add photos</strong>
+            <small>JPG, PNG or GIF — up to 5 photos, 5 MB each</small>
+            <span id="selectedFilesCount" class="file-count-pill"></span>
+          </button>
+          <div id="photoPreviewGrid" class="photo-preview-grid"></div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn primary large" id="submitReportBtn">Submit Report</button>
+        </div>
+      </form>
     </div>
+
+    <!-- Right Column: Live Summary Card -->
+    <aside class="request-summary">
+      <h2>Your report</h2>
+      <p class="card-intro">A quick check before you submit.</p>
+      <dl>
+        <div><dt>Category</dt><dd id="summaryCategory">Safety / Security</dd></div>
+        <div><dt>Urgency</dt><dd id="summaryUrgency">Low</dd></div>
+        <div><dt>Location</dt><dd id="summaryLocation">Not set</dd></div>
+        <div><dt>Photos</dt><dd id="summaryPhotos">None attached</dd></div>
+      </dl>
+      <div class="summary-notice">
+        <span>▣</span>
+        <div>For life-threatening emergencies, please also contact your local Barangay Tanod or emergency hotline immediately.</div>
+      </div>
+    </aside>
   </section>
 
+  <!-- Bottom Section: Submitted Reports History -->
+  <section class="reports-history" id="reportsHistory">
+    <div class="history-heading">
+      <div>
+        <h2>Your submitted reports</h2>
+        <p>Track the review status of your filed reports.</p>
+      </div>
+      <button type="button" class="view-history-button" onclick="document.getElementById('reportsList').scrollIntoView({ behavior: 'smooth' });">◷ &nbsp; View list</button>
+    </div>
+    <div class="reports-list" id="reportsList" aria-live="polite"></div>
+  </section>
+
+  <button class="help-button" type="button" aria-label="Help" onclick="showAlert('Select a category and urgency level, describe the location and incident, and attach photos if available.', 'info')">?</button>
+
+  <!-- Toast Notification Container -->
   <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="false"></div>
 
 </div>
 
 <script>
 // ────────────────────────────────────────────────
-// Photo Upload UI (Mobile-Friendly)
+// Interactive Choice Cards & Live Summary Sync
+// ────────────────────────────────────────────────
+document.querySelectorAll('[data-select="category"]').forEach((card) => {
+  card.addEventListener('click', () => {
+    const select = document.getElementById('category');
+    select.value = card.dataset.value;
+    document.querySelectorAll('[data-select="category"]').forEach(c => {
+      const selected = c === card;
+      c.classList.toggle('selected', selected);
+      c.setAttribute('aria-pressed', String(selected));
+    });
+    card.classList.add('selected');
+    document.getElementById('summaryCategory').textContent = card.dataset.label;
+  });
+});
+
+document.querySelectorAll('.urgency-card').forEach((card) => {
+  card.addEventListener('click', () => {
+    const radio = document.querySelector(`input[name="urgency"][value="${card.dataset.urgency}"]`);
+    if (radio) radio.checked = true;
+    document.querySelectorAll('.urgency-card').forEach(c => {
+      const selected = c === card;
+      c.classList.toggle('selected', selected);
+      c.setAttribute('aria-pressed', String(selected));
+    });
+    card.classList.add('selected');
+    document.getElementById('summaryUrgency').textContent = card.dataset.label;
+  });
+});
+
+document.getElementById('location').addEventListener('input', (e) => {
+  document.getElementById('summaryLocation').textContent = e.target.value.trim() || 'Not set';
+});
+
+// ────────────────────────────────────────────────
+// Photo Upload UI (Mobile-Friendly, Accumulative)
 // ────────────────────────────────────────────────
 const uploadArea = document.getElementById('photoUploadArea');
 const photoInput = document.getElementById('photo');
 const fileCountDisplay = document.getElementById('selectedFilesCount');
 const previewGrid = document.getElementById('photoPreviewGrid');
 
-// Click to upload - accumulate files instead of replacing
 uploadArea.addEventListener('click', () => {
-    // Create temporary input to get new files
-    const tempInput = document.createElement('input');
-    tempInput.type = 'file';
-    tempInput.accept = 'image/*';
-    tempInput.multiple = true;
-    
-    tempInput.addEventListener('change', () => {
-        if (tempInput.files.length > 0) {
-            // Merge new files with existing files
-            const dataTransfer = new DataTransfer();
-            
-            // Add existing files
-            Array.from(photoInput.files).forEach(file => {
-                dataTransfer.items.add(file);
-            });
-            
-            // Add new files
-            Array.from(tempInput.files).forEach(file => {
-                dataTransfer.items.add(file);
-            });
-            
-            // Update main input with combined files
-            photoInput.files = dataTransfer.files;
-            updateFileCount();
-            showPhotoPreview();
-        }
-    });
-    
-    tempInput.click();
+  const tempInput = document.createElement('input');
+  tempInput.type = 'file';
+  tempInput.accept = 'image/jpeg,image/png,image/gif,.jpg,.jpeg,.png,.gif';
+  tempInput.multiple = true;
+
+  tempInput.addEventListener('change', () => {
+    if (tempInput.files.length > 0) {
+      if (photoInput.files.length + tempInput.files.length > 5) {
+        showAlert('You can attach up to 5 photos.', 'warning');
+        return;
+      }
+
+      const dataTransfer = new DataTransfer();
+      Array.from(photoInput.files).forEach(file => dataTransfer.items.add(file));
+      Array.from(tempInput.files).forEach(file => dataTransfer.items.add(file));
+
+      photoInput.files = dataTransfer.files;
+      updateFileCount();
+      showPhotoPreview();
+    }
+  });
+
+  tempInput.click();
 });
 
-// Update file count display
 function updateFileCount() {
-    const count = photoInput.files.length;
-    if (count > 0) {
-        fileCountDisplay.style.display = 'block';
-        fileCountDisplay.textContent = `✓ ${count} photo${count !== 1 ? 's' : ''} selected`;
-        uploadArea.style.background = '#e8f4fd';
-        uploadArea.style.borderColor = '#27AE60';
-    } else {
-        fileCountDisplay.style.display = 'none';
-        uploadArea.style.background = '#f0f8ff';
-        uploadArea.style.borderColor = '#5DADE2';
-    }
+  const count = photoInput.files.length;
+  const summaryPhotos = document.getElementById('summaryPhotos');
+
+  if (count > 0) {
+    fileCountDisplay.style.display = 'inline-block';
+    fileCountDisplay.textContent = `✓ ${count} photo${count !== 1 ? 's' : ''} selected`;
+    uploadArea.classList.add('has-files');
+    summaryPhotos.textContent = `${count} photo${count !== 1 ? 's' : ''} attached`;
+  } else {
+    fileCountDisplay.style.display = 'none';
+    uploadArea.classList.remove('has-files');
+    summaryPhotos.textContent = 'None attached';
+  }
 }
 
-// Show photo preview before submission
 function showPhotoPreview() {
-    previewGrid.innerHTML = '';
-    const files = photoInput.files;
-    
-    if (files.length > 0) {
-        previewGrid.style.display = 'grid';
-        
-        Array.from(files).forEach((file, index) => {
-            const reader = new FileReader();
-            
-            reader.onload = (e) => {
-                const previewItem = document.createElement('div');
-                previewItem.style.position = 'relative';
-                previewItem.style.cursor = 'pointer';
-                previewItem.innerHTML = `
-                    <img src="${e.target.result}" style="width: 100%; height: 100px; object-fit: cover; border-radius: 6px; border: 2px solid #5DADE2;">
-                    <button type="button" onclick="removePhotoFromSelection(${index})" style="position: absolute; top: -8px; right: -8px; background: #E74C3C; color: white; border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
-                        <svg class="icon" aria-hidden="true"><use href="#icon-close"></use></svg>
-                    </button>
-                `;
-                previewGrid.appendChild(previewItem);
-            };
-            
-            reader.readAsDataURL(file);
-        });
-    } else {
-        previewGrid.style.display = 'none';
-    }
+  previewGrid.innerHTML = '';
+  const files = photoInput.files;
+
+  if (files.length > 0) {
+    previewGrid.style.display = 'grid';
+
+    Array.from(files).forEach((file, index) => {
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        const previewItem = document.createElement('div');
+        previewItem.className = 'preview-thumb';
+        previewItem.innerHTML = `
+          <img src="${e.target.result}" alt="Selected photo ${index + 1}">
+          <button type="button" class="remove-photo-btn" onclick="removePhotoFromSelection(${index})" aria-label="Remove photo">×</button>
+        `;
+        previewGrid.appendChild(previewItem);
+      };
+
+      reader.readAsDataURL(file);
+    });
+  } else {
+    previewGrid.style.display = 'none';
+  }
 }
 
-// Remove photo from selection
 function removePhotoFromSelection(indexToRemove) {
-    const dataTransfer = new DataTransfer();
-    const files = photoInput.files;
-    
-    Array.from(files).forEach((file, index) => {
-        if (index !== indexToRemove) {
-            dataTransfer.items.add(file);
-        }
-    });
-    
-    photoInput.files = dataTransfer.files;
-    updateFileCount();
-    showPhotoPreview();
+  const dataTransfer = new DataTransfer();
+  const files = photoInput.files;
+
+  Array.from(files).forEach((file, index) => {
+    if (index !== indexToRemove) {
+      dataTransfer.items.add(file);
+    }
+  });
+
+  photoInput.files = dataTransfer.files;
+  updateFileCount();
+  showPhotoPreview();
 }
 
 // ────────────────────────────────────────────────
-// Toast Notification
+// Toast Notification (Matching print.html)
 // ────────────────────────────────────────────────
 function showAlert(message, type = 'info') {
-    const container = document.getElementById('toastContainer');
-    
-    const iconName = type === 'error' || type === 'warning' ? 'alert' : type === 'info' ? 'help' : 'check';
-    
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    toast.innerHTML = `
-        <svg class="icon toast-icon" aria-hidden="true"><use href="#icon-${iconName}"></use></svg>
-        <span class="toast-message">${message}</span>
-    `;
-    
-    container.appendChild(toast);
-    
-    // Auto-remove after 4 seconds
-    setTimeout(() => {
-        toast.classList.add('removing');
-        setTimeout(() => {
-            toast.remove();
-        }, 300);
-    }, 4000);
+  const container = document.getElementById('toastContainer');
+  const icons = { success: '✓', error: '✕', warning: '!', info: 'ℹ' };
+
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `
+    <div class="toast-icon">${icons[type] || icons.info}</div>
+    <div class="toast-content">${message}</div>
+    <button type="button" class="toast-close" onclick="this.parentElement.remove()">×</button>
+  `;
+
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.classList.add('removing');
+    setTimeout(() => toast.remove(), 300);
+  }, 4500);
 }
 
 // ────────────────────────────────────────────────
@@ -336,173 +362,180 @@ function showAlert(message, type = 'info') {
 // ────────────────────────────────────────────────
 let reports = [];
 const escapeIncidentHtml = value => String(value ?? '').replace(/[&<>"']/g, character => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+  '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
 }[character]));
+
 const publicIncidentStatus = status => ({
-    pending: 'Submitted',
-    in_review: 'Under Review',
-    under_action: 'Referred',
-    resolved: 'Resolved',
-    closed: 'Closed'
+  pending: 'Submitted',
+  in_review: 'Under Review',
+  under_action: 'Referred',
+  resolved: 'Resolved',
+  closed: 'Closed'
 }[status] || 'Submitted');
 
-// Load user's incidents from database
 async function loadUserIncidents() {
-    try {
-        // Add cache-busting parameter to ensure fresh data
-        const timestamp = new Date().getTime();
-        const response = await fetch(`api/get_user_incidents.php?t=${timestamp}`, {
-            cache: 'no-store'
-        });
-        const result = await response.json();
-        
-        if (result.success) {
-            reports = result.data || [];
-            renderReports();
-        } else {
-            console.error('Failed to load incidents');
-        }
-    } catch (error) {
-        console.error('Error loading incidents:', error);
+  try {
+    const timestamp = new Date().getTime();
+    const response = await fetch(`api/get_user_incidents.php?t=${timestamp}`, {
+      cache: 'no-store'
+    });
+    const result = await response.json();
+
+    if (result.success) {
+      reports = result.data || [];
+      renderReports();
+    } else {
+      console.error('Failed to load incidents');
     }
+  } catch (error) {
+    console.error('Error loading incidents:', error);
+  }
 }
 
-// Render reports from database
 function renderReports() {
-    const list = document.getElementById('reportsList');
-    const history = document.getElementById('reportsHistory');
-    list.innerHTML = '';
+  const list = document.getElementById('reportsList');
+  list.innerHTML = '';
 
-    if (reports.length === 0) {
-        list.innerHTML = '<p>No reports submitted yet.</p>';
-    } else {
-        reports.forEach((report) => {
-            const item = document.createElement('div');
-            item.className = 'report-item';
-            const submittedDate = new Date(report.submitted_date).toLocaleDateString('en-US');
-            
-            // Parse photos - handle both JSON array and string format
-            let photosHtml = '';
-            if (report.photo_path) {
-                try {
-                    const photoPaths = JSON.parse(report.photo_path);
-                    const paths = Array.isArray(photoPaths) ? photoPaths : [photoPaths];
-                    photosHtml = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;margin-top:8px;">${paths.map(path => `<img src="${escapeIncidentHtml(path)}" style="width:100%;height:80px;object-fit:cover;border-radius:4px" alt="Incident photo" loading="lazy">`).join('')}</div>`;
-                } catch (e) {
-                    photosHtml = '';
-                }
-            }
-            const status = String(report.status || 'pending');
-            const description = String(report.description || '');
-            item.innerHTML = `
-                <div class="report-header">
-                    <strong>${escapeIncidentHtml(String(report.category || '').toUpperCase())}</strong>
-                    <span class="status ${escapeIncidentHtml(status)}">${escapeIncidentHtml(report.status_label || publicIncidentStatus(status))}</span>
-                </div>
-                <p class="report-desc">${escapeIncidentHtml(description.substring(0, 120))}${description.length > 120 ? '...' : ''}</p>
-                <p class="report-meta">Location: ${escapeIncidentHtml(report.location)} • Submitted: ${escapeIncidentHtml(submittedDate)}</p>
-                <p class="report-urgency">Urgency: <strong>${escapeIncidentHtml(String(report.urgency || '').toUpperCase())}</strong></p>
-                ${photosHtml}
-            `;
-            list.appendChild(item);
-        });
+  if (reports.length === 0) {
+    list.innerHTML = '<p class="empty-history">No reports submitted yet. Use the form above if you need to report an issue.</p>';
+    return;
+  }
+
+  reports.forEach((report) => {
+    const item = document.createElement('div');
+    item.className = 'report-item';
+    const submittedDate = new Date(report.submitted_date).toLocaleDateString('en-US', {
+      month: 'short', day: 'numeric', year: 'numeric'
+    });
+
+    let photosHtml = '';
+    if (report.photo_path) {
+      try {
+        const photoPaths = JSON.parse(report.photo_path);
+        const paths = Array.isArray(photoPaths) ? photoPaths : [photoPaths];
+        photosHtml = `<div class="report-photos">${paths.map(path => `<img src="${escapeIncidentHtml(path)}" alt="Incident photo" loading="lazy">`).join('')}</div>`;
+      } catch (e) {
+        photosHtml = '';
+      }
     }
 
-    history.style.display = reports.length > 0 ? 'block' : 'none';
+    const status = String(report.status || 'pending');
+    const statusSlug = status.toLowerCase().replace(/_/g, '-');
+    const description = String(report.description || '');
+
+    item.innerHTML = `
+      <div class="report-header">
+        <div>
+          <span class="category-pill">${escapeIncidentHtml(String(report.category || '').toUpperCase())}</span>
+          <span class="urgency-pill ${escapeIncidentHtml(String(report.urgency || 'low').toLowerCase())}">${escapeIncidentHtml(String(report.urgency || '').toUpperCase())}</span>
+        </div>
+        <span class="status ${escapeIncidentHtml(statusSlug)}">${escapeIncidentHtml(report.status_label || publicIncidentStatus(status))}</span>
+      </div>
+      <p class="report-desc">${escapeIncidentHtml(description.substring(0, 160))}${description.length > 160 ? '...' : ''}</p>
+      <div class="report-footer">
+        <span><strong>Location:</strong> ${escapeIncidentHtml(report.location)}</span>
+        <span><strong>Submitted:</strong> ${escapeIncidentHtml(submittedDate)}</span>
+      </div>
+      ${photosHtml}
+    `;
+    list.appendChild(item);
+  });
 }
 
 // ────────────────────────────────────────────────
 // Form Submission
 // ────────────────────────────────────────────────
 document.getElementById('reportForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const formData = new FormData();
-    
-    // Add form fields
-    formData.append('category', document.getElementById('category').value);
-    formData.append('description', document.getElementById('description').value);
-    formData.append('location', document.getElementById('location').value);
-    formData.append('urgency', document.querySelector('input[name="urgency"]:checked').value);
-    
-    // Add ALL photo files (explicit handling for multiple files)
-    const photoInput = document.getElementById('photo');
-    if (photoInput && photoInput.files.length > 0) {
-        console.log('DEBUG: Number of photo files selected:', photoInput.files.length);
-        Array.from(photoInput.files).forEach((file, index) => {
-            console.log('DEBUG: Appending file', index + 1, ':', file.name, file.size, 'bytes');
-            formData.append('photo[]', file);
-        });
+  const submitBtn = document.getElementById('submitReportBtn');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Submitting...';
+
+  const formData = new FormData();
+  formData.append('category', document.getElementById('category').value);
+  formData.append('description', document.getElementById('description').value);
+  formData.append('location', document.getElementById('location').value);
+  formData.append('urgency', document.querySelector('input[name="urgency"]:checked').value);
+
+  const photoInput = document.getElementById('photo');
+  if (photoInput && photoInput.files.length > 0) {
+    Array.from(photoInput.files).forEach((file) => {
+      formData.append('photo[]', file);
+    });
+  }
+
+  try {
+    const csrfResponse = await fetch('api/csrf_token.php', { credentials: 'same-origin', cache: 'no-store' });
+    const csrfData = await csrfResponse.json();
+    if (!csrfResponse.ok || !csrfData.success || !csrfData.csrf_token) {
+      throw new Error('Unable to prepare a secure submission.');
+    }
+
+    const response = await fetch('api/submit_incident.php', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'X-CSRF-Token': csrfData.csrf_token },
+      body: formData
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      showAlert('🎉 Your report has been submitted successfully! SK Office will review it soon.', 'success');
+
+      e.target.reset();
+      photoInput.value = '';
+      updateFileCount();
+      showPhotoPreview();
+
+      // Reset interactive choice cards & summary back to defaults
+      document.querySelectorAll('[data-select="category"]').forEach((c, i) => {
+        const selected = i === 0;
+        c.classList.toggle('selected', selected);
+        c.setAttribute('aria-pressed', String(selected));
+      });
+      document.querySelectorAll('.urgency-card').forEach((c, i) => {
+        const selected = i === 0;
+        c.classList.toggle('selected', selected);
+        c.setAttribute('aria-pressed', String(selected));
+      });
+      document.getElementById('summaryCategory').textContent = 'Safety / Security';
+      document.getElementById('summaryUrgency').textContent = 'Low';
+      document.getElementById('summaryLocation').textContent = 'Not set';
+
+      await loadUserIncidents();
     } else {
-        console.log('DEBUG: No photo files to append');
+      showAlert('Error: ' + (result.error || 'Failed to submit report'), 'error');
     }
-    
-    try {
-        const csrfResponse = await fetch('api/csrf_token.php', { credentials: 'same-origin', cache: 'no-store' });
-        const csrfData = await csrfResponse.json();
-        if (!csrfResponse.ok || !csrfData.success || !csrfData.csrf_token) {
-            throw new Error('Unable to prepare a secure submission.');
-        }
-        const response = await fetch('api/submit_incident.php', {
-            method: 'POST',
-            credentials: 'same-origin',
-            headers: { 'X-CSRF-Token': csrfData.csrf_token },
-            body: formData
-        });
-        
-        const result = await response.json();
-        
-        console.log('DEBUG: Server response:', result);
-        
-        if (result.success) {
-            showAlert('🎉 Your report has been submitted successfully! SK Office will review it soon. Thank you for helping keep our community safe.', 'success');
-            
-            // Reset form
-            e.target.reset();
-            
-            // Reset photo input and preview
-            photoInput.value = '';
-            updateFileCount();
-            showPhotoPreview();
-            
-            // Reload incidents
-            await loadUserIncidents();
-        } else {
-            console.error('API Error:', result);
-            showAlert('Error: ' + (result.error || 'Failed to submit report'), 'error');
-        }
-    } catch (error) {
-        console.error('Submit error:', error);
-        showAlert('Network error: ' + error.message, 'error');
-    }
+  } catch (error) {
+    console.error('Submit error:', error);
+    showAlert('Network error: ' + error.message, 'error');
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Submit Report';
+  }
 });
 
 // ────────────────────────────────────────────────
 // Initial Load
 // ────────────────────────────────────────────────
-// Fix database constraint issue (one-time)
 async function fixConstraint() {
-    try {
-        const response = await fetch('api/fix_incidents_constraint.php');
-        const result = await response.json();
-        if (result.success) {
-            console.log('Database constraint fixed');
-        }
-    } catch (e) {
-        console.log('Constraint fix (non-critical):', e);
-    }
+  try {
+    await fetch('api/fix_incidents_constraint.php');
+  } catch (e) {
+    console.log('Constraint fix (non-critical):', e);
+  }
 }
 
-// Setup incidents table on first load
 async function initializePage() {
-    try {
-        await fixConstraint();
-        await fetch('api/setup_incidents_table.php');
-    } catch (e) {
-        console.error('Setup warning (non-critical):', e);
-    }
-    
-    loadUserIncidents();
+  try {
+    await fixConstraint();
+    await fetch('api/setup_incidents_table.php');
+  } catch (e) {
+    console.error('Setup warning (non-critical):', e);
+  }
+  loadUserIncidents();
 }
 
 initializePage();
@@ -510,7 +543,6 @@ initializePage();
 
 <!-- Professional Loader System -->
 <script src="js/auth-guard.js" data-roles="youth"></script>
-<script src="js/youth-nav.js?v=20261021-3"></script>
 <script src="assets/js/loader.js?v=3"></script>
 </body>
 </html>
