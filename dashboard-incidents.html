@@ -342,6 +342,7 @@ function viewIncidentDetail(id){
     </dl>
     <div class="h3">Description</div><p class="text">${esc(i.description||'No description provided.')}</p>
     ${photos.length?`<div class="h3">Photos (${photos.length})</div><div class="photos">${photos.map((p,n)=>`<button type="button" data-photo="${n}" aria-label="View photo ${n+1}"><img src="${esc(p)}" alt="" loading="lazy"></button>`).join('')}</div>`:''}
+    ${i.video_url&&['video/mp4','video/quicktime'].includes(i.video_mime_type)?`<div class="h3">Video clip</div><video controls preload="metadata" aria-label="Incident video" style="display:block;width:100%;max-width:640px;max-height:360px;border-radius:12px;background:#102331"><source src="${esc(i.video_url)}" type="${esc(i.video_mime_type)}">Your browser does not support video playback.</video>`:''}
     ${i.admin_notes?`<div class="h3">Latest internal note</div><div class="notes">${esc(i.admin_notes)}</div>`:''}`;
   $('statusSelect').value=i.status;$('adminNotesInput').value='';
   populateHandlerSelect(i);
@@ -383,7 +384,7 @@ function deleteIncident(id){
   showConfirm('Delete this incident report? This cannot be undone.',async()=>{
     try{
       const r=await fetch('api/delete_incident.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({incident_id:id})}),d=await r.json();
-      if(d.success){notify('Incident deleted successfully');loadIncidents()}else notify('Error: '+(d.error||'Failed to delete'),'error');
+      if(d.success){notify(d.warning||'Incident deleted successfully',d.warning?'warning':'success');loadIncidents()}else notify('Error: '+(d.error||'Failed to delete'),'error');
     }catch(e){console.error('Delete error:',e);notify('Error deleting incident','error')}
   });
 }

@@ -16,6 +16,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
 
 require_once __DIR__ . '/db_connect.php';
 require_once __DIR__ . '/security_helpers.php';
+require_once __DIR__ . '/../includes/supabase_storage.php';
 securityRequireCsrf();
 
 $category = isset($_POST['category']) && is_string($_POST['category']) ? trim($_POST['category']) : '';
@@ -33,7 +34,10 @@ if (!in_array($category, $validCategories, true)
     exit;
 }
 
-$savedPaths = [];
+$uploadedObjectPaths = [];
+$photoObjectPaths = [];
+$videoObjectPath = null;
+$incidentBucket = null;
 try {
     $memberQuery = $pdo->prepare(
         'SELECT u.member_id, u.status
@@ -48,19 +52,20 @@ try {
     }
 
     $files = $_FILES['photo'] ?? null;
-    if (is_array($files) && !empty($files['name'])) {
-        $names = is_array($files['name']) ? $files['name'] : [$files['name']];
-        $tmpNames = is_array($files['tmp_name']) ? $files['tmp_name'] : [$files['tmp_name']];
-        $errors = is_array($files['error']) ? $files['error'] : [$files['error']];
-        $sizes = is_array($files['size']) ? $files['size'] : [$files['size']];
+    $validatedUploads = [];
+    if ($files !== null) {
+        if (!is_array($files)) {
+            throw new RuntimeException('The attached photos could not be read.');
+        }
+
+        $names = is_array($files['name'] ?? null) ? $files['name'] : [$files['name'] ?? ''];
+        $tmpNames = is_array($files['tmp_name'] ?? null) ? $files['tmp_name'] : [$files['tmp_name'] ?? ''];
+        $errors = is_array($files['error'] ?? null) ? $files['error'] : [$files['error'] ?? UPLOAD_ERR_NO_FILE];
+        $sizes = is_array($files['size'] ?? null) ? $files['size'] : [$files['size'] ?? 0];
         if (count($names) > 5) {
             throw new RuntimeException('A maximum of five photos may be attached.');
         }
 
-        $uploadDirectory = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . 'incidents';
-        if (!is_dir($uploadDirectory) && !mkdir($uploadDirectory, 0755, true) && !is_dir($uploadDirectory)) {
-            throw new RuntimeException('Unable to prepare the photo upload directory.');
-        }
         $allowedTypes = [
             'image/jpeg' => 'jpg',
             'image/png' => 'png',
@@ -69,35 +74,97 @@ try {
         $fileInfo = new finfo(FILEINFO_MIME_TYPE);
 
         foreach ($names as $index => $name) {
-            if (($errors[$index] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+            $uploadError = $errors[$index] ?? UPLOAD_ERR_NO_FILE;
+            if ($uploadError === UPLOAD_ERR_NO_FILE) {
                 continue;
             }
-            if (($errors[$index] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK
-                || !is_string($tmpNames[$index] ?? null)
+
+            $tmpName = $tmpNames[$index] ?? null;
+            if ($uploadError !== UPLOAD_ERR_OK
+                || !is_string($tmpName)
+                || !is_uploaded_file($tmpName)
                 || (int)($sizes[$index] ?? 0) < 1
                 || (int)$sizes[$index] > 5 * 1024 * 1024) {
-                throw new RuntimeException('Each attached photo must be under 5 MB and upload successfully.');
+                throw new RuntimeException('Each attached photo must be 5 MB or smaller and upload successfully.');
             }
-            $mime = $fileInfo->file($tmpNames[$index]);
-            if (!is_string($mime) || !isset($allowedTypes[$mime])) {
+
+            $mimeType = $fileInfo->file($tmpName);
+            if (!is_string($mimeType) || !isset($allowedTypes[$mimeType])) {
                 throw new RuntimeException('Only JPG, PNG, and GIF photos are allowed.');
             }
 
-            $filename = 'incident_' . bin2hex(random_bytes(16)) . '.' . $allowedTypes[$mime];
-            $target = $uploadDirectory . DIRECTORY_SEPARATOR . $filename;
-            if (!move_uploaded_file($tmpNames[$index], $target)) {
-                throw new RuntimeException('Unable to save an attached photo.');
-            }
-            $savedPaths[] = 'uploads/incidents/' . $filename;
+            $validatedUploads[] = [
+                'tmp_name' => $tmpName,
+                'mime_type' => $mimeType,
+                'extension' => $allowedTypes[$mimeType],
+            ];
         }
     }
 
-    $photoPath = $savedPaths ? json_encode($savedPaths, JSON_THROW_ON_ERROR) : null;
+    $videoUpload = null;
+    $videoFile = $_FILES['video'] ?? null;
+    if ($videoFile !== null) {
+        if (!is_array($videoFile)) {
+            throw new RuntimeException('The attached video could not be read.');
+        }
+
+        $uploadError = $videoFile['error'] ?? UPLOAD_ERR_NO_FILE;
+        if ($uploadError !== UPLOAD_ERR_NO_FILE) {
+            $tmpName = $videoFile['tmp_name'] ?? null;
+            $size = (int)($videoFile['size'] ?? 0);
+            if ($uploadError !== UPLOAD_ERR_OK
+                || !is_string($tmpName)
+                || !is_uploaded_file($tmpName)
+                || $size < 1
+                || $size > 50 * 1024 * 1024) {
+                throw new RuntimeException('The attached video must be 50 MB or smaller and upload successfully.');
+            }
+
+            $allowedVideoTypes = [
+                'video/mp4' => 'mp4',
+                'video/quicktime' => 'mov',
+            ];
+            $mimeType = (new finfo(FILEINFO_MIME_TYPE))->file($tmpName);
+            if (!is_string($mimeType) || !isset($allowedVideoTypes[$mimeType])) {
+                throw new RuntimeException('Only MP4 and MOV video clips are allowed.');
+            }
+
+            $videoUpload = [
+                'tmp_name' => $tmpName,
+                'mime_type' => $mimeType,
+                'extension' => $allowedVideoTypes[$mimeType],
+            ];
+        }
+    }
+
+    if ($validatedUploads || $videoUpload !== null) {
+        $incidentBucket = supabaseIncidentStorageBucket();
+    }
+
+    foreach ($validatedUploads as $upload) {
+        $objectPath = 'incidents/' . bin2hex(random_bytes(16)) . '.' . $upload['extension'];
+        $uploadedObjectPaths[] = $objectPath;
+        $photoObjectPaths[] = $objectPath;
+        supabaseStorageUpload($objectPath, $upload['tmp_name'], $upload['mime_type'], $incidentBucket);
+    }
+
+    if ($videoUpload !== null) {
+        $videoObjectPath = 'incidents/' . bin2hex(random_bytes(16)) . '.' . $videoUpload['extension'];
+        $uploadedObjectPaths[] = $videoObjectPath;
+        supabaseStorageUpload(
+            $videoObjectPath,
+            $videoUpload['tmp_name'],
+            $videoUpload['mime_type'],
+            $incidentBucket
+        );
+    }
+
+    $photoPath = $photoObjectPaths ? json_encode($photoObjectPaths, JSON_THROW_ON_ERROR) : null;
     $pdo->beginTransaction();
     $insert = $pdo->prepare(
         'INSERT INTO incidents
-            (member_id, category, description, location, urgency, status, photo_path)
-         VALUES (?, ?, ?, ?, ?, ?, ?)
+            (member_id, category, description, location, urgency, status, photo_path, video_path)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
          RETURNING id'
     );
     $insert->execute([
@@ -107,7 +174,8 @@ try {
         $location,
         $urgency,
         'pending',
-        $photoPath
+        $photoPath,
+        $videoObjectPath
     ]);
     $incidentId = (int)$insert->fetchColumn();
     $pdo->commit();
@@ -121,10 +189,11 @@ try {
     if ($pdo->inTransaction()) {
         $pdo->rollBack();
     }
-    foreach ($savedPaths as $path) {
-        $absolutePath = dirname(__DIR__) . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $path);
-        if (is_file($absolutePath)) {
-            unlink($absolutePath);
+    foreach ($uploadedObjectPaths as $objectPath) {
+        try {
+            supabaseStorageDelete($objectPath, $incidentBucket);
+        } catch (Throwable $cleanupException) {
+            error_log('[Incident] Supabase Storage cleanup failed: ' . $cleanupException->getMessage());
         }
     }
     http_response_code(400);
@@ -133,10 +202,11 @@ try {
     if ($pdo->inTransaction()) {
         $pdo->rollBack();
     }
-    foreach ($savedPaths as $path) {
-        $absolutePath = dirname(__DIR__) . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $path);
-        if (is_file($absolutePath)) {
-            unlink($absolutePath);
+    foreach ($uploadedObjectPaths as $objectPath) {
+        try {
+            supabaseStorageDelete($objectPath, $incidentBucket);
+        } catch (Throwable $cleanupException) {
+            error_log('[Incident] Supabase Storage cleanup failed: ' . $cleanupException->getMessage());
         }
     }
     error_log('[Incident] Verified submission failed: ' . $exception->getMessage());

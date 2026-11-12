@@ -23,11 +23,16 @@ The dummy secret keys must stay in local `.env` files and never be committed to 
 
 ## 1. Supabase
 
-Apply all PostgreSQL migrations, including `database/postgres/migrations/011_login_email_otp.sql` and `database/postgres/migrations/012_email_quota_activation_sms.sql`, before enabling email OTP or youth activation. The schema and migrations should otherwise already be applied:
+Apply all PostgreSQL migrations, including `database/postgres/migrations/011_login_email_otp.sql`, `database/postgres/migrations/012_email_quota_activation_sms.sql`, and `database/postgres/migrations/017_incident_video_path.sql`, before enabling incident video uploads. The schema and other migrations should otherwise already be applied:
 
 1. Use the Supabase **Session pooler** connection, port `5432`, database `postgres`.
 2. Do not use the transaction pooler on port `6543`.
 3. Keep the `anon` key out of this PHP application. The server-side `service_role` key is required only for private Storage operations and must never be exposed to browsers or committed to Git.
+4. Create two **private** Storage buckets:
+   - `printing` (or the bucket set by `SUPABASE_STORAGE_BUCKET`) for Print Services documents. Allow the document MIME types used by that page and set the file-size limit to at least 10 MB.
+   - `incidents` (or the bucket set by `SUPABASE_INCIDENTS_BUCKET`) for report attachments. Allow only `image/jpeg`, `image/png`, `image/gif`, `video/mp4`, and `video/quicktime`, and set the file-size limit to 50 MB. Reports accept up to five 5 MB photos and one 50 MB MP4 or MOV clip.
+
+Report photo and video objects are stored in the dedicated incidents bucket; the database stores only their object paths. The PHP API checks the user's access and returns short-lived signed URLs, so both buckets must remain private.
 
 ## 2. Create the Render demo service
 
@@ -57,6 +62,7 @@ Apply all PostgreSQL migrations, including `database/postgres/migrations/011_log
    | `SUPABASE_URL` | Supabase project URL, e.g. `https://<PROJECT_REF>.supabase.co` |
    | `SUPABASE_SERVICE_ROLE_KEY` | Supabase service-role key; keep server-side and never expose it to browsers |
    | `SUPABASE_STORAGE_BUCKET` | Private Storage bucket name; use `printing` |
+   | `SUPABASE_INCIDENTS_BUCKET` | Private incident-attachments bucket name; use `incidents` |
 
    Never put actual secret values in GitHub or this chat. UniSMS is used only for the youth activation phone check. EmailJS private keys must remain server-side.
 
@@ -78,7 +84,7 @@ Apply all PostgreSQL migrations, including `database/postgres/migrations/011_log
 Render Free is suitable for a temporary demo, not reliable production use:
 
 - The service sleeps after 15 minutes without traffic; waking can take about a minute.
-- Its filesystem is ephemeral. Uploaded files, PHP session files, and other local changes are lost on restart, spin-down, or redeploy.
+- Its filesystem is ephemeral. PHP session files and uploads still stored locally are lost on restart, spin-down, or redeploy. Print documents and report photos/videos are stored in Supabase Storage.
 - Free services cannot attach persistent disks. Do not use real or sensitive uploads for this demo.
 - Keep the service to one instance; sessions are stored as local PHP files.
 
@@ -99,7 +105,7 @@ The Render free plan may not provide an interactive service shell. Run these com
 
 ## Local XAMPP
 
-XAMPP continues to serve `http://localhost/SKalinga/`. Copy `.env.example` to `.env`, configure a separate `SITE_KEY` and the Supabase values, enable `pdo_pgsql` and `pgsql`, then restart Apache. The legacy ignored `includes/config.local.php` is also supported.
+XAMPP continues to serve `http://localhost/SKalinga/`. Copy `.env.example` to `.env`, configure a separate `SITE_KEY` and the Supabase values, enable `pdo_pgsql` and `pgsql`, then restart Apache. Set `upload_max_filesize=50M`, `post_max_size=80M`, `max_file_uploads=6`, `max_input_time=180`, and `max_execution_time=180` in PHP so the server accepts the documented upload sizes. The legacy ignored `includes/config.local.php` is also supported.
 
 ## Import the KK masterlist
 

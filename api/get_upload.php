@@ -3,9 +3,11 @@
 require_once __DIR__ . '/db_connect.php';
 require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/../includes/request.php';
+require_once __DIR__ . '/../includes/supabase_storage.php';
 
 authStartSession();
 $type = is_string($_GET['type'] ?? null) ? $_GET['type'] : '';
+$media = is_string($_GET['media'] ?? null) ? $_GET['media'] : 'photo';
 $id = filter_var($_GET['id'] ?? null, FILTER_VALIDATE_INT);
 $auth = currentAuth();
 $isAdmin = $auth !== null
@@ -49,7 +51,11 @@ try {
             }
         }
     } else {
-        $stmt = $pdo->prepare('SELECT member_id, photo_path FROM incidents WHERE id = ?');
+        if (!in_array($media, ['photo', 'video'], true)) {
+            http_response_code(404);
+            exit;
+        }
+        $stmt = $pdo->prepare('SELECT member_id, photo_path, video_path FROM incidents WHERE id = ?');
         $stmt->execute([$id]);
         $record = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$record) {
@@ -70,16 +76,35 @@ try {
             }
         }
 
-        $paths = json_decode((string)($record['photo_path'] ?? ''), true);
-        if (!is_array($paths)) {
-            $paths = [$record['photo_path']];
+        if ($media === 'video') {
+            $filePath = $record['video_path'] ?? '';
+        } else {
+            $paths = json_decode((string)($record['photo_path'] ?? ''), true);
+            if (!is_array($paths)) {
+                $paths = [$record['photo_path']];
+            }
+            $fileIndex = filter_var($_GET['file'] ?? 0, FILTER_VALIDATE_INT);
+            if ($fileIndex === false || $fileIndex < 0 || !isset($paths[$fileIndex])) {
+                http_response_code(404);
+                exit;
+            }
+            $filePath = $paths[$fileIndex];
         }
-        $fileIndex = filter_var($_GET['file'] ?? 0, FILTER_VALIDATE_INT);
-        if ($fileIndex === false || $fileIndex < 0 || !isset($paths[$fileIndex])) {
+    }
+
+    if ($type === 'incident' && is_string($filePath) && str_starts_with($filePath, 'incidents/')) {
+        $allowedPathPattern = $media === 'video'
+            ? '/^incidents\/[a-f0-9]{32}\.(?:mp4|mov)$/D'
+            : '/^incidents\/[a-f0-9]{32}\.(?:jpg|png|gif)$/D';
+        if (preg_match($allowedPathPattern, $filePath) !== 1) {
             http_response_code(404);
             exit;
         }
-        $filePath = $paths[$fileIndex];
+
+        $signedUrl = supabaseStorageCreateSignedUrl($filePath, 600, supabaseIncidentStorageBucket());
+        header('Cache-Control: private, no-store');
+        header('Location: ' . $signedUrl, true, 302);
+        exit;
     }
 
     $expectedPrefix = 'uploads/' . ($type === 'incident' ? 'incidents/' : 'printing/');

@@ -129,6 +129,7 @@ CREATE TABLE IF NOT EXISTS public.incidents (
     urgency varchar(20) NOT NULL DEFAULT 'low',
     status varchar(20) NOT NULL DEFAULT 'pending',
     photo_path varchar(255),
+    video_path varchar(255),
     submitted_date timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_date timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
     admin_notes text

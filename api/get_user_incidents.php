@@ -17,7 +17,7 @@ $member_id = $_SESSION['member_id'];
 try {
     $stmt = $pdo->prepare('
         SELECT id, member_id, category, description, location, urgency, status,
-               photo_path, submitted_date
+               photo_path, video_path, submitted_date
         FROM incidents
         WHERE member_id = ?
         ORDER BY submitted_date DESC
@@ -43,6 +43,15 @@ try {
             static fn(int $index): string => 'api/get_upload.php?type=incident&id=' . (int)$incident['id'] . '&file=' . $index,
             array_keys($photos)
         )), JSON_UNESCAPED_SLASHES);
+        $videoPath = (string)($incident['video_path'] ?? '');
+        if (preg_match('/^incidents\/[a-f0-9]{32}\.(mp4|mov)$/D', $videoPath, $matches) === 1) {
+            $incident['video_url'] = 'api/get_upload.php?type=incident&id=' . (int)$incident['id'] . '&media=video';
+            $incident['video_mime_type'] = $matches[1] === 'mp4' ? 'video/mp4' : 'video/quicktime';
+        } else {
+            $incident['video_url'] = null;
+            $incident['video_mime_type'] = null;
+        }
+        unset($incident['video_path']);
     }
     unset($incident);
     

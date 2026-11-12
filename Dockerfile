@@ -9,6 +9,11 @@ RUN apt-get update \
         'display_errors=Off' \
         'log_errors=On' \
         'error_log=/proc/self/fd/2' \
+        'upload_max_filesize=50M' \
+        'post_max_size=80M' \
+        'max_file_uploads=6' \
+        'max_execution_time=180' \
+        'max_input_time=180' \
         > "$PHP_INI_DIR/conf.d/zz-railway.ini" \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*

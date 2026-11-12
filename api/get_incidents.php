@@ -31,7 +31,7 @@ try {
     // Join through users table (via member_id) to youth_profiles to get incident details with member info
     $query = "
         SELECT i.id, i.member_id, i.category, i.description, i.location, i.urgency,
-               i.status, i.photo_path, i.submitted_date, i.admin_notes,
+               i.status, i.photo_path, i.video_path, i.submitted_date, i.admin_notes,
                i.assigned_to, i.handler_name, i.resolution_notes, i.resolved_at, i.closed_at,
                COALESCE(p.firstname, 'Unknown') as firstname,
                COALESCE(p.lastname, 'User') as lastname,
@@ -58,6 +58,15 @@ try {
             static fn(int $index): string => 'api/get_upload.php?type=incident&id=' . (int)$incident['id'] . '&file=' . $index,
             array_keys($photos)
         )), JSON_UNESCAPED_SLASHES);
+        $videoPath = (string)($incident['video_path'] ?? '');
+        if (preg_match('/^incidents\/[a-f0-9]{32}\.(mp4|mov)$/D', $videoPath, $matches) === 1) {
+            $incident['video_url'] = 'api/get_upload.php?type=incident&id=' . (int)$incident['id'] . '&media=video';
+            $incident['video_mime_type'] = $matches[1] === 'mp4' ? 'video/mp4' : 'video/quicktime';
+        } else {
+            $incident['video_url'] = null;
+            $incident['video_mime_type'] = null;
+        }
+        unset($incident['video_path']);
     }
     unset($incident);
     

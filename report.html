@@ -55,7 +55,7 @@
     <p>Submit incident reports, safety concerns, bullying, environmental problems, or request<br class="desktop-only"> emergency assistance directly to the SK Office.</p>
     <div class="hero-steps">
       <span><b>1</b> Describe incident</span>
-      <span><b>2</b> Set urgency &amp; photos</span>
+      <span><b>2</b> Set urgency &amp; attachments</span>
       <span><b>3</b> SK Office review</span>
     </div>
     <button type="button" class="history-button" onclick="document.getElementById('reportsHistory').scrollIntoView({ behavior: 'smooth' });">
@@ -164,6 +164,17 @@
           <div id="photoPreviewGrid" class="photo-preview-grid"></div>
         </div>
 
+        <div class="form-group">
+          <label for="video">Attach one video clip (optional)</label>
+          <input type="file" id="video" name="video" accept="video/mp4,video/quicktime,.mp4,.mov" class="file-input-hidden" tabindex="-1" aria-hidden="true">
+          <button type="button" id="videoUploadArea" class="file-dropzone video-dropzone" aria-label="Add one report video clip">
+            <span class="upload-icon">▶</span>
+            <strong>Tap to add a video clip</strong>
+            <small id="selectedVideoName">MP4 or MOV — up to 50 MB</small>
+          </button>
+          <div id="videoPreview" class="video-preview" hidden></div>
+        </div>
+
         <div class="form-actions">
           <button type="submit" class="btn primary large" id="submitReportBtn">Submit Report</button>
         </div>
@@ -179,6 +190,7 @@
         <div><dt>Urgency</dt><dd id="summaryUrgency">Low</dd></div>
         <div><dt>Location</dt><dd id="summaryLocation">Not set</dd></div>
         <div><dt>Photos</dt><dd id="summaryPhotos">None attached</dd></div>
+        <div><dt>Video</dt><dd id="summaryVideo">None attached</dd></div>
       </dl>
       <div class="summary-notice">
         <span>▣</span>
@@ -199,7 +211,7 @@
     <div class="reports-list" id="reportsList" aria-live="polite"></div>
   </section>
 
-  <button class="help-button" type="button" aria-label="Help" onclick="showAlert('Select a category and urgency level, describe the location and incident, and attach photos if available.', 'info')">?</button>
+  <button class="help-button" type="button" aria-label="Help" onclick="showAlert('Select a category and urgency level, describe the location and incident, and attach up to five photos or one video clip if available.', 'info')">?</button>
 
   <!-- Toast Notification Container -->
   <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="false"></div>
@@ -249,6 +261,11 @@ const uploadArea = document.getElementById('photoUploadArea');
 const photoInput = document.getElementById('photo');
 const fileCountDisplay = document.getElementById('selectedFilesCount');
 const previewGrid = document.getElementById('photoPreviewGrid');
+const videoInput = document.getElementById('video');
+const videoUploadArea = document.getElementById('videoUploadArea');
+const videoPreview = document.getElementById('videoPreview');
+const selectedVideoName = document.getElementById('selectedVideoName');
+let videoObjectUrl = null;
 
 uploadArea.addEventListener('click', () => {
   const tempInput = document.createElement('input');
@@ -332,6 +349,58 @@ function removePhotoFromSelection(indexToRemove) {
   photoInput.files = dataTransfer.files;
   updateFileCount();
   showPhotoPreview();
+}
+
+videoUploadArea.addEventListener('click', () => videoInput.click());
+videoInput.addEventListener('change', () => {
+  const file = videoInput.files[0];
+  if (file && file.size > 50 * 1024 * 1024) {
+    videoInput.value = '';
+    updateVideoPreview();
+    showAlert('The video clip must be 50 MB or smaller.', 'warning');
+    return;
+  }
+  updateVideoPreview();
+});
+
+function updateVideoPreview() {
+  if (videoObjectUrl) {
+    URL.revokeObjectURL(videoObjectUrl);
+    videoObjectUrl = null;
+  }
+  videoPreview.replaceChildren();
+
+  const file = videoInput.files[0];
+  const summaryVideo = document.getElementById('summaryVideo');
+  if (!file) {
+    videoPreview.hidden = true;
+    selectedVideoName.textContent = 'MP4 or MOV — up to 50 MB';
+    videoUploadArea.classList.remove('has-files');
+    summaryVideo.textContent = 'None attached';
+    return;
+  }
+
+  videoObjectUrl = URL.createObjectURL(file);
+  const player = document.createElement('video');
+  player.controls = true;
+  player.preload = 'metadata';
+  player.src = videoObjectUrl;
+  player.setAttribute('aria-label', 'Selected incident video preview');
+
+  const removeButton = document.createElement('button');
+  removeButton.type = 'button';
+  removeButton.className = 'remove-video-btn';
+  removeButton.textContent = 'Remove video';
+  removeButton.addEventListener('click', () => {
+    videoInput.value = '';
+    updateVideoPreview();
+  });
+
+  videoPreview.append(player, removeButton);
+  videoPreview.hidden = false;
+  selectedVideoName.textContent = file.name;
+  videoUploadArea.classList.add('has-files');
+  summaryVideo.textContent = '1 clip attached';
 }
 
 // ────────────────────────────────────────────────
@@ -418,6 +487,12 @@ function renderReports() {
         photosHtml = '';
       }
     }
+    const videoMimeType = ['video/mp4', 'video/quicktime'].includes(report.video_mime_type)
+      ? report.video_mime_type
+      : '';
+    const videoHtml = typeof report.video_url === 'string' && videoMimeType
+      ? `<video class="report-video" controls preload="metadata" aria-label="Incident video"><source src="${escapeIncidentHtml(report.video_url)}" type="${videoMimeType}">Your browser does not support video playback.</video>`
+      : '';
 
     const status = String(report.status || 'pending');
     const statusSlug = status.toLowerCase().replace(/_/g, '-');
@@ -437,6 +512,7 @@ function renderReports() {
         <span><strong>Submitted:</strong> ${escapeIncidentHtml(submittedDate)}</span>
       </div>
       ${photosHtml}
+      ${videoHtml}
     `;
     list.appendChild(item);
   });
@@ -464,6 +540,10 @@ document.getElementById('reportForm').addEventListener('submit', async (e) => {
       formData.append('photo[]', file);
     });
   }
+  const videoInput = document.getElementById('video');
+  if (videoInput && videoInput.files.length > 0) {
+    formData.append('video', videoInput.files[0]);
+  }
 
   try {
     const csrfResponse = await fetch('api/csrf_token.php', { credentials: 'same-origin', cache: 'no-store' });
@@ -488,6 +568,7 @@ document.getElementById('reportForm').addEventListener('submit', async (e) => {
       photoInput.value = '';
       updateFileCount();
       showPhotoPreview();
+      updateVideoPreview();
 
       // Reset interactive choice cards & summary back to defaults
       document.querySelectorAll('[data-select="category"]').forEach((c, i) => {

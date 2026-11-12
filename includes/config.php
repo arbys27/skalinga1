@@ -41,6 +41,7 @@ function skalingaConfig(): array
             'SUPABASE_URL',
             'SUPABASE_SERVICE_ROLE_KEY',
             'SUPABASE_STORAGE_BUCKET',
+            'SUPABASE_INCIDENTS_BUCKET',
         ];
         foreach ($dotenvKeys as $key) {
             if (isset($parsedConfig[$key]) && is_string($parsedConfig[$key])) {
@@ -100,6 +101,7 @@ function skalingaConfig(): array
         'SUPABASE_URL',
         'SUPABASE_SERVICE_ROLE_KEY',
         'SUPABASE_STORAGE_BUCKET',
+        'SUPABASE_INCIDENTS_BUCKET',
     ] as $key) {
         $environmentValue = getenv($key);
         if ($environmentValue !== false && $environmentValue !== '') {
