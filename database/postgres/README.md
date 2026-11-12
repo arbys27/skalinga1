@@ -1,7 +1,7 @@
 # Supabase PostgreSQL schema
 
 Run `schema.sql` in the Supabase SQL editor, followed by every file in `migrations/`
-in numeric order (`001` through `009`). The files are safe to re-run.
+in numeric order (`001` through `013`). The files are safe to re-run.
 
 Migration `007_freedom_wall.sql` creates the moderated youth Freedom Wall post
 table and indexes. Apply it before using the Freedom Wall pages or APIs.
@@ -21,6 +21,10 @@ Migration `009_incident_accountability.sql` adds incident handler snapshots,
 resolution/closure metadata, and the admin-only incident status/assignment history.
 Apply it before using the incident management dashboard's handler assignment and
 history features.
+
+Migration `013_printing_submission_verification.sql` adds the
+`AwaitingVerification` printing status and verification metadata for the physical
+and email-verified submission flow.
 
 The original MySQL dump is `../skalinga_youth.sql`; the task-referenced
 `database/skalinga_schema.sql` is not present in this repository. The converted
