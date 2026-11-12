@@ -128,11 +128,12 @@ try {
         verificationResponse(['success' => false, 'message' => 'Verification is not configured for this service.'], 400);
     }
 
+    $otpRequired = $purpose === 'submit' || postgresBoolean($settings['otp_required']);
     $insert = $pdo->prepare(
         'INSERT INTO service_verification_tokens
             (user_id, service_type, service_ref, token_hash, expires_at, otp_required,
              code_hash, code_expires_at)
-         VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP + (CAST(? AS integer) * INTERVAL \'1 second\'), ?, NULL, NULL)
+         VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP + (CAST(? AS integer) * INTERVAL \'1 second\'), CAST(? AS boolean), NULL, NULL)
          RETURNING id, expires_at'
     );
     $insert->execute([
@@ -141,7 +142,7 @@ try {
         $serviceRef,
         $tokenHash,
         (int)$settings['token_ttl_seconds'],
-        $purpose === 'submit' ? true : postgresBoolean($settings['otp_required']),
+        $otpRequired ? 'true' : 'false',
     ]);
     $created = $insert->fetch(PDO::FETCH_ASSOC);
     verificationAudit(
@@ -163,7 +164,7 @@ try {
         'token_id' => (int)$created['id'],
         'expires_at' => $created['expires_at'],
         'expires_in' => (int)$settings['token_ttl_seconds'],
-        'otp_required' => $purpose === 'submit' ? true : postgresBoolean($settings['otp_required']),
+        'otp_required' => $otpRequired,
         'purpose' => $purpose,
         'request' => [
             'request_id' => $serviceType === 'print' ? (int)$request['request_id'] : null,
