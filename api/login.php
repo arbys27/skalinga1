@@ -50,7 +50,7 @@ try {
     $attempts = $attemptStmt->fetch(PDO::FETCH_NUM);
     $attemptCount = (int)($attempts[0] ?? 0);
     $lastAttempt = isset($attempts[1]) ? strtotime((string)$attempts[1]) : false;
-    $lockoutSeconds = min(1800, 30 * (2 ** max(0, $attemptCount - 1)));
+    $lockoutSeconds = 180;
     if ($attemptCount >= 5 && $lastAttempt !== false && time() - $lastAttempt < $lockoutSeconds) {
         $waitSeconds = $lockoutSeconds - (time() - $lastAttempt);
         authJsonResponse([
@@ -58,8 +58,15 @@ try {
             'message' => 'Too many login attempts. Please wait ' . $waitSeconds . ' seconds before trying again.'
         ], 429);
     }
-    $pdo->prepare('INSERT INTO login_attempts (ip_address, attempt_type) VALUES (?, ?)')
-        ->execute([$ipAddress, 'login']);
+    if ($attemptCount >= 5) {
+        $pdo->prepare('DELETE FROM login_attempts WHERE ip_address = ? AND attempt_type = ?')
+            ->execute([$ipAddress, 'login']);
+    }
+
+    $recordFailedAttempt = static function () use ($pdo, $ipAddress): void {
+        $pdo->prepare('INSERT INTO login_attempts (ip_address, attempt_type) VALUES (?, ?)')
+            ->execute([$ipAddress, 'login']);
+    };
 
     $normalizedIdentifier = function_exists('mb_strtolower')
         ? mb_strtolower(preg_replace('/\s+/u', ' ', $identifier), 'UTF-8')
@@ -89,6 +96,7 @@ try {
 
     if ($admin && $youth) {
         error_log('[Auth Login] Identifier collision detected.');
+        $recordFailedAttempt();
         authJsonResponse(['success' => false, 'message' => 'Invalid credentials.'], 401);
     }
 
@@ -99,8 +107,12 @@ try {
     }
     $passwordMatches = password_verify($password, $passwordHash);
     if (!$account || !$passwordMatches || strtolower((string)($account['status'] ?? '')) !== 'active') {
+        $recordFailedAttempt();
         authJsonResponse(['success' => false, 'message' => 'Invalid credentials.'], 401);
     }
+
+    $pdo->prepare('DELETE FROM login_attempts WHERE ip_address = ? AND attempt_type = ?')
+        ->execute([$ipAddress, 'login']);
 
     $isAdmin = is_array($admin);
     $role = $isAdmin ? (($account['role'] ?? '') === 'superadmin' ? 'admin' : 'sk_official') : 'youth';
