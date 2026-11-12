@@ -43,10 +43,6 @@
             items: [{ label: 'Public Disclosure', href: 'dashboard-public_disclosure.html', icon: 'disclosure' }]
         },
         {
-            title: 'Service desk',
-            items: [{ label: 'Verify service claim', href: 'admin-service-verification.html', icon: 'verify' }]
-        },
-        {
             title: 'System',
             items: [
                 { label: 'Logout', icon: 'logout', action: 'logout' }

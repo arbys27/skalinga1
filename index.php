@@ -13,8 +13,8 @@ $escapeHtml = static function ($value): string {
 };
 
 // ---- SK office location (edit these) ----
-$officeName    = 'SK Office, Barangay San Antonio';
-$officeAddress = 'Barangay San Antonio, Biñan, Laguna'; // shown as text under the name
+$officeName    = 'SK San Antonio Office';
+$officeAddress = '1582 Kaimito Street, Garcia Subdivision, Barangay San Antonio, City of Biñan, Laguna'; // shown as text under the name
 $officeHours   = ''; // optional, e.g. 'Mon to Fri, 8:00 AM to 5:00 PM'. Leave empty to hide.
 $officeLat     = '14.3344666';
 $officeLng     = '121.0880925';
@@ -266,11 +266,33 @@ section.s{padding:clamp(64px,9vw,120px) 0}
 .signin-band p{margin:8px 0 0;color:var(--ink);max-width:48ch}
 @media(min-width:760px){.signin-band{grid-template-columns:1fr auto}}
 
-footer{background:var(--green-deep);color:rgba(255,255,255,.85);padding:48px 0 36px;font-size:14px}
-footer .wrap{display:grid;gap:20px}
-footer b{font:800 22px var(--h);color:#fff}
-footer a:hover{color:var(--mint)}
-@media(min-width:760px){footer .wrap{grid-template-columns:1.4fr 1fr 1fr}}
+/* footer */
+footer{background:var(--green-deep);color:rgba(255,255,255,.85);padding:56px 0 32px;font-size:14px}
+footer .wrap{display:grid;gap:32px}
+footer b{display:inline-flex;align-items:center;gap:10px;font:800 22px var(--h);color:#fff;margin-bottom:8px}
+.footer-heading{font:700 12px var(--b);text-transform:uppercase;letter-spacing:.08em;color:var(--mint);margin:0 0 14px}
+.footer-links{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.footer-link{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:8px 14px;border-radius:12px;
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
+  color:#fff;font-weight:600;
+  transition:background .2s ease,border-color .2s ease,transform .15s ease,color .2s ease;
+}
+.footer-link .icon{width:18px;height:18px;color:var(--mint);transition:transform .2s ease,color .2s ease}
+.footer-link:hover{
+  background:rgba(255,255,255,.16);border-color:var(--mint);
+  color:var(--mint);transform:translateY(-2px);
+}
+.footer-link:hover .icon{color:var(--pink);transform:scale(1.08)}
+.footer-link:active{transform:scale(.98)}
+.footer-bottom{
+  margin-top:36px;padding-top:20px;
+  border-top:1px solid rgba(255,255,255,.12);
+  display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;
+  font-size:13px;color:rgba(255,255,255,.65);
+}
+@media(min-width:760px){footer .wrap{grid-template-columns:1.3fr 1fr 1.2fr}}
 
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 @media(prefers-reduced-motion:reduce){.slide.on img{transform:none!important;animation:none!important}}
@@ -294,6 +316,38 @@ footer a:hover{color:var(--mint)}
 .card .meta span{display:inline-flex;align-items:center;gap:5px}
 .card .meta .icon{width:16px;height:16px}
 .empty-activities{width:100%;padding:24px;border:1px dashed color-mix(in srgb,var(--green) 35%,white);border-radius:20px;color:var(--muted)}
+
+/* Archived Yan Ang SK Ko content */
+.legacy-signup{background:linear-gradient(135deg,color-mix(in srgb,var(--mint) 36%,white),#fff)}
+.legacy-signup .feature h2,.legacy-join h2{font-size:clamp(30px,5vw,48px);margin:10px 0 14px}
+.legacy-signup .feature p,.legacy-join p{color:var(--muted);max-width:60ch}
+.legacy-updates{background:var(--green-tint)}
+.legacy-posts{display:grid;grid-template-columns:1fr;gap:16px}
+.legacy-post{display:flex;flex-direction:column;align-items:flex-start;padding:clamp(20px,3vw,30px);border:1px solid var(--line);border-radius:24px;background:#fff;box-shadow:0 12px 30px color-mix(in srgb,var(--green-deep) 6%,transparent)}
+.legacy-meta{display:flex;flex-wrap:wrap;gap:8px 12px;margin-bottom:14px;color:var(--muted);font-size:12px;font-weight:700}
+.legacy-meta span{color:var(--green-deep);text-transform:uppercase;letter-spacing:.06em}
+.legacy-post h3{font-size:clamp(20px,2.4vw,25px);margin-bottom:10px}
+.legacy-post p{margin:0 0 18px;color:var(--muted);font-size:14px}
+.legacy-post{min-height:100%}
+@media(min-width:700px){.legacy-posts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.legacy-month-grid{display:grid;grid-template-columns:1fr;gap:16px}
+.legacy-month{overflow:hidden;border:1px solid var(--line);border-radius:24px;background:#fff}
+.legacy-month img{width:100%;aspect-ratio:16/10;object-fit:cover;background:var(--green-tint)}
+.legacy-month>div{padding:18px 20px 22px}
+.legacy-month-label{color:var(--pink-deep);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.legacy-month h3{margin:8px 0;font-size:21px}
+.legacy-month p{margin:0;color:var(--muted);font-size:14px}
+@media(min-width:700px){.legacy-month-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(min-width:1000px){.legacy-month-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.legacy-join-card{display:grid;overflow:hidden;align-items:center;border-radius:30px;background:var(--green-deep);color:#fff}
+.legacy-join-card>img{width:100%;height:100%;min-height:240px;max-height:420px;object-fit:cover}
+.legacy-join-card>div{padding:clamp(26px,5vw,54px)}
+.legacy-join-card p{color:rgba(255,255,255,.82)}
+.legacy-join-card .pill{background:var(--mint)}
+@media(min-width:860px){.legacy-join-card{grid-template-columns:1fr 1fr}}
+.legacy-office-photo{display:block;width:112px;height:112px;object-fit:contain;align-self:flex-start;border-radius:16px;background:var(--green-tint)}
+.legacy-contact-row a{color:inherit;text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--green) 42%,transparent);text-underline-offset:3px}
+.legacy-contact-row a:hover{color:var(--pink-deep)}
 @media(max-width:600px){
   .wrap{width:min(100% - 32px,1180px)}
   .nav{padding:10px 0}
@@ -368,6 +422,10 @@ footer a:hover{color:var(--mint)}
   <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
   <symbol id="i-left" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+  <symbol id="i-fb" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.4 19.4 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.2-1.3a2 2 0 0 1 2.1-.5c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.8 2.1Z"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></symbol>
+  <symbol id="i-ext" viewBox="0 0 24 24"><path d="M7 17 17 7M7 7h10v10"/></symbol>
 </svg>
 
 <header class="nav" id="nav">
@@ -378,7 +436,7 @@ footer a:hover{color:var(--mint)}
       <span>SKalinga</span>
     </a>
     <nav class="links" aria-label="Main">
-<a href="#projects">Projects</a><a href="#activities">Activities</a><a href="#services">Services</a><a href="#location">Find us</a><a href="#contact">Contact</a>    </nav>
+<a href="#projects">Projects</a><a href="#activities">Activities</a><a href="#youth-updates">Youth updates</a><a href="#services">Services</a><a href="#location">Find us</a><a href="#contact">Contact</a>    </nav>
     <a class="btn btn-pink" href="login.html">Sign in</a>
   </div>
 </header>
@@ -403,7 +461,7 @@ footer a:hover{color:var(--mint)}
       <p class="lead">Join events, borrow equipment, request prints, get health updates and see how your SK works for you, all in one portal.</p>
       <div class="cta">
         <a class="btn btn-pink" href="login.html">Sign in to SKalinga <svg class="icon"><use href="#i-arrow"/></svg></a>
-        <a class="btn btn-ghost" href="#projects">See our projects</a>
+        <a class="btn btn-ghost" href="#youth-updates">Explore youth updates</a>
       </div>
     </div>
 
@@ -477,6 +535,85 @@ footer a:hover{color:var(--mint)}
     </div>
   </section>
 
+  <section class="s legacy-updates" id="youth-updates">
+    <div class="wrap">
+      <div class="head">
+        <span class="pill">Mga kuwento ng kabataan</span>
+        <h2>San Antonio Youth Updates</h2>
+        <p>Mga balita, tagumpay, at gawaing pangkabataan na nagbigay-buhay sa mga programa ng Sangguniang Kabataan ng Barangay San Antonio.</p>
+      </div>
+      <div class="legacy-posts">
+        <article class="legacy-post">
+          <div class="legacy-meta"><span>SK Sport Update</span><time datetime="2025-07-13">July 13, 2025</time></div>
+          <h3>Tuloy-tuloy na Pag-arangkada!</h3>
+          <p>Noong Hulyo 13, 2025, wagi ang San Antonio Under-21 laban sa Barangay San Francisco sa iskor na 81–76 sa Biñan City Inter-Barangay Basketball League 2025 sa Brgy. Tubigan Covered Court. Ipinakita ng koponan ang lakas, talino, at disiplina sa dikdikang laban. Pasasalamat din sa mga manlalaro, coach, at komunidad sa kanilang suporta.</p>
+        </article>
+        <article class="legacy-post">
+          <div class="legacy-meta"><span>SK Advisory</span><time datetime="2025-07-11">July 11, 2025</time></div>
+          <h3>Laging Ligtas Exhibit 2025</h3>
+          <p>Nakiisa ang SK San Antonio sa ikalimang Laging Handa, Laging Ligtas: Survival and Rescue Night Exhibit, sa pangunguna ni Kapitan Michael “Moro” Gonzales. Bahagi ito ng National Disaster Resilience Month 2025 at paalala na mahalaga ang paghahanda at kaalaman sa sakuna upang mapatatag at mapangalagaan ang komunidad.</p>
+        </article>
+        <article class="legacy-post">
+          <div class="legacy-meta"><span>SK Achievements</span><time datetime="2025-07-11">July 11, 2025</time></div>
+          <h3>SK Noel Marcellana Kinilala bilang Bagong Pangulo ng Biñan Leo Club</h3>
+          <p>Isang karangalan para sa SK San Antonio ang pagkakahalal ni SK Chairperson Noel L. Marcellana Jr. bilang Pangulo ng Biñan Leo Club para sa taong 2025–2026. Kasama sa bagong yugto ng paglilingkod ang pakikipagtulungan sa Leo at Lions community, at pagpapatuloy ng mga gawaing naglilingkod sa kabataan sa loob at labas ng barangay.</p>
+        </article>
+        <article class="legacy-post">
+          <div class="legacy-meta"><span>SK Project</span><time datetime="2025-07-11">July 11, 2025</time></div>
+          <h3>Alagang Bata With Cong. Len Alonte</h3>
+          <p>Noong Hulyo 11, 2025, nakiisa ang SK San Antonio sa partnership outreach program sa Jollibee Umbria bilang pagdiriwang sa kaarawan ni Congresswoman Len Alonte. Sa tulong ng mga katuwang at boluntaryo, naghatid ang programa ng ligaya, pag-asa, at serbisyong may malasakit para sa mga kabataan.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="s legacy-months">
+    <div class="wrap">
+      <div class="head">
+        <h2>Maraming Salamat sa Inyong Tiwala</h2>
+        <p>Magkakasama tayong nagtagumpay sa mga programa na ating itinaguyod para sa ating Barangay. Silipin ang mga highlight ng unang anim na buwan ng 2025.</p>
+      </div>
+      <div class="legacy-month-grid">
+        <article class="legacy-month">
+          <img src="assets/legacy/yanangskko/june-2025.jpeg" alt="SK San Antonio June 2025 community highlights" loading="lazy" width="1200" height="800">
+          <div><span class="legacy-month-label">June 2025</span><h3>Celebrating a Colorful JUNE with Pride</h3><p>Isang matagumpay na buwan para sa SK San Antonio, sunod-sunod na naisakatuparan ang mga proyektong naglalayong itaguyod ang kalusugan, kaayusan, at kapakanan ng kabataan sa ating komunidad.</p></div>
+        </article>
+        <article class="legacy-month">
+          <img src="assets/legacy/yanangskko/may-2025.jpeg" alt="SK San Antonio May 2025 community highlights" loading="lazy" width="1200" height="800">
+          <div><span class="legacy-month-label">May 2025</span><h3>Mayo na may Kulay at Saysay</h3><p>Isang makulay at makabuluhang buwan. Buong puso kaming nagpapasalamat sa patuloy ninyong suporta at pakikiisa sa mga programang isinulong para sa kabataan at komunidad.</p></div>
+        </article>
+        <article class="legacy-month">
+          <img src="assets/legacy/yanangskko/april-2025.jpeg" alt="SK San Antonio April 2025 community highlights" loading="lazy" width="1200" height="800">
+          <div><span class="legacy-month-label">April 2025</span><h3>Apir, para sa Mainit at Makabuluhang Abril</h3><p>Sunod-sunod na naisakatuparan ang mga aktibidad at proyektong naglalayong itaguyod ang malasakit, partisipasyon, at kapakanan ng kabataan sa ating komunidad.</p></div>
+        </article>
+        <article class="legacy-month">
+          <img src="assets/legacy/yanangskko/march-2025.jpeg" alt="SK San Antonio March 2025 community highlights" loading="lazy" width="1200" height="800">
+          <div><span class="legacy-month-label">March 2025</span><h3>Marching Forward with a Mission</h3><p>Isang buwan ng pagkatuto at paglinang ng kakayahan sa pamamagitan ng aktibong pakikibahagi sa mga programa at pagsasanay para sa mas mahusay na paglilingkod.</p></div>
+        </article>
+        <article class="legacy-month">
+          <img src="assets/legacy/yanangskko/february-2025.jpeg" alt="SK San Antonio February 2025 community highlights" loading="lazy" width="1200" height="800">
+          <div><span class="legacy-month-label">February 2025</span><h3>Makabuluhan at Produktibong Pebrero</h3><p>Mula sa pagdiriwang ng anibersaryo ng Biñan, hanggang sa mga aral mula sa webinar at mga inisyatibong pangkalikasan—lahat ay bahagi ng patuloy na paglilingkod.</p></div>
+        </article>
+        <article class="legacy-month">
+          <img src="assets/legacy/yanangskko/january-2025.jpeg" alt="SK San Antonio January 2025 community highlights" loading="lazy" width="1200" height="800">
+          <div><span class="legacy-month-label">January 2025</span><h3>Masigasig at Produktibong Enero</h3><p>Sinimulan ang taon nang may sigasig sa paglilingkod. Sa bawat aktibidad at programang naisakatuparan, dama ang pagkakaisa at malasakit para sa mas maunlad na komunidad.</p></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="s legacy-join">
+    <div class="wrap legacy-join-card">
+      <img src="assets/legacy/yanangskko/join-sk-cta.png" alt="Youth leaders of Barangay San Antonio" loading="lazy" width="1200" height="800">
+      <div>
+        <span class="pill">Makiisa sa Sangguniang Kabataan</span>
+        <h2>Samahan ninyo kami.</h2>
+        <p>Samahan ninyo kami sa layuning bigyang-kapangyarihan ang kabataan at lumikha ng pangmatagalang pagbabago sa ating komunidad.</p>
+        <a class="btn btn-pink" href="https://www.facebook.com/sksanantonio2023" target="_blank" rel="noopener noreferrer">Connect on Facebook <svg class="icon"><use href="#i-arrow"/></svg></a>
+      </div>
+    </div>
+  </section>
+
   <section class="s services" id="services">
     <div class="wrap">
       <div class="head"><h2>Everything you need, after one sign in</h2><p>Six services built for the youth of San Antonio.</p></div>
@@ -491,15 +628,6 @@ footer a:hover{color:var(--mint)}
     </div>
   </section>
 
-  <section class="s">
-    <div class="wrap">
-      <div class="signin-band">
-        <div><h2>Your Digital ID is waiting.</h2><p>Sign in to register for events, request services and keep track of everything you've joined.</p></div>
-        <a class="btn btn-dark" href="login.html"><svg class="icon"><use href="#i-id"/></svg> Sign in now</a>
-      </div>
-    </div>
-  </section>
-
     <section class="s" id="location" style="padding-top:0">
     <div class="wrap locate">
       <div class="locate-info">
@@ -509,6 +637,14 @@ footer a:hover{color:var(--mint)}
         <div class="locate-row">
           <svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Z"/><circle cx="12" cy="10" r="2.5"/></svg>
           <span><?= $escapeHtml($officeName) ?><br><small style="font-weight:400;color:var(--muted)"><?= $escapeHtml($officeAddress) ?></small></span>
+        </div>
+        <div class="locate-row legacy-contact-row">
+          <svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.4 19.4 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.2-1.3a2 2 0 0 1 2.1-.5c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.8 2.1Z"/></svg>
+          <span><a href="tel:+639912633774">+63 991-263-3774</a><br><a href="tel:+639368674299">+63 936-867-4299</a></span>
+        </div>
+        <div class="locate-row legacy-contact-row">
+          <svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+          <a href="mailto:sksanantonio23@gmail.com">sksanantonio23@gmail.com</a>
         </div>
         <?php if ($officeHours !== ''): ?>
         <div class="locate-row">
@@ -526,13 +662,57 @@ footer a:hover{color:var(--mint)}
       </div>
     </div>
   </section>
+
+  <section class="s">
+    <div class="wrap">
+      <div class="signin-band">
+        <div><h2>Your Digital ID is waiting.</h2><p>Sign in to register for events, request services and keep track of everything you've joined.</p></div>
+        <a class="btn btn-dark" href="login.html"><svg class="icon"><use href="#i-id"/></svg> Sign in now</a>
+      </div>
+    </div>
+  </section>
 </main>
 
 <footer id="contact">
   <div class="wrap">
-    <div><b>SKalinga</b><p>Sangguniang Kabataan ng Barangay San Antonio, City of Biñan, Laguna.</p></div>
-    <div><p><a href="https://facebook.com/SKSanAntonio2023" rel="noopener">Facebook: SKSanAntonio2023</a><br><a href="https://yanangskko.mystrikingly.com" rel="noopener">yanangskko.mystrikingly.com</a></p></div>
-    <div><p><a href="mailto:sksanantonio23@gmail.com">sksanantonio23@gmail.com</a><br>&copy; <span id="yr"></span> SK San Antonio</p></div>
+    <div>
+      <b>SKalinga</b>
+      <p style="margin:0;max-width:34ch;color:rgba(255,255,255,.78)">Sangguniang Kabataan ng Barangay San Antonio, City of Biñan, Laguna.</p>
+    </div>
+
+    <div>
+      <p class="footer-heading">Connect With Us</p>
+      <div class="footer-links">
+        <a class="footer-link" href="https://www.facebook.com/sksanantonio2023" target="_blank" rel="noopener noreferrer">
+          <svg class="icon" aria-hidden="true"><use href="#i-fb"/></svg>
+          <span>SKSanAntonio2023</span>
+          <svg class="icon" aria-hidden="true" style="width:14px;height:14px;opacity:.7"><use href="#i-ext"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <div>
+      <p class="footer-heading">Contact Directory</p>
+      <div class="footer-links">
+        <a class="footer-link" href="tel:+639912633774">
+          <svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg>
+          <span>+63 991-263-3774</span>
+        </a>
+        <a class="footer-link" href="tel:+639368674299">
+          <svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg>
+          <span>+63 936-867-4299</span>
+        </a>
+        <a class="footer-link" href="mailto:sksanantonio23@gmail.com">
+          <svg class="icon" aria-hidden="true"><use href="#i-mail"/></svg>
+          <span>sksanantonio23@gmail.com</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap footer-bottom">
+    <span>&copy; <span id="yr"></span> SK San Antonio. All rights reserved.</span>
+    <span>#YanAngSKko</span>
   </div>
 </footer>
 
