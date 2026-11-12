@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Borrow &amp; Return Verification - SKalinga</title>
+<link rel="stylesheet" href="assets/css/dashboard.css"><link rel="stylesheet" href="assets/css/admin-theme.css">
+<style>
+body{background:#f3f8f5;color:#16303f}.shell{max-width:900px;margin:32px auto;padding:20px}.card{background:#fff;border:1px solid #dfeae3;border-radius:22px;padding:28px;box-shadow:0 12px 36px #16303f12}h1{color:#0f4d31}label{display:block;margin:16px 0 6px;font-weight:700}input,select,textarea{width:100%;box-sizing:border-box;min-height:46px;padding:10px;border:1px solid #cbd9d0;border-radius:10px;font:inherit}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}button{min-height:44px;padding:0 16px;border:0;border-radius:10px;background:#228b57;color:#fff;font-weight:700;cursor:pointer}button.secondary{background:#e8f3ec;color:#0f4d31}.status{min-height:24px;margin-top:16px;font-weight:700}.error{color:#b42345}.result{margin-top:20px;padding:18px;border:1px solid #dce9e1;border-radius:14px;background:#f8fbf9}.result[hidden],#borrowFields[hidden],#returnFields[hidden]{display:none}.loan{display:flex;gap:8px;align-items:center;padding:8px 0}.loan input{width:auto;min-height:auto}@media(max-width:600px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main class="shell"><section class="card">
+<h1 id="title">Borrow / Return scanner</h1>
+<p>Scan a short-lived youth QR or paste its 64-character token. Permanent member QR codes are not accepted.</p>
+<div class="grid"><div><label for="serviceType">Service</label><select id="serviceType"><option value="borrow">Borrow</option><option value="return">Return</option></select></div><div><label for="token">QR token</label><input id="token" maxlength="64" autocomplete="off"></div></div>
+<div class="actions"><button id="cameraButton" class="secondary" type="button">Use camera</button><button id="scanButton" type="button">Validate scan</button></div>
+<video id="video" playsinline muted hidden style="width:100%;max-width:440px;margin-top:16px;border-radius:12px;background:#10251c"></video>
+<section id="result" class="result" hidden><p><strong>Youth:</strong> <span id="youth"></span></p><p><strong>Member ID:</strong> <span id="member"></span></p><p id="itemsLabel"><strong>Eligible items</strong></p>
+<div id="borrowFields"><div class="grid"><div><label for="item">Item</label><select id="item"></select></div><div><label for="quantity">Quantity</label><input id="quantity" type="number" min="1" value="1"></div></div><label for="due">Due date</label><input id="due" type="date"></div>
+<div id="returnFields"><div id="loans"></div><label for="condition">Return condition</label><textarea id="condition" maxlength="500" rows="3" placeholder="Describe the condition after return"></textarea></div>
+<label for="code">Short verification code</label><input id="code" inputmode="numeric" maxlength="2" placeholder="00">
+<div class="actions"><button id="complete" type="button">Complete</button></div></section>
+<p id="status" class="status" role="status"></p>
+</section></main>
+<script>
+(()=>{const $=id=>document.getElementById(id);let csrfToken='',scanData=null,stream=null,detector=null;
+const requested=new URLSearchParams(location.search).get('service');if(requested==='return')$('serviceType').value='return';
+async function csrf(){if(csrfToken)return csrfToken;const r=await fetch('api/csrf_token.php',{credentials:'same-origin'}),d=await r.json();if(!r.ok||!d.success)throw Error(d.message||'Unable to prepare secure request.');return csrfToken=d.csrf_token}
+function status(t,e=false){$('status').textContent=t;$('status').className='status'+(e?' error':'')}
+function tokenValue(v){const t=v.trim();if(/^[a-f0-9]{64}$/i.test(t))return t;try{const u=new URL(t),q=u.searchParams.get('t')||'';return/^[a-f0-9]{64}$/i.test(q)?q:''}catch{return''}}
+async function post(path,body){const r=await fetch('api/verification/'+path+'.php',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-CSRF-Token':await csrf()},body:JSON.stringify(body)}),d=await r.json();if(!r.ok||!d.success)throw Error(d.message||'Request failed.');return d}
+function render(data){scanData=data.verification;$('result').hidden=false;$('youth').textContent=scanData.youth_name;$('member').textContent=scanData.member_id;$('borrowFields').hidden=$('serviceType').value!=='borrow';$('returnFields').hidden=$('serviceType').value!=='return';if($('serviceType').value==='borrow'){const sel=$('item');sel.innerHTML='';fetch('api/get_resources.php').then(r=>r.json()).then(d=>(d.data||[]).filter(x=>Number(x.available)>0).forEach(x=>sel.add(new Option(`${x.name} (${x.available} available)`,x.item_id))))}else{$('loans').innerHTML=(scanData.items||[]).map(x=>`<label class="loan"><input type="checkbox" value="${x.borrow_id}"> ${x.item_name} × ${x.quantity} — due ${x.due_date}</label>`).join('')}}
+async function validate(){try{const token=tokenValue($('token').value);if(!token)throw Error('Enter or scan a valid token.');const d=await post('validate',{token});if(d.verification.service.toLowerCase().indexOf($('serviceType').value)===-1)throw Error('Select the service represented by this QR.');render(d);status('Token validated. Enter the short code and complete the transaction.')}catch(e){status(e.message,true)}}
+$('scanButton').onclick=validate;$('serviceType').onchange=()=>{$('result').hidden=true};$('complete').onclick=async()=>{try{const token=tokenValue($('token').value),code=$('code').value.trim();let body={token,code};if($('serviceType').value==='borrow')Object.assign(body,{item_id:$('item').value,quantity:Number($('quantity').value),due_date:$('due').value});else Object.assign(body,{borrow_ids:[...document.querySelectorAll('#loans input:checked')].map(x=>Number(x.value)),return_condition:$('condition').value.trim()});const d=await post('complete_'+$('serviceType').value,body);status(d.message);$('result').hidden=true;$('token').value='';$('code').value=''}catch(e){status(e.message,true)}};
+$('cameraButton').onclick=async()=>{try{if(!('BarcodeDetector'in window))throw Error('Camera QR scanning is not supported here. Paste the token manually.');stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});$('video').hidden=false;$('video').srcObject=stream;await $('video').play();detector=new BarcodeDetector({formats:['qr_code']});const loop=async()=>{if(!stream)return;const found=await detector.detect($('video'));if(found[0]){$('token').value=found[0].rawValue;stream.getTracks().forEach(t=>t.stop());stream=null;$('video').hidden=true;validate();return}requestAnimationFrame(loop)};loop()}catch(e){status(e.message,true)}};
+})();
+</script>
+<script src="js/admin-common.js"></script><script src="js/auth-guard.js" data-roles="admin,sk_official"></script>
+</body></html>

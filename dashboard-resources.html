@@ -153,15 +153,17 @@ table.lt{width:100%;border-collapse:collapse;font-size:14px}
       <div class="bar">
         <label class="find"><span style="position:absolute;width:1px;height:1px;overflow:hidden">Search records</span><i class="fas fa-magnifying-glass"></i><input type="search" id="searchInput" placeholder="Search by item or borrower" autocomplete="off"></label>
         <div class="acts">
-          <button class="btn pink" id="recordBorrowBtn" type="button"><i class="fas fa-plus"></i>Record borrowing</button>
-          <button class="btn soft" id="scanReturnBtn" type="button"><i class="fas fa-rotate-left"></i>Find loan to return</button>
+          <a class="btn pink" href="admin-borrow-return.html?service=borrow"><i class="fas fa-qrcode"></i>Borrow scanner</a>
+          <a class="btn soft" href="admin-borrow-return.html?service=return"><i class="fas fa-qrcode"></i>Return scanner</a>
         </div>
       </div>
 
       <div class="row2">
         <div class="tabs" role="group" aria-label="View">
-          <button type="button" data-view="records" aria-pressed="true">Lending records</button>
+          <button type="button" data-view="records" aria-pressed="true">Active / Overdue</button>
           <button type="button" data-view="inventory" aria-pressed="false">Inventory</button>
+          <a class="tabs-link" href="admin-borrow-return.html?service=borrow">Borrow</a>
+          <a class="tabs-link" href="admin-borrow-return.html?service=return">Return</a>
         </div>
         <div class="chips" id="statusChips" role="group" aria-label="Filter by status">
           <button class="chip" type="button" data-s="" aria-pressed="true">All<em id="cAll">0</em></button>
@@ -391,7 +393,7 @@ $('itemForm').addEventListener('submit',async e=>{
   if(!name||!(quantity>=1)){notify('Please fill in all required fields with valid values','warning');return}
   $('itemSave').disabled=true;
   try{
-    const r=await fetch('api/add_resource.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,description,quantity})}),d=await r.json();
+    const r=await fetch('api/add_resource.php',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-CSRF-Token':await getCsrfToken()},body:JSON.stringify({name,description,quantity})}),d=await r.json();
     if(d.success){notify('Item added successfully!');closeM('addItemModal');await refresh()}else notify('Error: '+d.error,'error');
   }catch(err){console.error(err);notify('Failed to add item. Please try again.','error')}
   $('itemSave').disabled=false;
@@ -404,7 +406,7 @@ $('editItemForm').addEventListener('submit',async e=>{
   if(!item_id||!name||!Number.isInteger(restock_quantity)||restock_quantity<0){notify('Enter a valid item name and a non-negative stock quantity.','warning');return}
   $('editItemSave').disabled=true;
   try{
-    const r=await fetch('api/update_resource.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({item_id,name,description,restock_quantity})}),d=await r.json();
+    const r=await fetch('api/update_resource.php',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-CSRF-Token':await getCsrfToken()},body:JSON.stringify({item_id,name,description,restock_quantity})}),d=await r.json();
     if(d.success){notify('Inventory item updated successfully.');closeM('editItemModal');await refresh()}else notify('Error: '+d.error,'error');
   }catch(err){console.error(err);notify('Failed to update inventory item. Please try again.','error')}
   finally{$('editItemSave').disabled=false}
@@ -416,8 +418,8 @@ function resetScan(){
   populateBorrowItemDropdown();
   setDefaultDates();
 }
-$('recordBorrowBtn').onclick=()=>{resetScan();openM('borrowModal');setTimeout(()=>$('borrowYouthId').focus(),50)};
-$('scanReturnBtn').onclick=()=>{resetReturnScan();openM('returnScanModal');setTimeout(()=>$('returnYouthId').focus(),50)};
+if($('recordBorrowBtn'))$('recordBorrowBtn').onclick=()=>{resetScan();openM('borrowModal');setTimeout(()=>$('borrowYouthId').focus(),50)};
+if($('scanReturnBtn'))$('scanReturnBtn').onclick=()=>{resetReturnScan();openM('returnScanModal');setTimeout(()=>$('returnYouthId').focus(),50)};
 function populateBorrowItemDropdown(){
   const s=$('borrowItem');if(!s)return;
   const avail=itemsData.filter(i=>Number(i.available)>0);
@@ -508,7 +510,7 @@ $('borrowFormElement').addEventListener('submit',async e=>{
 /* ---- return / delete / view ---- */
 async function post(url,borrow_id,okMsg,failMsg){
   try{
-    const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({borrow_id})}),d=await r.json();
+    const r=await fetch(url,{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-CSRF-Token':await getCsrfToken()},body:JSON.stringify({borrow_id})}),d=await r.json();
     if(d.success){notify(okMsg);await refresh()}else notify('Error: '+d.error,'error');
   }catch(err){console.error(err);notify(failMsg,'error')}
 }

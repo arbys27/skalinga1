@@ -4,7 +4,9 @@ header('Content-Type: application/json');
 
 require_once 'db_connect.php';
 require_once 'auth.php';
+require_once 'security_helpers.php';
 requireAdminApi();
+securityRequireCsrf();
 
 // Check if admin is logged in
 if (!isset($_SESSION['admin_id'])) {

@@ -84,6 +84,27 @@ function verificationServiceRequest(
         return null;
     }
 
+    function verificationBorrowUser(PDO $pdo, string $serviceType, string $serviceRef, int $userId, bool $forUpdate = false): ?array
+    {
+        if (!in_array($serviceType, ['borrow', 'return'], true) || (int)$serviceRef !== $userId) {
+            return null;
+        }
+
+        $sql = "SELECT u.id, u.member_id,
+                       COALESCE(NULLIF(TRIM(CONCAT_WS(' ', yp.firstname, yp.lastname)), ''), u.member_id) AS display_name
+                FROM users u
+                LEFT JOIN youth_profiles yp ON yp.user_id = u.id
+                WHERE u.id = ? AND u.status = 'active'
+                LIMIT 1";
+        if ($forUpdate) {
+            $sql .= ' FOR UPDATE OF u';
+        }
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$userId]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $user ?: null;
+    }
+
     $status = $purpose === 'submit' ? 'Pending' : 'Completed';
     $sql = "SELECT request_id, member_id, member_name, document_title, status
             FROM printing_requests

@@ -7,7 +7,9 @@ require_once 'auth.php';
 requireAdminApi();
 
 require_once __DIR__ . '/../includes/request.php';
+require_once __DIR__ . '/security_helpers.php';
 secureSessionStart();
+securityRequireCsrf();
 
 // Check if admin is logged in
 if (!isset($_SESSION['admin_id'])) {

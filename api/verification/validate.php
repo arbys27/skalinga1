@@ -55,6 +55,51 @@ try {
         verificationResponse(['success' => false, 'message' => 'This verification token has expired.'], 410);
     }
 
+    if (in_array((string)$record['service_type'], ['borrow', 'return'], true)) {
+        $user = verificationBorrowUser($pdo, (string)$record['service_type'], (string)$record['service_ref'], (int)$record['user_id'], true);
+        if (!$user) {
+            $pdo->rollBack();
+            verificationResponse(['success' => false, 'message' => 'The youth account is no longer eligible.'], 409);
+        }
+        $active = [];
+        if ((string)$record['service_type'] === 'return') {
+            $items = $pdo->prepare(
+                "SELECT br.borrow_id, br.item_id, br.quantity, br.due_date, br.status, r.name AS item_name
+                 FROM borrow_records br
+                 JOIN resources r ON r.item_id = br.item_id
+                 WHERE br.member_id = ? AND br.status IN ('Borrowed', 'Overdue')
+                 ORDER BY br.due_date, br.borrow_id
+                 FOR UPDATE OF br"
+            );
+            $items->execute([(string)$user['member_id']]);
+            $active = $items->fetchAll(PDO::FETCH_ASSOC);
+            if (!$active) {
+                $pdo->rollBack();
+                verificationResponse(['success' => false, 'message' => 'This youth has no active borrowed items.'], 409);
+            }
+        }
+        $markScanned = $pdo->prepare(
+            'UPDATE service_verification_tokens
+             SET scanned_by_admin_id = ?, updated_at = CURRENT_TIMESTAMP
+             WHERE id = ? AND status = \'active\''
+        );
+        $markScanned->execute([(int)$admin['id'], (int)$record['id']]);
+        verificationAudit($pdo, 'scan', 'success', (int)$record['id'], $tokenHash, (int)$record['user_id'],
+            (int)$admin['id'], (string)$record['service_type'], (string)$record['service_ref']);
+        $pdo->commit();
+        verificationResponse([
+            'success' => true,
+            'verification' => [
+                'service' => (string)$record['service_type'] === 'borrow' ? 'Borrow resources' : 'Return resources',
+                'youth_name' => (string)$user['display_name'],
+                'member_id' => (string)$user['member_id'],
+                'items' => $active,
+                'verification_code_required' => true,
+                'code_expires_in' => 180,
+            ],
+        ]);
+    }
+
     $requestQuery = $pdo->prepare(
         "SELECT pr.request_id, pr.member_id, pr.document_title, pr.status,
                 COALESCE(NULLIF(TRIM(CONCAT_WS(' ', NULLIF(yp.firstname, ''), NULLIF(LEFT(yp.lastname, 1) || '.', ''))), ''),

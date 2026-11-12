@@ -3,7 +3,9 @@ header('Content-Type: application/json');
 
 require_once 'db_connect.php';
 require_once 'auth.php';
+require_once 'security_helpers.php';
 requireAdminApi();
+securityRequireCsrf();
 
 if (!isset($_SESSION['admin_id'])) {
     http_response_code(401);
@@ -52,10 +54,11 @@ try {
 
         $stmt = $pdo->prepare('
             UPDATE resources
-            SET name = ?, description = ?, quantity = quantity + ?, available = available + ?
-            WHERE item_id = ?
+            SET name = ?, description = ?, quantity = quantity + ?, available = available + ?,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE item_id = ? AND quantity + ? >= 0 AND available + ? >= 0
         ');
-        $stmt->execute([$name, $description, $restockQuantity, $restockQuantity, $itemId]);
+        $stmt->execute([$name, $description, $restockQuantity, $restockQuantity, $itemId, $restockQuantity, $restockQuantity]);
         $pdo->commit();
 
         echo json_encode([

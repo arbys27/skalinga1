@@ -87,6 +87,12 @@ Authenticated youth can submit feedback, suggestions, concerns, or other posts a
 - `POST api/request_password_reset.php` - sends a youth account password-reset OTP by email
 - `POST api/reset_password.php` - verifies the OTP and updates the youth account password
 - `GET api/get_user_borrow_records.php` - returns borrowing history for the authenticated youth account
+- `POST api/verification/generate.php` - youth-only, three-minute QR tokens for `borrow` and `return`
+- `POST api/verification/validate.php` - admin scanner validation and return-loan lookup
+- `POST api/verification/complete_borrow.php` - CSRF-protected transactional borrow completion
+- `POST api/verification/complete_return.php` - CSRF-protected transactional multi-item return completion
+- `GET api/get_resources.php` / `POST api/add_resource.php` / `POST api/update_resource.php` - admin inventory management
+- `php scripts/overdue_reminders.php` - marks expired loans overdue and sends one retryable SMS reminder per loan
 
 Login OTP uses EmailJS over HTTPS. Configure the exact template variables and server-side private key access described in [docs/EMAILJS_SETUP.md](docs/EMAILJS_SETUP.md). Codes expire after 10 minutes and are limited to five verification attempts. Youth activation uses UniSMS only for mobile verification; SMS is not used for login or service verification.
 
@@ -99,7 +105,9 @@ Admin and SK official APIs enforce the session role on the server through `api/a
 
 ### Secure service verification
 
-Service claims use a short-lived, single-use QR token bound to an authenticated youth and a real service request. The QR contains only a cryptographically random token; permanent member ID QR codes are not accepted as proof of identity for services. Staff scan or enter the token on the service verification page, then confirm or reject the linked request. Tokens expire after three minutes, can be cancelled by the youth, and are limited to five generations per user per hour. Service verification does not create an SMS login or activation path.
+Service claims use a short-lived, single-use QR token bound to an authenticated youth and a real service request. The QR contains only a cryptographically random token; permanent member ID QR codes are not accepted as proof of identity for services. Staff scan or enter the token on the service verification page, then confirm or reject the linked request. Tokens expire after three minutes, can be cancelled by the youth, and are limited to five generations per user per hour. Borrow and return tokens also carry a two-digit HMAC-protected code and are completed transactionally by the Resources Management scanner. Apply [database/postgres/migrations/015_borrow_return_verification.sql](database/postgres/migrations/015_borrow_return_verification.sql) after migration `014_printing_two_digit_verification.sql`.
+
+Run `php scripts/overdue_reminders.php` from a scheduler (for example, once daily). It changes past-due `Borrowed` records to `Overdue`, sends reminders through the configured iProg or UniSMS driver, and records attempts/errors to avoid duplicate successful reminders.
 
 The current service adapter supports claiming a completed, unclaimed print request. Borrow, event, and health requests do not yet have individual pending-request records in this database and therefore cannot be issued verification tokens. Apply [database/postgres/migrations/008_service_verification.sql](database/postgres/migrations/008_service_verification.sql) after migration `007_freedom_wall.sql`.
 

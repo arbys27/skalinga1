@@ -11,7 +11,10 @@ $input = verificationInput();
 $serviceType = is_string($input['service_type'] ?? null) ? trim($input['service_type']) : '';
 $purpose = is_string($input['purpose'] ?? null) ? trim($input['purpose']) : 'claim';
 $serviceRef = is_scalar($input['request_id'] ?? null) ? trim((string)$input['request_id']) : '';
-if ($serviceType !== 'print' || !in_array($purpose, ['submit', 'claim'], true) || $serviceRef === '') {
+$supported = $serviceType === 'print'
+    ? in_array($purpose, ['submit', 'claim'], true) && $serviceRef !== ''
+    : in_array($serviceType, ['borrow', 'return'], true) && $purpose === 'claim';
+if (!$supported) {
     verificationAudit(
         $pdo,
         'generate',
@@ -25,7 +28,7 @@ if ($serviceType !== 'print' || !in_array($purpose, ['submit', 'claim'], true) |
     );
     verificationResponse([
         'success' => false,
-        'message' => 'A supported service type and request ID are required. Currently supported: print.',
+        'message' => 'A supported service type and request ID are required.',
     ], 400);
 }
 
@@ -47,15 +50,13 @@ try {
         $pdo->rollBack();
         verificationResponse(['success' => false, 'message' => 'An active youth account is required.'], 403);
     }
+    if (in_array($serviceType, ['borrow', 'return'], true)) {
+        $serviceRef = (string)$user['id'];
+    }
 
-    $request = verificationServiceRequest(
-        $pdo,
-        $serviceType,
-        $serviceRef,
-        (string)$user['member_id'],
-        $purpose,
-        true
-    );
+    $request = $serviceType === 'print'
+        ? verificationServiceRequest($pdo, $serviceType, $serviceRef, (string)$user['member_id'], $purpose, true)
+        : verificationBorrowUser($pdo, $serviceType, (string)$user['id'], (int)$auth['id'], true);
     if (!$request) {
         verificationAudit(
             $pdo,
@@ -71,7 +72,7 @@ try {
         $pdo->commit();
         verificationResponse([
             'success' => false,
-            'message' => $purpose === 'submit'
+            'message' => $serviceType === 'print' && $purpose === 'submit'
                 ? 'This print request is not awaiting verification for your account.'
                 : 'This request is not an eligible, unclaimed print request for your account.',
         ], 404);
@@ -112,10 +113,16 @@ try {
         verificationResponse(['success' => false, 'message' => 'Verification is not configured for this service.'], 400);
     }
 
+    $shortCode = null;
+    if (in_array($serviceType, ['borrow', 'return'], true)) {
+        $shortCode = str_pad((string)random_int(0, 99), 2, '0', STR_PAD_LEFT);
+    }
     $insert = $pdo->prepare(
         'INSERT INTO service_verification_tokens
-            (user_id, service_type, service_ref, token_hash, expires_at, otp_required)
-         VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP + (CAST(? AS integer) * INTERVAL \'1 second\'), ?)
+            (user_id, service_type, service_ref, token_hash, expires_at, otp_required,
+             code_hash, code_expires_at)
+         VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP + (CAST(? AS integer) * INTERVAL \'1 second\'), ?, ?,
+                 CASE WHEN ? IS NULL THEN NULL ELSE CURRENT_TIMESTAMP + INTERVAL \'3 minutes\' END)
          RETURNING id, expires_at'
     );
     $insert->execute([
@@ -125,6 +132,8 @@ try {
         $tokenHash,
         (int)$settings['token_ttl_seconds'],
         $purpose === 'submit' ? true : postgresBoolean($settings['otp_required']),
+        $shortCode === null ? null : otpCodeHash($shortCode),
+        $shortCode,
     ]);
     $created = $insert->fetch(PDO::FETCH_ASSOC);
     verificationAudit(
@@ -147,12 +156,13 @@ try {
         'expires_at' => $created['expires_at'],
         'expires_in' => (int)$settings['token_ttl_seconds'],
         'otp_required' => $purpose === 'submit' ? true : postgresBoolean($settings['otp_required']),
+        'verification_code' => $shortCode,
         'purpose' => $purpose,
         'request' => [
-            'request_id' => (int)$request['request_id'],
+            'request_id' => $serviceType === 'print' ? (int)$request['request_id'] : null,
             'member_id' => (string)$request['member_id'],
-            'member_name' => (string)$request['member_name'],
-            'document_title' => (string)$request['document_title'],
+            'member_name' => (string)($request['member_name'] ?? $request['display_name'] ?? ''),
+            'document_title' => $serviceType === 'print' ? (string)$request['document_title'] : null,
         ],
     ]);
 } catch (Throwable $exception) {

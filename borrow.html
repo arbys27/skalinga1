@@ -165,10 +165,15 @@
   <div class="pr-box" role="dialog" aria-modal="true" aria-labelledby="borrowIdTitle">
     <button class="x" id="closeModal" type="button" aria-label="Close digital ID"><svg class="ic"><use href="#b-x"/></svg></button>
     <h2 id="borrowIdTitle">Borrowing request verification</h2>
-    <p id="idHelp">The current system does not yet create individual pending borrowing requests. Contact SK Office staff; a permanent member QR is not accepted as proof of identity.</p>
+    <p id="idHelp">Show this QR and short code to the SK Office staff. The code expires with the QR.</p>
+    <div id="verificationState" class="empty">Preparing your secure verification...</div>
+    <div id="verificationQr" style="display:grid;place-items:center;margin:14px auto;min-height:180px"></div>
+    <p style="text-align:center"><strong>Short code</strong><br><code id="verificationCode" style="font-size:32px;letter-spacing:.2em"></code></p>
+    <p id="verificationExpiry" class="hint" style="text-align:center"></p>
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script>
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
@@ -248,15 +253,30 @@ async function loadBorrowHistory(){
 async function refreshBorrowHistory(){$('borrowList').innerHTML='<div class="sk"></div><div class="sk"></div>';await loadBorrowHistory()}
 
 /* ---- Borrowing request availability notice ---- */
-const modal=$('digitalIdModal');
-function openId(){modal.hidden=false;$('closeModal').focus()}
+const modal=$('digitalIdModal');let verificationMode='borrow',csrfToken='';
+async function getCsrf(){if(csrfToken)return csrfToken;const r=await fetch('api/csrf_token.php',{credentials:'same-origin'}),d=await r.json();if(!r.ok||!d.success)throw new Error(d.message||'Unable to prepare secure request.');csrfToken=d.csrf_token;return csrfToken}
+async function openVerification(mode){
+  verificationMode=mode;modal.hidden=false;$('borrowIdTitle').textContent=mode==='return'?'Return item verification':'Borrowing request verification';
+  $('verificationState').textContent='Preparing your secure verification...';$('verificationQr').replaceChildren();$('verificationCode').textContent='';$('verificationExpiry').textContent='';
+  try{
+    const csrf=await getCsrf(),r=await fetch('api/verification/generate.php',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({service_type:mode,purpose:'claim'})}),d=await r.json();
+    if(!r.ok||!d.success)throw new Error(d.message||'Unable to generate verification.');
+    $('verificationState').textContent='Show this QR to staff, then provide the short code.';
+    new QRCode($('verificationQr'),{text:d.token,width:180,height:180,colorDark:'#0F4D31',colorLight:'#ffffff'});
+    $('verificationCode').textContent=d.verification_code||'--';
+    const until=Date.now()+Number(d.expires_in||180)*1000;
+    const tick=()=>{const left=Math.max(0,Math.ceil((until-Date.now())/1000));$('verificationExpiry').textContent=left?'Expires in '+left+' seconds':'Expired. Close this window and generate a new code.';if(left)setTimeout(tick,1000)};tick();
+  }catch(e){$('verificationState').textContent=e.message||'Unable to generate verification.'}
+}
+function openId(){openVerification('borrow')}
 const closeM=()=>{modal.hidden=true};
 $('requestBorrowBtn').onclick=openId;
-$('returnBtn').onclick=openId;
+$('returnBtn').onclick=()=>openVerification('return');
 $('closeModal').onclick=closeM;
 modal.addEventListener('click',e=>{if(e.target===modal)closeM()});
 document.addEventListener('click',e=>{
-  if(e.target.closest('[data-return]')||e.target.closest('[data-borrow]'))openId();
+  if(e.target.closest('[data-return]'))openVerification('return');
+  if(e.target.closest('[data-borrow]'))openId();
 });
 
 /* ---- history drawer ---- */
