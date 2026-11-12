@@ -28,6 +28,27 @@ function normalizeMasterlistName(?string $value): string
     return normalizeMasterlistValue($value);
 }
 
+function submittedMasterlistName(array $input): string
+{
+    if (array_key_exists('first_name', $input) || array_key_exists('middle_name', $input) || array_key_exists('last_name', $input)) {
+        $first = is_string($input['first_name'] ?? null) ? trim($input['first_name']) : '';
+        $middle = is_string($input['middle_name'] ?? null) ? trim($input['middle_name']) : '';
+        $last = is_string($input['last_name'] ?? null) ? trim($input['last_name']) : '';
+        if ($first === '' || $last === '') {
+            return '';
+        }
+
+        return normalizeMasterlistName(implode(' ', array_filter(
+            [$first, $middle, $last],
+            static fn(string $part): bool => $part !== ''
+        )));
+    }
+
+    return is_string($input['full_name'] ?? null)
+        ? normalizeMasterlistName($input['full_name'])
+        : '';
+}
+
 function masterlistClientIp(): string
 {
     return clientIp();

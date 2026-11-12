@@ -23,8 +23,13 @@ securityRequireCsrf();
 enforceMasterlistRateLimit($pdo, 'activate', 5);
 
 $voterId = normalizeMasterlistValue($_POST['voter_id'] ?? '');
-$fullName = normalizeMasterlistName($_POST['full_name'] ?? '');
+$fullName = submittedMasterlistName($_POST);
 $birthday = trim($_POST['birthday'] ?? '');
+$houseNumber = is_string($_POST['house_number'] ?? null) ? trim($_POST['house_number']) : '';
+$streetName = is_string($_POST['street_name'] ?? null) ? trim($_POST['street_name']) : '';
+$subdivisionPurok = is_string($_POST['subdivision_purok'] ?? null) ? trim($_POST['subdivision_purok']) : '';
+$city = is_string($_POST['city'] ?? null) ? trim($_POST['city']) : '';
+$province = is_string($_POST['province'] ?? null) ? trim($_POST['province']) : '';
 $rawMobile = is_string($_POST['mobile'] ?? null) ? $_POST['mobile'] : '';
 $email = trim($_POST['email'] ?? '');
 $password = is_string($_POST['password'] ?? null) ? $_POST['password'] : '';
@@ -32,6 +37,9 @@ $confirmPassword = is_string($_POST['confirm_password'] ?? null) ? $_POST['confi
 
 if ($voterId === '' || $fullName === '' || !DateTime::createFromFormat('!Y-m-d', $birthday)) {
     masterlistJsonResponse(['success' => false, 'message' => 'Please complete the masterlist verification first.'], 400);
+}
+if ($houseNumber === '' || $streetName === '' || $subdivisionPurok === '' || $city === '' || $province === '') {
+    masterlistJsonResponse(['success' => false, 'message' => 'Please complete all address fields.'], 400);
 }
 try {
     $mobile = normalizePhPhone($rawMobile);
@@ -121,21 +129,34 @@ try {
 
     $sex = strtolower(trim($record['sex']));
     $gender = $sex === 'male' ? 'Male' : ($sex === 'female' ? 'Female' : 'Other');
+    $address = implode(', ', [
+        trim($houseNumber . ' ' . $streetName),
+        $subdivisionPurok,
+        $city,
+        $province
+    ]);
     $stmt = $pdo->prepare(
         'INSERT INTO youth_profiles
-         (user_id, firstname, lastname, birthday, age, gender, phone, address, barangay, created_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'
+         (user_id, firstname, middle_name, lastname, birthday, age, gender, phone, address, barangay,
+          house_number, street_name, subdivision_purok, city, province, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'
     );
     $stmt->execute([
         $userId,
         $record['first_name'],
+        $record['middle_name'],
         $record['last_name'],
         $record['birthday'],
         $record['age'],
         $gender,
         $mobile,
-        $record['address'],
-        $record['purok_or_barangay']
+        $address,
+        $record['purok_or_barangay'],
+        $houseNumber,
+        $streetName,
+        $subdivisionPurok,
+        $city,
+        $province
     ]);
 
     $stmt = $pdo->prepare(

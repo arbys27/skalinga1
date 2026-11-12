@@ -13,13 +13,13 @@ try {
     enforceMasterlistRateLimit($pdo, 'masterlist_verify');
 
     $voterId = normalizeMasterlistValue($_POST['voter_id'] ?? '');
-    $fullName = normalizeMasterlistName($_POST['full_name'] ?? '');
+    $fullName = submittedMasterlistName($_POST);
     $birthday = trim($_POST['birthday'] ?? '');
 
     if ($voterId === '' || $fullName === '' || !DateTime::createFromFormat('!Y-m-d', $birthday)) {
         masterlistJsonResponse([
             'success' => false,
-            'message' => 'Please provide a valid voter ID, full name, and birthday.'
+            'message' => 'Please provide a valid voter ID, first name, last name, and birthday.'
         ], 400);
     }
 

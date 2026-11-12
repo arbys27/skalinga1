@@ -640,6 +640,24 @@ function updateSummary() {
     document.getElementById('statNew').textContent = added;
 }
 
+function youthFullName(youth) {
+    return [youth.firstname, youth.middle_name, youth.lastname]
+        .map(name => String(name || '').trim())
+        .filter(Boolean)
+        .join(' ');
+}
+
+function youthFullAddress(youth) {
+    const structured = [
+        youth.house_number,
+        youth.street_name,
+        youth.subdivision_purok,
+        youth.city,
+        youth.province
+    ].map(part => String(part || '').trim()).filter(Boolean).join(', ');
+    return structured || youth.address || 'N/A';
+}
+
 function renderYouthTable(filtered = youthData) {
     const tbody = document.getElementById('youthTableBody');
     document.getElementById('statShown').textContent = filtered.length;
@@ -657,7 +675,8 @@ function renderYouthTable(filtered = youthData) {
 
     tbody.innerHTML = '';
     filtered.forEach(youth => {
-        const fullName = `${youth.firstname || ''} ${youth.lastname || ''}`.trim();
+        const fullName = youthFullName(youth);
+        const fullAddress = youthFullAddress(youth);
         const initials = ((youth.firstname || '?')[0] + (youth.lastname || '')[0 ] || '').toUpperCase();
         const id = esc(youth.member_id);
         const tr = document.createElement('tr');
@@ -673,7 +692,7 @@ function renderYouthTable(filtered = youthData) {
                 </div>
             </td>
             <td>${esc(youth.phone || 'N/A')}</td>
-            <td class="address-column" title="${esc(youth.address || 'N/A')}">${esc(youth.address || 'N/A')}</td>
+            <td class="address-column" title="${esc(fullAddress)}">${esc(fullAddress)}</td>
             <td>
                 <span class="status-badge ${esc(youth.status)}">${esc(youth.status)}</span>
                 ${youth.status_reason ? `<div class="person-sub">${esc(youth.status_reason)}</div>` : ''}
@@ -693,7 +712,7 @@ function renderYouthTable(filtered = youthData) {
 function filterTable() {
     const search = document.getElementById('searchInput').value.toLowerCase().trim();
     const filtered = youthData.filter(y =>
-        `${y.firstname} ${y.lastname} ${y.member_id} ${y.phone || ''}`.toLowerCase().includes(search)
+        `${youthFullName(y)} ${y.member_id} ${y.phone || ''}`.toLowerCase().includes(search)
     );
     renderYouthTable(filtered);
 }
@@ -916,19 +935,19 @@ function viewYouth(member_id) {
     document.getElementById('viewPersonalInfo').innerHTML = `
         <dl class="detail-grid">
             <div><dt>Member ID</dt><dd>${esc(youth.member_id)}</dd></div>
-            <div><dt>Full name</dt><dd>${esc(youth.firstname)} ${esc(youth.lastname)}</dd></div>
+            <div><dt>Full name</dt><dd>${esc(youthFullName(youth))}</dd></div>
             <div><dt>Birthday</dt><dd>${esc(birthday)}</dd></div>
             <div><dt>Age</dt><dd>${esc(youth.age || 'N/A')}</dd></div>
             <div><dt>Gender</dt><dd>${esc(youth.gender || 'N/A')}</dd></div>
             <div><dt>Contact</dt><dd>${esc(youth.phone || 'N/A')}</dd></div>
             <div class="full"><dt>Email</dt><dd>${esc(youth.email || 'N/A')}</dd></div>
-            <div class="full"><dt>Full address</dt><dd>${esc(youth.address || 'N/A')}</dd></div>
+            <div class="full"><dt>Full address</dt><dd>${esc(youthFullAddress(youth))}</dd></div>
             <div class="full"><dt>Barangay</dt><dd>${esc(youth.barangay || 'N/A')}</dd></div>
             <div><dt>Last login</dt><dd>${esc(youth.last_login ? new Date(youth.last_login).toLocaleDateString('en-US') : 'No recorded login')}</dd></div>
             <div class="full"><dt>Status / reason</dt><dd>${esc(youth.status)}${youth.status_reason ? ` — ${esc(youth.status_reason)}` : ''}</dd></div>
         </dl>`;
 
-    document.getElementById('viewName').textContent = `${youth.firstname} ${youth.lastname}`;
+    document.getElementById('viewName').textContent = youthFullName(youth);
     document.getElementById('viewId').textContent = youth.member_id;
     document.getElementById('viewDate').textContent = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
     viewModal.style.display = 'flex';
@@ -938,7 +957,7 @@ function viewYouth(member_id) {
 // Show ID Preview
 // ────────────────────────────────────────────────
 function showIdPreview(youth) {
-    document.getElementById('previewName').textContent = `${youth.firstname} ${youth.lastname}`;
+    document.getElementById('previewName').textContent = youthFullName(youth);
     document.getElementById('previewId').textContent = youth.member_id;
     document.getElementById('previewDate').textContent = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
     idPreview.style.display = 'flex';

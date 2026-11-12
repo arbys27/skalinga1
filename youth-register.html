@@ -76,11 +76,15 @@ label small{color:var(--mu);font-weight:600}
 input:not([type=checkbox]):not([type=hidden]){width:100%;min-height:54px;padding:0 16px 0 46px;border:1.5px solid var(--ln);border-radius:16px;background:#fff;font:inherit;color:var(--ink);transition:border-color .15s,box-shadow .15s}
 input::placeholder{color:#9fb0a7}
 input:focus{outline:none;border-color:var(--g);box-shadow:0 0 0 4px rgba(34,139,87,.15)}
+.inp input[type=date]{padding-right:14px;cursor:pointer}
 .inp:focus-within>.ic{color:var(--g)}
 .inp.pw input{padding-right:52px}
 .eye{position:absolute;right:6px;top:50%;width:44px;height:44px;margin-top:-22px;border:0;border-radius:12px;background:none;color:var(--mu);cursor:pointer;display:grid;place-items:center}
 .eye:hover{background:#f1f6f3;color:var(--ink)}
 .two{display:grid;gap:16px}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 12px}
+.form-grid .field{min-width:0}
+.form-grid .field.full{grid-column:1/-1}
 .hint{margin:6px 2px 0;color:var(--mu);font-size:12.5px}
 
 .found{display:flex;gap:14px;align-items:flex-start;margin:0 0 22px;padding:16px;border:1.5px solid #b9d9c8;border-radius:22px;background:linear-gradient(140deg,#f4fbf7,#e9f7ef)}
@@ -106,6 +110,7 @@ input:focus{outline:none;border-color:var(--g);box-shadow:0 0 0 4px rgba(34,139,
 .view{animation:in .3s ease-out}
 @keyframes in{from{opacity:0;transform:translateY(10px)}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media(max-width:480px){.form-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -152,8 +157,12 @@ input:focus{outline:none;border-color:var(--g);box-shadow:0 0 0 4px rgba(34,139,
         <p class="note">Use the details exactly as they appear on the KK Masterlist.</p>
         <form id="verifyForm">
           <div class="field"><label for="voterId">Voter ID</label><div class="inp"><svg class="ic"><use href="#r-id"/></svg><input type="text" id="voterId" name="voter_id" autocomplete="off" required></div></div>
-          <div class="field"><label for="fullName">Full name</label><div class="inp"><svg class="ic"><use href="#r-u"/></svg><input type="text" id="fullName" name="full_name" placeholder="First Middle Last" autocomplete="name" required></div></div>
-          <div class="field"><label for="birthday">Birthday</label><div class="inp"><svg class="ic"><use href="#r-cal"/></svg><input type="date" id="birthday" name="birthday" required></div></div>
+          <div class="form-grid">
+            <div class="field"><label for="firstName">First Name</label><div class="inp"><svg class="ic"><use href="#r-u"/></svg><input type="text" id="firstName" name="first_name" placeholder="Enter first name" autocomplete="given-name" maxlength="100" required></div></div>
+            <div class="field"><label for="middleName">Middle Name</label><div class="inp"><svg class="ic"><use href="#r-u"/></svg><input type="text" id="middleName" name="middle_name" placeholder="Enter middle name" autocomplete="additional-name" maxlength="100"></div></div>
+            <div class="field full"><label for="lastName">Last Name</label><div class="inp"><svg class="ic"><use href="#r-u"/></svg><input type="text" id="lastName" name="last_name" placeholder="Enter last name" autocomplete="family-name" maxlength="100" required></div></div>
+          </div>
+          <div class="field"><label for="birthday">Birthday</label><div class="inp"><svg class="ic"><use href="#r-cal"/></svg><input type="date" id="birthday" name="birthday" autocomplete="bday" aria-describedby="birthdayHint" required></div><p class="hint" id="birthdayHint">Choose your date of birth using the calendar.</p></div>
           <span id="verifyStatus" class="status-message" role="status"></span>
           <button type="submit" class="btn" id="verifySubmit">Find my record</button>
         </form>
@@ -175,8 +184,17 @@ input:focus{outline:none;border-color:var(--g);box-shadow:0 0 0 4px rgba(34,139,
         </div>
         <form id="activationForm">
           <input type="hidden" id="activationVoterId" name="voter_id">
-          <input type="hidden" id="activationFullName" name="full_name">
+          <input type="hidden" id="activationFirstName" name="first_name">
+          <input type="hidden" id="activationMiddleName" name="middle_name">
+          <input type="hidden" id="activationLastName" name="last_name">
           <input type="hidden" id="activationBirthday" name="birthday">
+          <div class="form-grid">
+            <div class="field"><label for="houseNumber">House Number</label><div class="inp"><svg class="ic"><use href="#r-id"/></svg><input type="text" id="houseNumber" name="house_number" placeholder="Enter house number" maxlength="100" autocomplete="address-line1" required></div></div>
+            <div class="field"><label for="streetName">Street Name</label><div class="inp"><svg class="ic"><use href="#r-id"/></svg><input type="text" id="streetName" name="street_name" placeholder="Enter street name" maxlength="150" autocomplete="address-line2" required></div></div>
+            <div class="field full"><label for="subdivisionPurok">Subdivision / Purok</label><div class="inp"><svg class="ic"><use href="#r-id"/></svg><input type="text" id="subdivisionPurok" name="subdivision_purok" placeholder="Enter subdivision or purok" maxlength="150" required></div></div>
+            <div class="field"><label for="city">City</label><div class="inp"><svg class="ic"><use href="#r-id"/></svg><input type="text" id="city" name="city" placeholder="Enter city" maxlength="100" autocomplete="address-level2" required></div></div>
+            <div class="field"><label for="province">Province</label><div class="inp"><svg class="ic"><use href="#r-id"/></svg><input type="text" id="province" name="province" placeholder="Enter province" maxlength="100" autocomplete="address-level1" required></div></div>
+          </div>
           <div class="field"><label for="mobile">Mobile number</label><div class="inp"><svg class="ic"><use href="#r-ph"/></svg><input type="tel" id="mobile" name="mobile" placeholder="09XXXXXXXXX or +639XXXXXXXXX" autocomplete="tel" required></div><p class="hint">Enter a Philippine number in 09XXXXXXXXX, 9XXXXXXXXX, 639XXXXXXXXX, or +639XXXXXXXXX format.</p></div>
           <div id="phoneOtpControls" hidden>
            <div id="phoneOtpSendChallenge">
@@ -214,6 +232,8 @@ const verifyForm=$('verifyForm'),activationForm=$('activationForm'),stepOne=$('s
 const verifyStatus=$('verifyStatus'),activationStatus=$('activationStatus'),verifySubmit=$('verifySubmit'),activationSubmit=$('activationSubmit');
 let activationChallenge;
 let verifiedActivationMobile = '';
+const today = new Date();
+$('birthday').max = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
 
 function setStatus(el,message,type){el.textContent=message||'';el.className='status-message '+(type||'')}
 function setStep(n){
@@ -240,7 +260,11 @@ verifyForm.addEventListener('submit',async e=>{
     const p=result.profile,name=[p.first_name,p.middle_name,p.last_name].filter(Boolean).join(' ');
     $('profileName').textContent=name;$('avatar').textContent=(p.first_name||name||'?').trim().charAt(0).toUpperCase();
     $('profileBirthday').textContent=prettyDate(p.birthday);$('profileAge').textContent=p.age;$('profileSex').textContent=p.sex;$('profileAddress').textContent=p.address;
-    $('activationVoterId').value=$('voterId').value;$('activationFullName').value=$('fullName').value;$('activationBirthday').value=$('birthday').value;
+    $('activationVoterId').value=$('voterId').value;
+    $('activationFirstName').value=$('firstName').value.trim();
+    $('activationMiddleName').value=$('middleName').value.trim();
+    $('activationLastName').value=$('lastName').value.trim();
+    $('activationBirthday').value=$('birthday').value;
     setStep(2);
   }catch(err){setStatus(verifyStatus,'Unable to verify your record. Please try again.','error')}
   finally{verifySubmit.textContent='Find my record'}

@@ -34,8 +34,9 @@ try {
         // Get specific youth member
         $query = "SELECT u.id, u.email, u.member_id, u.status, u.status_reason, u.status_changed_at,
                          u.last_login, u.created_at,
-                         p.firstname, p.lastname, p.birthday, p.age, p.gender, 
-                         p.phone, p.address, p.barangay, p.avatar_path
+                         p.firstname, p.middle_name, p.lastname, p.birthday, p.age, p.gender,
+                         p.phone, p.address, p.barangay, p.house_number, p.street_name,
+                         p.subdivision_purok, p.city, p.province, p.avatar_path
                   FROM users u
                   LEFT JOIN youth_profiles p ON u.id = p.user_id
                   WHERE u.member_id = ?
@@ -60,8 +61,9 @@ try {
         // Get all youth members
         $query = "SELECT u.id, u.email, u.member_id, u.status, u.status_reason, u.status_changed_at,
                          u.last_login, u.created_at,
-                         p.firstname, p.lastname, p.birthday, p.age, p.gender,
-                         p.phone, p.address, p.barangay
+                         p.firstname, p.middle_name, p.lastname, p.birthday, p.age, p.gender,
+                         p.phone, p.address, p.barangay, p.house_number, p.street_name,
+                         p.subdivision_purok, p.city, p.province
                   FROM users u
                   LEFT JOIN youth_profiles p ON u.id = p.user_id
                   WHERE u.status = ?
