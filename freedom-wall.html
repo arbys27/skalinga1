@@ -1,98 +1,340 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#228B57">
-  <title>Freedom Wall | SKalinga</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#228B57" />
+  <title>SKalinga - Freedom Wall</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="assets/css/global.css">
   <link rel="stylesheet" href="assets/css/portal.css">
   <link rel="stylesheet" href="assets/css/freedom-wall.css">
+
+  <!-- Professional Loader System -->
   <link rel="stylesheet" href="assets/css/loader.css?v=3">
-  <style>
-    :root{color:#16303f;background:#f4faf6}
-    *{box-sizing:border-box}body{margin:0}.wrap{width:min(980px,calc(100% - 32px));margin:28px auto 70px}
-    a{color:#228b57}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:20px}
-    .top a{font-weight:700;text-decoration:none}.hero,.card{background:#fff;border:1px solid #e3ece7;border-radius:22px;padding:clamp(18px,4vw,30px);box-shadow:0 6px 24px #228b5710}
-    .hero{background:linear-gradient(130deg,#228b57,#0f4d31);color:#fff;margin-bottom:18px}.hero h1{margin:0 0 8px;font-size:clamp(28px,5vw,40px)}.hero p{margin:0;color:#e5fff0}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.card h2{margin:0 0 14px;font-size:21px}
-    label{display:block;font-weight:700;margin:14px 0 6px}input,select,textarea{width:100%;font:inherit;border:1px solid #bdcec4;border-radius:12px;padding:12px;color:#16303f;background:white}
-    textarea{min-height:145px;resize:vertical}input:focus,select:focus,textarea:focus{outline:3px solid #5dade255;border-color:#5dade2}
-    .rules{padding:12px 14px;border-left:4px solid #ff6b9d;background:#fff0f5;border-radius:8px;line-height:1.55;font-size:13px}
-    .check{display:flex;align-items:center;gap:9px;font-weight:600}.check input{width:auto}.btn{border:0;border-radius:12px;background:#228b57;color:#fff;padding:12px 18px;font:700 14px inherit;cursor:pointer;min-height:46px}.btn:hover{background:#176d43}.btn.secondary{background:#5dade2;color:#123445}
-    .actions{display:flex;align-items:center;gap:12px;margin-top:16px;flex-wrap:wrap}.muted{color:#5f7788;font-size:13px}.list{display:grid;gap:12px}.post{border:1px solid #e3ece7;border-radius:16px;padding:16px}.post h3{margin:8px 0;font-size:18px;overflow-wrap:anywhere}.post p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6}.meta{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;color:#5f7788;font-size:12px}.tag{display:inline-block;border-radius:999px;background:#e9f7ef;color:#176d43;padding:5px 10px;font-size:12px;font-weight:700}.status{font-weight:700;text-transform:capitalize}.status.approved{color:#228b57}.status.rejected{color:#c0395e}.status.pending{color:#a76c00}.notice{padding:12px;border-radius:10px;background:#e9f7ef;color:#176d43}.error{background:#fff0f5;color:#a52e54}.tabs{display:flex;gap:8px;margin-bottom:14px}.tabs button{border:1px solid #d5e5db;border-radius:99px;background:white;padding:9px 13px;color:#176d43;font:inherit;font-weight:700;cursor:pointer}.tabs button[aria-selected=true]{background:#228b57;color:white}.hidden{display:none!important}
-    @media(max-width:760px){.grid{grid-template-columns:1fr}.wrap{margin-top:16px}.top{align-items:flex-start}}
-  </style>
+  <script src="assets/js/service-shell.js" defer></script>
 </head>
-<body class="is-loading">
-  <div class="app-container">
-    <button class="back-btn" onclick="window.location.href='youth-portal.html'" aria-label="Back to Youth Portal">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"></path></svg>
-    </button>
-    <nav class="top-nav">
-      <div class="logo-area">
-        <img src="assets/images/logosanantonio.jpg" alt="San Antonio Logo" class="official-logo">
-        <div class="logo-text"><h1>SKalinga</h1><p>Youth Portal</p></div>
-        <img src="assets/images/sklogo.jpg" alt="SK Logo" class="official-logo">
-      </div>
-    </nav>
-    <header class="page-header"><h1>Freedom Wall</h1><p>Share feedback, suggestions, and concerns. All posts are reviewed before publication.</p></header>
-    <main class="wrap">
-    <div class="grid">
-      <section class="card" aria-labelledby="share-heading">
-        <h2 id="share-heading">Share a thought</h2>
-        <div class="rules"><strong>Posting rules:</strong> Do not post personal information, threats, harassment, defamatory content, or identifying details about another person. Posts that violate these rules will be rejected.</div>
-        <form id="post-form">
-          <label for="category">Category</label>
-          <select id="category" name="category" required>
-            <option value="">Choose a category</option><option>Feedback</option><option>Suggestion</option><option>Concern</option><option>Other</option>
-          </select>
-          <label for="title">Title</label>
-          <input id="title" name="title" maxlength="120" required>
-          <label for="body">Message</label>
-          <textarea id="body" name="body" maxlength="2000" required></textarea>
-          <label class="check"><input type="checkbox" name="is_anonymous" value="true"> Post anonymously as “Anonymous Youth”</label>
-          <div class="actions"><button class="btn" type="submit">Submit for review</button><span class="muted">All posts are reviewed before appearing publicly.</span></div>
-          <p id="form-message" class="notice hidden" role="status"></p>
-        </form>
-      </section>
-      <section class="card" aria-labelledby="board-heading">
-        <h2 id="board-heading">Community posts</h2>
-        <div class="rules">Do not post personal information, threats, harassment, defamatory content, or identifying details about another person. Posts that violate these rules will be rejected.</div>
-        <div id="board" class="list" aria-live="polite" style="margin-top:14px"></div>
-      </section>
+<body class="service-page is-loading">
+
+<div class="app-container">
+
+  <!-- Unified Portal Navigation -->
+  <nav class="portal-nav">
+    <a class="portal-brand" href="youth-portal.html">
+      <span class="brand-logos">
+        <img src="assets/images/logosanantonio.jpg" alt="San Antonio Logo">
+        <img src="assets/images/sklogo.jpg" alt="SK Logo">
+      </span>
+      <span><strong>SKalinga</strong><small>Youth Portal</small></span>
+    </a>
+    <div class="portal-links" aria-label="Main navigation">
+      <a href="youth-portal.html">Home</a>
+      <a href="events.html">Events</a>
+      <a href="borrow.html">Borrow</a>
+      <a href="print.html">Print</a>
+      <a href="health.html">Health</a>
+      <a href="report.html">Report</a>
+      <a href="public-disclosure.html">Documents</a>
+      <a href="profile.html">Profile</a>
     </div>
-    <section class="card" id="my-posts" style="margin-top:18px">
-      <h2>My Posts</h2>
+    <a class="profile-link" href="profile.html">My profile <span aria-hidden="true">→</span></a>
+  </nav>
+
+  <!-- Hero Banner -->
+  <header class="fw-hero">
+    <h1>Freedom Wall</h1>
+    <p>Share your feedback, suggestions, and community concerns with the SK Council.<br class="desktop-only"> Every voice helps shape a better San Antonio.</p>
+    <div class="hero-steps">
+      <span><b>1</b> Share your thought</span>
+      <span><b>2</b> Admin moderation</span>
+      <span><b>3</b> Published to board</span>
+    </div>
+    <button type="button" class="history-button" onclick="document.getElementById('my-posts').scrollIntoView({ behavior: 'smooth' });">
+      <span>◷</span> View my submissions
+    </button>
+  </header>
+
+  <!-- Main 2-Column Layout -->
+  <section class="fw-layout">
+    <!-- Left Column: Submission Form -->
+    <div class="fw-card">
+      <h2 id="share-heading">Share a thought</h2>
+      <p class="card-intro">All posts are reviewed before appearing publicly on the wall.</p>
+
+      <div class="rules-notice">
+        <span>▣</span>
+        <div><strong>Posting rules:</strong> Do not post personal information, threats, harassment, defamatory content, or identifying details about another person.</div>
+      </div>
+
+      <form id="post-form" class="fw-form">
+        <div class="form-group choice-group">
+          <label>Category *</label>
+          <div class="choice-grid two">
+            <button type="button" class="choice-card selected" data-select="category" data-value="Feedback">
+              <strong>Feedback</strong>
+              <small>Events &amp; services</small>
+            </button>
+            <button type="button" class="choice-card" data-select="category" data-value="Suggestion">
+              <strong>Suggestion</strong>
+              <small>New youth ideas</small>
+            </button>
+            <button type="button" class="choice-card" data-select="category" data-value="Concern">
+              <strong>Concern</strong>
+              <small>Community issues</small>
+            </button>
+            <button type="button" class="choice-card" data-select="category" data-value="Other">
+              <strong>Other</strong>
+              <small>General thoughts</small>
+            </button>
+          </div>
+          <select class="select-source" id="category" name="category" required>
+            <option value="Feedback" selected>Feedback</option>
+            <option value="Suggestion">Suggestion</option>
+            <option value="Concern">Concern</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="title">Title *</label>
+          <input type="text" id="title" name="title" maxlength="120" placeholder="e.g., Idea for next sportsfest, Library printing hours" required>
+        </div>
+
+        <div class="form-group">
+          <label for="body">Message *</label>
+          <textarea id="body" name="body" maxlength="2000" placeholder="Write your message clearly and respectfully..." required></textarea>
+        </div>
+
+        <label class="anon-toggle">
+          <input type="checkbox" name="is_anonymous" value="true">
+          <span>Post anonymously as <strong>“Anonymous Youth”</strong></span>
+        </label>
+
+        <div class="form-actions">
+          <button type="submit" class="btn primary large" id="submitPostBtn">Submit for Review</button>
+        </div>
+        <p id="form-message" class="notice hidden" role="status"></p>
+      </form>
+    </div>
+
+    <!-- Right Column: Community Board -->
+    <aside class="fw-card board-column" aria-labelledby="board-heading">
+      <div class="board-header">
+        <div>
+          <h2 id="board-heading">Community posts</h2>
+          <p class="card-intro">Approved messages from San Antonio youth.</p>
+        </div>
+        <span class="live-badge">Public Wall</span>
+      </div>
+
+      <div id="board" class="post-list" aria-live="polite"></div>
+    </aside>
+  </section>
+
+  <!-- Bottom Section: My Submissions & Rules -->
+  <section class="my-posts-section" id="my-posts">
+    <div class="history-heading">
+      <div>
+        <h2>My submissions</h2>
+        <p>Track the approval status of your posts anytime.</p>
+      </div>
       <div class="tabs" role="tablist" aria-label="Freedom Wall views">
-        <button type="button" role="tab" aria-selected="true" data-view="mine">My submissions</button>
+        <button type="button" role="tab" aria-selected="true" data-view="mine">My posts</button>
         <button type="button" role="tab" aria-selected="false" data-view="rules">Posting rules</button>
       </div>
-      <div id="mine-panel"><div id="mine" class="list" aria-live="polite"></div></div>
-      <div id="rules-panel" class="rules hidden">Do not post personal information, threats, harassment, defamatory content, or identifying details about another person. Posts that violate these rules will be rejected.</div>
-    </section>
-    </main>
-  </div>
-  <script>
-    const form=document.getElementById('post-form'),formMessage=document.getElementById('form-message');
-    const api=async(url,options={})=>{const response=await fetch(url,{credentials:'same-origin',...options});const data=await response.json();if(!response.ok||!data.success)throw new Error(data.message||'The request could not be completed.');return data};
-    const el=(tag,cls,text)=>{const node=document.createElement(tag);if(cls)node.className=cls;if(text!==undefined)node.textContent=text;return node};
-    function showPost(target,post,own=false){
-      const card=el('article','post'),meta=el('div','meta'),category=el('span','tag',post.category);
-      meta.append(category,el('span','',new Date(post.created_at||post.approved_at).toLocaleString()));
-      card.append(meta,el('h3','',post.title),el('p','',post.body.length>420?post.body.slice(0,420)+'…':post.body));
-      const footer=el('div','meta');footer.style.marginTop='12px';
-      if(own){footer.append(el('span','status '+post.status,post.status));if(post.status==='rejected'&&post.rejection_reason)footer.append(el('span','',`Reason: ${post.rejection_reason}`))}
-      else footer.append(el('span','',post.display_name),el('span','',post.approved_at?`Approved ${new Date(post.approved_at).toLocaleDateString()}`:''));
-      card.appendChild(footer);target.appendChild(card);
+    </div>
+
+    <div id="mine-panel">
+      <div id="mine" class="my-posts-grid" aria-live="polite"></div>
+    </div>
+
+    <div id="rules-panel" class="rules-notice hidden" style="margin-top: 16px;">
+      <span>▣</span>
+      <div><strong>Community Guidelines:</strong> Do not post personal information, threats, harassment, defamatory content, or identifying details about another person. Posts that violate these rules will be rejected by SK moderators.</div>
+    </div>
+  </section>
+
+  <button class="help-button" type="button" aria-label="Help" onclick="showToast('Submit your message on the left. Once approved by SK admins, it will appear on the Community Wall.', 'info', 5000)">?</button>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+</div>
+
+<script>
+  // --- Toast Notification System (Matching Print Services) ---
+  function showToast(message, type = 'info', duration = 4000) {
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+
+    const icons = { success: '✓', error: '✕', info: 'ℹ' };
+
+    toast.innerHTML = `
+      <div class="toast-icon">${icons[type] || icons.info}</div>
+      <div class="toast-content">${message}</div>
+      <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+    `;
+
+    container.appendChild(toast);
+
+    if (duration > 0) {
+      setTimeout(() => {
+        toast.classList.add('removing');
+        setTimeout(() => toast.remove(), 300);
+      }, duration);
     }
-    async function loadBoard(){const target=document.getElementById('board');target.replaceChildren();try{const result=await api('api/freedom_wall/list_public.php');if(!result.data.length)target.appendChild(el('p','muted','No approved posts yet. Be the first to share an idea.'));else result.data.forEach(post=>showPost(target,post))}catch(error){target.appendChild(el('p','notice error',error.message))}}
-    async function loadMine(){const target=document.getElementById('mine');target.replaceChildren();try{const result=await api('api/freedom_wall/my_posts.php');if(!result.data.length)target.appendChild(el('p','muted','You have not submitted any posts yet.'));else result.data.forEach(post=>showPost(target,post,true))}catch(error){target.appendChild(el('p','notice error',error.message))}}
-    form.addEventListener('submit',async event=>{event.preventDefault();formMessage.classList.add('hidden');const button=form.querySelector('button[type=submit]');button.disabled=true;try{const csrf=await api('api/csrf_token.php');const values=new FormData(form);const result=await api('api/freedom_wall/submit.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf.csrf_token},body:JSON.stringify({category:values.get('category'),title:values.get('title'),body:values.get('body'),is_anonymous:values.get('is_anonymous')==='true'})});form.reset();formMessage.textContent=result.message;formMessage.classList.remove('hidden','error');await loadMine()}catch(error){formMessage.textContent=error.message;formMessage.classList.remove('hidden');formMessage.classList.add('error')}finally{button.disabled=false}});
-    document.querySelectorAll('[data-view]').forEach(button=>button.addEventListener('click',()=>{document.querySelectorAll('[data-view]').forEach(tab=>tab.setAttribute('aria-selected',String(tab===button)));document.getElementById('mine-panel').classList.toggle('hidden',button.dataset.view!=='mine');document.getElementById('rules-panel').classList.toggle('hidden',button.dataset.view!=='rules')}));
-    loadBoard();loadMine();
-  </script>
-  <script src="js/auth-guard.js" data-roles="youth"></script>
-  <script src="assets/js/loader.js?v=3"></script>
+  }
+
+  // --- Interactive Choice Cards ---
+  document.querySelectorAll('.choice-card').forEach((card) => {
+    card.addEventListener('click', () => {
+      const source = document.getElementById(card.dataset.select);
+      source.value = card.dataset.value;
+      source.dispatchEvent(new Event('change'));
+      document.querySelectorAll(`[data-select="${card.dataset.select}"]`).forEach((item) => item.classList.remove('selected'));
+      card.classList.add('selected');
+    });
+  });
+
+  // --- Freedom Wall API & Rendering ---
+  const form = document.getElementById('post-form');
+  const formMessage = document.getElementById('form-message');
+
+  const api = async (url, options = {}) => {
+    const response = await fetch(url, { credentials: 'same-origin', ...options });
+    const data = await response.json();
+    if (!response.ok || !data.success) throw new Error(data.message || 'The request could not be completed.');
+    return data;
+  };
+
+  const el = (tag, cls, text) => {
+    const node = document.createElement(tag);
+    if (cls) node.className = cls;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  };
+
+  function showPost(target, post, own = false) {
+    const card = el('article', 'post-card');
+    const meta = el('div', 'post-meta');
+    const category = el('span', 'tag', post.category);
+    const dateStr = new Date(post.created_at || post.approved_at).toLocaleString('en-US', {
+      month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'
+    });
+
+    meta.append(category, el('span', 'post-date', dateStr));
+    card.append(
+      meta,
+      el('h3', '', post.title),
+      el('p', '', post.body.length > 420 ? post.body.slice(0, 420) + '…' : post.body)
+    );
+
+    const footer = el('div', 'post-footer');
+    if (own) {
+      footer.append(el('span', 'status ' + post.status.toLowerCase(), post.status));
+      if (post.status === 'rejected' && post.rejection_reason) {
+        footer.append(el('span', 'rejection-note', `Reason: ${post.rejection_reason}`));
+      }
+    } else {
+      footer.append(
+        el('span', 'author-name', `By ${post.display_name}`),
+        el('span', 'approved-date', post.approved_at ? `Approved ${new Date(post.approved_at).toLocaleDateString()}` : '')
+      );
+    }
+
+    card.appendChild(footer);
+    target.appendChild(card);
+  }
+
+  async function loadBoard() {
+    const target = document.getElementById('board');
+    target.replaceChildren();
+    try {
+      const result = await api('api/freedom_wall/list_public.php');
+      if (!result.data.length) {
+        target.appendChild(el('p', 'empty-state', 'No approved posts yet. Be the first to share an idea!'));
+      } else {
+        result.data.forEach(post => showPost(target, post));
+      }
+    } catch (error) {
+      target.appendChild(el('p', 'notice error', error.message));
+    }
+  }
+
+  async function loadMine() {
+    const target = document.getElementById('mine');
+    target.replaceChildren();
+    try {
+      const result = await api('api/freedom_wall/my_posts.php');
+      if (!result.data.length) {
+        target.appendChild(el('p', 'empty-state', 'You have not submitted any posts yet.'));
+      } else {
+        result.data.forEach(post => showPost(target, post, true));
+      }
+    } catch (error) {
+      target.appendChild(el('p', 'notice error', error.message));
+    }
+  }
+
+  form.addEventListener('submit', async event => {
+    event.preventDefault();
+    formMessage.classList.add('hidden');
+    const button = document.getElementById('submitPostBtn');
+    button.disabled = true;
+    button.textContent = 'Submitting...';
+
+    try {
+      const csrf = await api('api/csrf_token.php');
+      const values = new FormData(form);
+      const result = await api('api/freedom_wall/submit.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': csrf.csrf_token
+        },
+        body: JSON.stringify({
+          category: values.get('category'),
+          title: values.get('title'),
+          body: values.get('body'),
+          is_anonymous: values.get('is_anonymous') === 'true'
+        })
+      });
+
+      form.reset();
+      // Reset category card UI back to Feedback
+      document.querySelectorAll('[data-select="category"]').forEach((item, idx) => {
+        item.classList.toggle('selected', idx === 0);
+      });
+
+      showToast(result.message || 'Your post has been submitted for moderation!', 'success', 5000);
+      await loadMine();
+    } catch (error) {
+      showToast(error.message, 'error');
+    } finally {
+      button.disabled = false;
+      button.textContent = 'Submit for Review';
+    }
+  });
+
+  // Tab switching for My Submissions / Rules
+  document.querySelectorAll('[data-view]').forEach(button => {
+    button.addEventListener('click', () => {
+      document.querySelectorAll('[data-view]').forEach(tab => tab.setAttribute('aria-selected', String(tab === button)));
+      document.getElementById('mine-panel').classList.toggle('hidden', button.dataset.view !== 'mine');
+      document.getElementById('rules-panel').classList.toggle('hidden', button.dataset.view !== 'rules');
+    });
+  });
+
+  loadBoard();
+  loadMine();
+</script>
+
+<script src="js/auth-guard.js" data-roles="youth"></script>
+<script src="assets/js/loader.js?v=3"></script>
 </body>
 </html>
