@@ -247,7 +247,15 @@ table.pt{width:100%;border-collapse:collapse;font-size:14px}
 <script>
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
-const safeUrl=u=>/^(https?:\/\/|\/|\.\/|[\w][\w\-./%]*$)/i.test(String(u||'').trim())&&!/^\s*(javascript|data):/i.test(u);
+const safeUrl=u=>{
+  const value=String(u||'').trim();
+  if(!value||/^\s*(javascript|data|vbscript):/i.test(value))return false;
+  try{
+    const parsed=new URL(value,window.location.href);
+    return ['http:','https:'].includes(parsed.protocol)
+      && (parsed.origin===window.location.origin||/^https?:\/\//i.test(value));
+  }catch{return false}
+};
 let printRequests=[],statusFilter='',csrfToken='';
 
 function notify(msg,type='success'){
