@@ -65,7 +65,7 @@ try {
         "SELECT pr.request_id
          FROM printing_requests pr
          JOIN users u ON u.member_id = pr.member_id AND u.id = ?
-         WHERE pr.request_id = ? AND pr.status = 'Completed'
+         WHERE pr.request_id = ? AND pr.status IN ('Completed', 'AwaitingVerification')
          LIMIT 1
          FOR UPDATE OF pr"
     );
@@ -80,7 +80,7 @@ try {
          SET status = 'Rejected',
              notes = CASE WHEN NULLIF(notes, '') IS NULL THEN ? ELSE notes || E'\\n' || ? END,
              updated_at = CURRENT_TIMESTAMP
-         WHERE request_id = ? AND status = 'Completed'"
+         WHERE request_id = ? AND status IN ('Completed', 'AwaitingVerification')"
     );
     $rejectionNote = 'Verification rejected' . ($reason !== '' ? ': ' . $reason : '.');
     $rejectRequest->execute([$rejectionNote, $rejectionNote, (int)$record['service_ref']]);

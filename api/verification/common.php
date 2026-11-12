@@ -71,21 +71,29 @@ function verificationTokenInput(array $input): ?string
     return preg_match('/^[a-f0-9]{64}$/i', $token) === 1 ? strtolower($token) : null;
 }
 
-function verificationServiceRequest(PDO $pdo, string $serviceType, string $serviceRef, string $memberId, bool $forUpdate = false): ?array
+function verificationServiceRequest(
+    PDO $pdo,
+    string $serviceType,
+    string $serviceRef,
+    string $memberId,
+    string $purpose = 'claim',
+    bool $forUpdate = false
+): ?array
 {
     if ($serviceType !== 'print' || preg_match('/^[1-9]\d{0,9}$/', $serviceRef) !== 1) {
         return null;
     }
 
-    $sql = "SELECT request_id, member_id, document_title, status
+    $status = $purpose === 'submit' ? 'AwaitingVerification' : 'Completed';
+    $sql = "SELECT request_id, member_id, member_name, document_title, status
             FROM printing_requests
-            WHERE request_id = ? AND member_id = ? AND status = 'Completed'
+            WHERE request_id = ? AND member_id = ? AND status = ?
             LIMIT 1";
     if ($forUpdate) {
         $sql .= ' FOR UPDATE';
     }
     $stmt = $pdo->prepare($sql);
-    $stmt->execute([(int)$serviceRef, $memberId]);
+    $stmt->execute([(int)$serviceRef, $memberId, $status]);
     $request = $stmt->fetch(PDO::FETCH_ASSOC);
     return $request ?: null;
 }

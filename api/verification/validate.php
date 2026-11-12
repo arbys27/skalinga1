@@ -52,7 +52,7 @@ try {
          JOIN users u ON u.member_id = pr.member_id AND u.id = ?
          LEFT JOIN youth_profiles yp ON yp.user_id = u.id
          LEFT JOIN kk_masterlist km ON km.id = u.masterlist_id
-         WHERE pr.request_id = ? AND pr.status = 'Completed'
+         WHERE pr.request_id = ? AND pr.status IN ('Completed', 'AwaitingVerification')
          LIMIT 1
          FOR UPDATE OF pr"
     );
@@ -90,6 +90,7 @@ try {
         'verification' => [
             'otp_required' => postgresBoolean($record['otp_required']),
             'youth_name' => $request['display_name'],
+            'status' => $request['status'],
             'service' => verificationServiceLabel((string)$record['service_type'], $request),
         ],
     ]);

@@ -34,12 +34,12 @@
     <aside class="sidebar" id="adminSidebar"></aside>
     <main class="main-content">
       <header class="top-header">
-        <div class="header-left"><h2>Service Verification</h2><p>Confirm one-time service claims</p></div>
+        <div class="header-left"><h2>Service Verification</h2><p>Confirm one-time print submissions and claims</p></div>
       </header>
       <section class="dashboard-content">
   <main class="verify-shell">
     <section class="verify-card">
-      <h1>Verify service claim</h1>
+      <h1>Verify print service</h1>
       <p class="muted">Scan a one-time service QR or enter its token manually. Permanent member ID QR codes are not accepted.</p>
       <label for="tokenInput">Verification token</label>
       <input id="tokenInput" type="text" autocomplete="off" spellcheck="false" maxlength="512" placeholder="Paste the 64-character token or scan a QR">
@@ -54,7 +54,7 @@
       <div id="verificationResult" class="result" hidden>
         <p><strong>Youth:</strong> <span id="youthName"></span></p>
         <p><strong>Service:</strong> <span id="serviceName"></span></p>
-        <p id="otpNotice" class="muted" hidden>SMS OTP is required before completion.</p>
+        <p id="otpNotice" class="muted" hidden>Email confirmation is required before completion.</p>
         <div id="otpControls" hidden>
           <button id="sendOtpButton" class="secondary" type="button">Send OTP</button>
           <label for="otpInput">6-digit OTP</label>
@@ -63,7 +63,7 @@
         <label for="rejectReason">Rejection reason (optional)</label>
         <textarea id="rejectReason" rows="2" maxlength="500"></textarea>
         <div class="actions">
-          <button id="confirmButton" type="button">Confirm &amp; Complete</button>
+          <button id="confirmButton" type="button">Confirm verification</button>
           <button id="rejectButton" class="danger" type="button">Reject</button>
         </div>
       </div>

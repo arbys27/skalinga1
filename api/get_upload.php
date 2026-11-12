@@ -109,7 +109,10 @@ try {
     header('Content-Length: ' . filesize($fullPath));
     header('X-Content-Type-Options: nosniff');
     header('Cache-Control: private, no-store');
-    $disposition = $type === 'incident' ? 'inline' : 'attachment';
+    $preview = filter_var($_GET['preview'] ?? false, FILTER_VALIDATE_BOOLEAN);
+    $disposition = $type === 'incident' || ($type === 'printing' && $preview)
+        ? 'inline'
+        : 'attachment';
     header('Content-Disposition: ' . $disposition . '; filename="' . addcslashes($filename, '"\\') . '"');
     readfile($fullPath);
 } catch (Throwable $exception) {

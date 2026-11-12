@@ -44,6 +44,7 @@ try {
         LEFT JOIN users u ON u.member_id = pr.member_id
         LEFT JOIN youth_profiles yp ON yp.user_id = u.id
         LEFT JOIN kk_masterlist km ON km.id = u.masterlist_id
+        WHERE pr.status <> 'AwaitingVerification'
         ORDER BY pr.created_at DESC
     ");
     

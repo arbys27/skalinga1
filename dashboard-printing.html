@@ -95,6 +95,9 @@ table.pt{width:100%;border-collapse:collapse;font-size:14px}
 .det div:last-child{border:0}.det dt{color:var(--mu)}.det dd{margin:0;font-weight:600;text-align:right;overflow-wrap:anywhere}
 .docs{display:flex;align-items:center;gap:12px;margin:16px 0 0;padding:14px;border-radius:16px;background:#f4fbf7;border:1.5px solid #cfe9db}
 .docs i{font-size:26px;color:var(--pkd)}.docs b{display:block;overflow-wrap:anywhere}.docs span{color:var(--mu);font-size:12.5px}
+.document-viewer{width:min(100%,900px);height:min(78vh,720px);border:1px solid var(--ln);border-radius:16px;background:#f4f8f6}
+.document-viewer[hidden]{display:none}
+.viewer-note{margin:16px 0 0;padding:14px;border-radius:14px;background:#fff4d6;color:#7a5600;font-size:13px;font-weight:600}
 .fa-end{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:20px}
 .req{display:flex;gap:12px;align-items:center;margin:0 0 14px;padding:14px;border-radius:16px;background:#fff0f5}
 .req i{color:var(--pkd);font-size:20px}.req b{display:block}.req span{color:var(--mu);font-size:13px}
@@ -129,13 +132,18 @@ table.pt{width:100%;border-collapse:collapse;font-size:14px}
 
       <div class="bar">
         <label class="find"><span style="position:absolute;width:1px;height:1px;overflow:hidden">Search requests</span><i class="fas fa-magnifying-glass"></i><input type="search" id="searchInput" placeholder="Search by member ID, name or document" autocomplete="off"></label>
-        <button class="btn green" id="refreshBtn" type="button"><i class="fas fa-rotate"></i><span>Refresh requests</span></button>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <a class="btn pink" href="admin-service-verification.html"><i class="fas fa-qrcode"></i><span>Verify new request</span></a>
+          <button class="btn green" id="refreshBtn" type="button"><i class="fas fa-rotate"></i><span>Refresh requests</span></button>
+        </div>
       </div>
 
       <div class="chips" id="statusChips" role="group" aria-label="Filter by status">
         <button class="chip" type="button" data-s="" aria-pressed="true">All<em id="cAll">0</em></button>
         <button class="chip" type="button" data-s="Pending" aria-pressed="false">Pending<em id="cPending">0</em></button>
         <button class="chip" type="button" data-s="Completed" aria-pressed="false">Completed<em id="cDone">0</em></button>
+        <button class="chip" type="button" data-s="Printing" aria-pressed="false">Printing<em id="cPrinting">0</em></button>
+        <button class="chip" type="button" data-s="Claimed" aria-pressed="false">Claimed<em id="cClaimed">0</em></button>
       </div>
 
       <div class="tw"><div class="scroll">
@@ -156,6 +164,20 @@ table.pt{width:100%;border-collapse:collapse;font-size:14px}
     <dl class="det" id="detailsContent"></dl>
     <div class="docs" id="docPreview"></div>
     <div class="fa-end" id="viewActions"></div>
+  </div>
+</div>
+
+<!-- Document viewer -->
+<div class="pm-modal" id="documentViewerModal" role="dialog" aria-modal="true" aria-labelledby="documentViewerTitle">
+  <div class="box">
+    <button class="cl" id="closeDocumentViewer" type="button" aria-label="Close document viewer"><i class="fas fa-xmark"></i></button>
+    <h2 id="documentViewerTitle">Document preview</h2>
+    <p class="lead" id="documentViewerName"></p>
+    <iframe class="document-viewer" id="documentViewerFrame" title="Print document preview" hidden></iframe>
+    <div class="viewer-note" id="documentViewerNote" hidden></div>
+    <div class="fa-end">
+      <a class="btn soft" id="documentDownload" href="#" target="_blank" rel="noopener" download><i class="fas fa-download"></i>Download document</a>
+    </div>
   </div>
 </div>
 
@@ -182,6 +204,7 @@ function notify(msg,type='success'){
 const openM=id=>{$(id).classList.add('on');document.body.style.overflow='hidden'};
 const closeM=id=>{$(id).classList.remove('on');if(!document.querySelector('.pm-modal.on'))document.body.style.overflow=''};
 $('closeViewDetails').onclick=()=>closeM('viewDetailsModal');
+$('closeDocumentViewer').onclick=()=>closeM('documentViewerModal');
 document.querySelectorAll('.pm-modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeM(m.id)}));
 addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.pm-modal.on').forEach(m=>closeM(m.id))});
 function showConfirm(message,onConfirm,label='Delete'){
@@ -215,6 +238,8 @@ function renderStats(){
   $('sTotal').textContent=printRequests.length;$('sPending').textContent=p;$('sDone').textContent=c;
   $('sToday').textContent=printRequests.filter(r=>new Date(r.created_at).toDateString()===today).length;
   $('cAll').textContent=printRequests.length;$('cPending').textContent=p;$('cDone').textContent=c;
+  $('cPrinting').textContent=printRequests.filter(r=>r.status==='Printing').length;
+  $('cClaimed').textContent=printRequests.filter(r=>r.status==='Claimed').length;
 }
 function renderPrintTable(list){
   const tb=$('printingTableBody');
@@ -226,10 +251,11 @@ function renderPrintTable(list){
       <td data-l="Youth" class="nl"><div class="who"><span class="av">${esc(name.charAt(0).toUpperCase())}</span><div><b>${esc(name)}</b><span class="mono">${esc(r.member_id)}</span></div></div></td>
       <td data-l="Details"><div><b style="font-weight:600">${esc(r.document_title||'Untitled')}</b><div class="specs">${esc(specs(r))}</div></div></td>
       <td data-l="Sent">${esc(dt(r.created_at,{dateStyle:'short',timeStyle:'short'}))}</td>
-      <td data-l="Status"><span class="pill ${done?'completed':'pending'}">${done?'Completed':'Pending'}</span></td>
+      <td data-l="Status"><span class="pill ${done?'completed':'pending'}">${esc(r.status)}</span></td>
       <td data-l="Document">${link}</td>
       <td class="ab-td nl"><div class="ab">
-        <button class="ib" type="button" data-act="view" data-id="${id}" aria-label="View details" title="View details"><i class="fas fa-eye"></i></button>
+        ${r.file_path&&safeUrl(r.file_path)?`<button class="ib" type="button" data-act="document" data-id="${id}" aria-label="Preview document" title="Preview document"><i class="fas fa-eye"></i></button>`:''}
+        <button class="ib" type="button" data-act="view" data-id="${id}" aria-label="View details" title="View details"><i class="fas fa-circle-info"></i></button>
         ${done?'':`<button class="ib" type="button" data-act="complete" data-id="${id}" aria-label="Mark completed" title="Mark completed"><i class="fas fa-check"></i></button>`}
         <button class="ib del" type="button" data-act="delete" data-id="${id}" aria-label="Delete request" title="Delete request"><i class="fas fa-trash"></i></button></div></td></tr>`;
   }).join('');
@@ -243,6 +269,7 @@ $('searchInput').addEventListener('input',filterTable);
 $('statusChips').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;statusFilter=b.dataset.s;document.querySelectorAll('.chip').forEach(x=>x.setAttribute('aria-pressed',x===b));filterTable()});
 $('printingTableBody').addEventListener('click',e=>{
   const b=e.target.closest('[data-act]');if(!b)return;
+  if(b.dataset.act==='document'){viewDocument(b.dataset.id);return}
   ({view:viewDetails,complete:id=>updateStatus(id,'Completed'),delete:deleteRequest})[b.dataset.act](b.dataset.id);
 });
 $('refreshBtn').onclick=async()=>{const b=$('refreshBtn');b.classList.add('spin');b.disabled=true;await loadPrintRequests();b.classList.remove('spin');b.disabled=false;notify('Requests refreshed')};
@@ -259,6 +286,25 @@ function viewDetails(id){
   $('viewActions').innerHTML=done?'':`<button class="btn pink" type="button" id="vComplete"><i class="fas fa-check"></i>Mark completed</button>`;
   if(!done)$('vComplete').onclick=async()=>{if(await updateStatus(id,'Completed'))closeM('viewDetailsModal')};
   openM('viewDetailsModal');
+}
+function viewDocument(id){
+  const r=recOf(id);
+  if(!r||!r.file_path||!safeUrl(r.file_path)){notify('Document is unavailable','error');return}
+  const url=`${r.file_path}&preview=1`;
+  const extension=ext(r.file_name);
+  const canPreview=['pdf','jpg','jpeg','png','gif','txt'].includes(extension);
+  $('documentViewerTitle').textContent='Document preview';
+  $('documentViewerName').textContent=`${r.file_name||'Document'} · ${reqRef(r.request_id)}`;
+  $('documentDownload').href=r.file_path;
+  $('documentDownload').download=r.file_name||'document';
+  $('documentViewerFrame').hidden=!canPreview;
+  $('documentViewerNote').hidden=canPreview;
+  $('documentViewerNote').textContent=canPreview
+    ? ''
+    : 'This file type cannot be previewed in the browser. Use Download document to open it in the appropriate application.';
+  if(canPreview)$('documentViewerFrame').src=url;
+  else $('documentViewerFrame').removeAttribute('src');
+  openM('documentViewerModal');
 }
 
 /* ---- status ---- */

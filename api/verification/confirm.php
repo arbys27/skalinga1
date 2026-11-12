@@ -84,15 +84,16 @@ try {
         verificationResponse(['success' => false, 'message' => 'This service type is not currently supported.'], 400);
     }
     $requestQuery = $pdo->prepare(
-        "SELECT pr.request_id
+        "SELECT pr.request_id, pr.status
          FROM printing_requests pr
          JOIN users u ON u.member_id = pr.member_id AND u.id = ?
-         WHERE pr.request_id = ? AND pr.status = 'Completed'
+         WHERE pr.request_id = ? AND pr.status IN ('Completed', 'AwaitingVerification')
          LIMIT 1
          FOR UPDATE OF pr"
     );
     $requestQuery->execute([(int)$record['user_id'], (int)$record['service_ref']]);
-    if (!$requestQuery->fetch(PDO::FETCH_ASSOC)) {
+    $requestStatus = $requestQuery->fetch(PDO::FETCH_ASSOC);
+    if (!$requestStatus) {
         $cancel = $pdo->prepare(
             "UPDATE service_verification_tokens
              SET status = 'cancelled', otp_hash = NULL, otp_expires_at = NULL, updated_at = CURRENT_TIMESTAMP
@@ -108,13 +109,28 @@ try {
         verificationResponse(['success' => false, 'message' => 'The linked service request is no longer available.'], 409);
     }
 
-    $claim = $pdo->prepare(
-        "UPDATE printing_requests
-         SET status = 'Claimed', claimed_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
-         WHERE request_id = ? AND status = 'Completed'"
-    );
-    $claim->execute([(int)$record['service_ref']]);
-    if ($claim->rowCount() !== 1) {
+    if (!is_string($requestStatus['status'] ?? null)) {
+        $pdo->rollBack();
+        verificationResponse(['success' => false, 'message' => 'The linked service request changed. Scan again.'], 409);
+    }
+    $isSubmit = $requestStatus['status'] === 'AwaitingVerification';
+
+    $update = $isSubmit
+        ? $pdo->prepare(
+            "UPDATE printing_requests
+             SET status = 'Pending', verified_at = CURRENT_TIMESTAMP, verified_by_admin_id = ?,
+                 updated_at = CURRENT_TIMESTAMP
+             WHERE request_id = ? AND status = 'AwaitingVerification'"
+        )
+        : $pdo->prepare(
+            "UPDATE printing_requests
+             SET status = 'Claimed', claimed_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
+             WHERE request_id = ? AND status = 'Completed'"
+        );
+    $update->execute($isSubmit
+        ? [(int)$admin['id'], (int)$record['service_ref']]
+        : [(int)$record['service_ref']]);
+    if ($update->rowCount() !== 1) {
         $pdo->rollBack();
         verificationResponse(['success' => false, 'message' => 'The linked service request changed. Scan again.'], 409);
     }
@@ -147,7 +163,13 @@ try {
         securityClientIp(),
     ]);
     $pdo->commit();
-    verificationResponse(['success' => true, 'message' => 'Print request claim confirmed.']);
+    verificationResponse([
+        'success' => true,
+        'message' => $isSubmit
+            ? 'Print request verification confirmed.'
+            : 'Print request claim confirmed.',
+        'status' => $isSubmit ? 'Pending' : 'Claimed',
+    ]);
 } catch (Throwable $exception) {
     if ($pdo->inTransaction()) {
         $pdo->rollBack();

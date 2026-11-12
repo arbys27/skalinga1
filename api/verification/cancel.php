@@ -8,6 +8,7 @@ $auth = requireAuth(['youth']);
 securityRequireCsrf();
 $input = verificationInput();
 $tokenId = filter_var($input['token_id'] ?? null, FILTER_VALIDATE_INT);
+$cancelRequest = filter_var($input['cancel_request'] ?? false, FILTER_VALIDATE_BOOLEAN);
 if (!$tokenId || $tokenId < 1) {
     verificationAudit($pdo, 'cancel', 'invalid_token_id', null, null, (int)$auth['id']);
     verificationResponse(['success' => false, 'message' => 'A valid token ID is required.'], 400);
@@ -54,6 +55,31 @@ try {
          WHERE id = ?"
     );
     $update->execute([$tokenId]);
+    if ($cancelRequest && (string)$token['service_type'] === 'print') {
+        $requestUpdate = $pdo->prepare(
+            "UPDATE printing_requests
+             SET status = 'Rejected',
+                 notes = CASE WHEN NULLIF(notes, '') IS NULL
+                     THEN 'Cancelled by youth before verification.'
+                     ELSE notes || E'\\nCancelled by youth before verification.'
+                 END,
+                 updated_at = CURRENT_TIMESTAMP
+             WHERE request_id = ? AND status = 'AwaitingVerification'"
+        );
+        $requestUpdate->execute([(int)$token['service_ref']]);
+        if ($requestUpdate->rowCount() === 1) {
+            $pdo->prepare(
+                'INSERT INTO activity_logs (user_id, role, action, identifier, ip_address)
+                 VALUES (?, ?, ?, ?, ?)'
+            )->execute([
+                (int)$auth['id'],
+                'youth',
+                'print_request_cancelled',
+                'print:' . (string)$token['service_ref'],
+                securityClientIp(),
+            ]);
+        }
+    }
     verificationAudit(
         $pdo,
         'cancel',

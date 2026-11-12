@@ -9,8 +9,9 @@ securityRequireCsrf();
 $input = verificationInput();
 
 $serviceType = is_string($input['service_type'] ?? null) ? trim($input['service_type']) : '';
+$purpose = is_string($input['purpose'] ?? null) ? trim($input['purpose']) : 'claim';
 $serviceRef = is_scalar($input['request_id'] ?? null) ? trim((string)$input['request_id']) : '';
-if ($serviceType !== 'print' || $serviceRef === '') {
+if ($serviceType !== 'print' || !in_array($purpose, ['submit', 'claim'], true) || $serviceRef === '') {
     verificationAudit(
         $pdo,
         'generate',
@@ -47,7 +48,14 @@ try {
         verificationResponse(['success' => false, 'message' => 'An active youth account is required.'], 403);
     }
 
-    $request = verificationServiceRequest($pdo, $serviceType, $serviceRef, (string)$user['member_id'], true);
+    $request = verificationServiceRequest(
+        $pdo,
+        $serviceType,
+        $serviceRef,
+        (string)$user['member_id'],
+        $purpose,
+        true
+    );
     if (!$request) {
         verificationAudit(
             $pdo,
@@ -63,7 +71,9 @@ try {
         $pdo->commit();
         verificationResponse([
             'success' => false,
-            'message' => 'This request is not an eligible, unclaimed print request for your account.',
+            'message' => $purpose === 'submit'
+                ? 'This print request is not awaiting verification for your account.'
+                : 'This request is not an eligible, unclaimed print request for your account.',
         ], 404);
     }
 
@@ -114,7 +124,7 @@ try {
         $serviceRef,
         $tokenHash,
         (int)$settings['token_ttl_seconds'],
-        postgresBoolean($settings['otp_required']),
+        $purpose === 'submit' ? true : postgresBoolean($settings['otp_required']),
     ]);
     $created = $insert->fetch(PDO::FETCH_ASSOC);
     verificationAudit(
@@ -136,7 +146,14 @@ try {
         'token_id' => (int)$created['id'],
         'expires_at' => $created['expires_at'],
         'expires_in' => (int)$settings['token_ttl_seconds'],
-        'otp_required' => postgresBoolean($settings['otp_required']),
+        'otp_required' => $purpose === 'submit' ? true : postgresBoolean($settings['otp_required']),
+        'purpose' => $purpose,
+        'request' => [
+            'request_id' => (int)$request['request_id'],
+            'member_id' => (string)$request['member_id'],
+            'member_name' => (string)$request['member_name'],
+            'document_title' => (string)$request['document_title'],
+        ],
     ]);
 } catch (Throwable $exception) {
     if ($pdo->inTransaction()) {

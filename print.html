@@ -136,6 +136,8 @@
 .pr-box h2{margin:0 40px 6px 0;font:800 24px/1.1 var(--h);letter-spacing:-.03em}
 .pr-box>p{margin:0 0 18px;color:var(--mu);font-size:14px}
 .pr-box .pr-x{position:absolute;top:14px;right:14px;border:1px solid var(--ln)}
+.pr-modal-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pr-modal-actions .pr-go{margin-top:0}
 .pr-done{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
 .pr-done a,.pr-done button{flex:1;min-width:150px;min-height:48px;display:inline-flex;align-items:center;justify-content:center;border-radius:16px;font:700 14px var(--b);text-decoration:none;cursor:pointer;border:0}
 .pr-done a{background:var(--g);color:#fff}.pr-done button{background:#f1f6f3;color:var(--ink)}
@@ -245,11 +247,54 @@
 <div class="pr-modal" id="digitalIdModal" hidden>
   <div class="pr-box" role="dialog" aria-modal="true" aria-labelledby="printIdTitle">
     <button class="pr-x" id="closeModal" type="button" aria-label="Close verification QR"><svg class="ic"><use href="#p-x"/></svg></button>
-    <h2 id="printIdTitle">One-time service verification</h2>
-    <p>Show this QR to SK Office staff. It contains only a short-lived token and expires in three minutes.</p>
-    <div id="serviceQRCode" style="display:grid;place-items:center;min-height:180px;padding:12px" aria-label="One-time service verification QR"></div>
+    <h2 id="printIdTitle">Your digital service ID</h2>
+    <p>Show this fresh QR to SK Office staff. It contains only a short-lived token and expires in three minutes.</p>
+    <div class="digital-youth-id-card">
+      <section class="dyid-front" aria-label="Digital Youth ID for print verification">
+        <div class="dyid-header">
+          <img src="assets/images/sklogo.jpg" alt="SK Logo" class="dyid-logo">
+          <div class="dyid-brand">
+            <span>SKalinga Youth Services</span>
+            <strong>SK San Antonio</strong>
+          </div>
+          <span class="dyid-classification">Print service</span>
+        </div>
+        <span class="dyid-hologram" aria-hidden="true">SK</span>
+        <div class="dyid-main">
+          <div class="dyid-person">
+            <div class="dyid-details">
+              <span class="dyid-field-label">Youth member</span>
+              <h4 class="dyid-name" id="verificationYouthName">Loading...</h4>
+              <span class="dyid-number-stamp">
+                <span>Member number</span>
+                <strong id="verificationMemberId">Loading...</strong>
+              </span>
+              <span class="dyid-detail">
+                <span>Document</span>
+                <strong id="verificationDocument">Loading...</strong>
+              </span>
+            </div>
+          </div>
+          <div class="dyid-qr-panel">
+            <div class="dyid-qr-box" id="serviceQRCode" role="img" aria-label="Short-lived print verification QR"></div>
+            <span class="dyid-qr-caption">Fresh QR · expires in 3 minutes</span>
+          </div>
+          <div class="dyid-request-ref">
+            Request <strong id="verificationRequest">Loading...</strong>
+          </div>
+        </div>
+        <div class="dyid-footer">
+          <span>Physical + email verification</span>
+          <span>Present to SK staff</span>
+        </div>
+      </section>
+    </div>
     <p id="verificationCountdown" role="status" aria-live="polite"></p>
-    <button type="button" id="cancelVerification" class="pr-go">Cancel verification</button>
+    <p id="verificationStatus" role="status" aria-live="polite">Waiting for staff verification.</p>
+    <div class="pr-modal-actions">
+      <button type="button" id="regenerateVerification" class="pr-go">Regenerate QR</button>
+      <button type="button" id="cancelVerification" class="pr-go">Cancel request</button>
+    </div>
   </div>
 </div>
 
@@ -274,7 +319,7 @@ function showToast(message,type='info',duration=4500){
 const form=$('printForm'),fileIn=$('document'),drop=$('drop');
 const val=n=>form.querySelector(`[name="${n}"]:checked`)?.value||'';
 const fmt=b=>b>1048576?(b/1048576).toFixed(1)+' MB':Math.max(1,Math.round(b/1024))+' KB';
-let verificationTokenId=null,verificationTimer=null,verificationExpiresAt=0;
+let verificationTokenId=null,verificationRequestId=null,verificationTimer=null,verificationPoller=null,verificationExpiresAt=0;
 function sync(){
   const f=fileIn.files[0];
   $('sTitle').textContent=$('documentTitle').value.trim()||'Not set';
@@ -295,13 +340,7 @@ $('minus').onclick=()=>step(-1);$('plus').onclick=()=>step(1);
 /* ---- modal ---- */
 const modal=$('digitalIdModal');
 const closeM=()=>{modal.hidden=true};
-$('closeModal').onclick=async()=>{
-  if(verificationTokenId){
-    $('cancelVerification').click();
-    return;
-  }
-  closeM();
-};
+$('closeModal').onclick=closeM;
 modal.addEventListener('click',e=>{if(e.target===modal)closeM()});
 addEventListener('keydown',e=>{if(e.key==='Escape'){closeM();closeH()}});
 
@@ -341,6 +380,7 @@ form.addEventListener('submit',async e=>{
       form.reset();sync();
       showToast('"'+((res.data&&res.data.document_title)||title)+'" was uploaded.','success',6000);
       loadPrintHistory();
+      await generateVerification(Number(res.request_id||res.data?.request_id));
     }else showToast(res.error||'Failed to upload document.','error');
   }catch(err){console.error('Upload error:',err);showToast('Error uploading file. Please try again.','error')}
   finally{btn.disabled=false;btn.textContent='Send for printing'}
@@ -366,12 +406,18 @@ function renderPrintHistory(list){
 async function generateVerification(requestId){
   try{
     const csrf=await getCsrfToken();
-    const response=await fetch('api/verification/generate.php',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({service_type:'print',request_id:requestId})});
+    const response=await fetch('api/verification/generate.php',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({service_type:'print',purpose:'submit',request_id:requestId})});
     const data=await response.json();
     if(!response.ok||!data.success)throw new Error(data.message||'Unable to generate a verification QR.');
     if(!window.QRCode)throw new Error('QR display library is unavailable.');
     clearInterval(verificationTimer);
     verificationTokenId=data.token_id;
+    verificationRequestId=requestId;
+    $('verificationYouthName').textContent=data.request?.member_name||'Youth member';
+    $('verificationMemberId').textContent=`Member ID: ${data.request?.member_id||'Unavailable'}`;
+    $('verificationDocument').textContent=`${data.request?.document_title||'Print request'} · ${data.purpose==='submit'?'Awaiting verification':'Claim verification'}`;
+    $('verificationRequest').textContent=`REQ-${String(requestId).padStart(4,'0')}`;
+    $('verificationStatus').textContent='Waiting for staff verification.';
     $('serviceQRCode').replaceChildren();
     new QRCode($('serviceQRCode'),{text:data.token,width:200,height:200,correctLevel:QRCode.CorrectLevel.M});
     verificationExpiresAt=Date.now()+Number(data.expires_in||180)*1000;
@@ -383,10 +429,31 @@ async function generateVerification(requestId){
     $('cancelVerification').disabled=false;
     updateCountdown();
     verificationTimer=setInterval(updateCountdown,1000);
+    clearInterval(verificationPoller);
+    verificationPoller=setInterval(pollVerificationStatus,5000);
     modal.hidden=false;
     $('cancelVerification').focus();
   }catch(error){showToast(error.message||'Unable to generate a verification QR.','error')}
 }
+
+async function pollVerificationStatus(){
+  if(!verificationRequestId)return;
+  try{
+    const response=await fetch('api/get_user_print_requests.php',{credentials:'include',cache:'no-store'});
+    const data=await response.json();
+    const request=(data.data||[]).find(item=>Number(item.request_id)===Number(verificationRequestId));
+    if(request?.status==='Pending'){
+      clearInterval(verificationPoller);clearInterval(verificationTimer);
+      verificationTokenId=null;verificationRequestId=null;modal.hidden=true;
+      showToast('Your request is now pending with the SK Office.','success');
+      loadPrintHistory();
+    }
+  }catch(error){console.error('Verification status polling failed:',error)}
+}
+
+$('regenerateVerification').addEventListener('click',()=>{
+  if(verificationRequestId)generateVerification(verificationRequestId);
+});
 
 $('printList').addEventListener('click',event=>{
   const button=event.target.closest('[data-verify-print]');
@@ -398,7 +465,7 @@ $('cancelVerification').addEventListener('click',async()=>{
   $('cancelVerification').disabled=true;
   try{
     const csrf=await getCsrfToken();
-    const response=await fetch('api/verification/cancel.php',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({token_id:verificationTokenId})});
+    const response=await fetch('api/verification/cancel.php',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({token_id:verificationTokenId,cancel_request:true})});
     const data=await response.json();
     if(!response.ok||!data.success){
       if(response.status===409||response.status===410){
@@ -412,7 +479,9 @@ $('cancelVerification').addEventListener('click',async()=>{
     }
     showToast('Verification cancelled.','success');
     clearInterval(verificationTimer);
+    clearInterval(verificationPoller);
     verificationTokenId=null;
+    verificationRequestId=null;
     $('serviceQRCode').replaceChildren();
     $('verificationCountdown').textContent='Cancelled.';
     modal.hidden=true;
