@@ -139,6 +139,7 @@ table.ht{width:100%;border-collapse:collapse;font-size:14px}
         <label class="find"><span style="position:absolute;width:1px;height:1px;overflow:hidden">Search announcements</span><i class="fas fa-magnifying-glass"></i><input id="search" type="search" placeholder="Search title, description or venue" autocomplete="off"></label>
         <select id="categoryFilter" class="sel" aria-label="Filter by category"><option value="">All categories</option></select>
         <button class="btn pink" id="newButton" type="button"><i class="fas fa-plus"></i>New announcement</button>
+        <button type="button" class="btn soft" id="exportPdfBtn"><i class="fas fa-file-pdf"></i><span>Export PDF</span></button>
       </div>
 
       <div class="chips" id="tabs" role="group" aria-label="Filter by status">
@@ -209,6 +210,9 @@ table.ht{width:100%;border-collapse:collapse;font-size:14px}
 
 <div id="toastContainer" aria-live="polite"></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
+<script src="js/admin-export-pdf.js"></script>
 <script>
 (()=>{
 const $=id=>document.getElementById(id);
@@ -216,7 +220,7 @@ const safe=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'
 const CATS=['Dental Caravan','Medical Mission','Vaccination','Free Check-up','Mental Health','Nutrition and Fitness','Blood Donation','Other'];
 const ICON={'Blood Donation':'fa-droplet','Vaccination':'fa-syringe','Dental Caravan':'fa-tooth','Mental Health':'fa-brain','Nutrition and Fitness':'fa-apple-whole','Medical Mission':'fa-kit-medical','Free Check-up':'fa-stethoscope'};
 const icon=c=>ICON[c]||'fa-heart-pulse';
-let all=[],activeStatus='',objectUrl=null;
+let all=[],activeStatus='',objectUrl=null,filteredAnnouncements=[];
 CATS.forEach(c=>{$('category').add(new Option(c,c));$('categoryFilter').add(new Option(c,c))});
 
 function notify(msg,type='success'){
@@ -254,6 +258,7 @@ function render(){
   $('cAll').textContent=all.length;$('cPublished').textContent=n('Published');$('cDraft').textContent=n('Draft');$('cCancelled').textContent=n('Cancelled');$('cArchived').textContent=n('Archived');
   const q=$('search').value.toLowerCase().trim(),cat=$('categoryFilter').value;
   const list=all.filter(p=>(!activeStatus||p.status===activeStatus)&&(!cat||p.category===cat)&&(!q||`${p.title} ${p.description||''} ${p.venue||''}`.toLowerCase().includes(q)));
+  filteredAnnouncements=list;
   if(!list.length){$('rows').innerHTML=`<tr><td colspan="6" class="empty"><i class="fas fa-heart-pulse"></i>No health announcements found.</td></tr>`;return}
   $('rows').innerHTML=list.map(p=>{
     const id=safe(p.id),pub=p.status==='Published';
@@ -271,6 +276,18 @@ function render(){
         ${p.status!=='Archived'?`<button class="ib del" type="button" data-action="archive" data-id="${id}" aria-label="Archive" title="Archive"><i class="fas fa-box-archive"></i></button>`:''}</div></td></tr>`;
   }).join('');
 }
+async function exportAnnouncements(){
+  const button=$('exportPdfBtn'),label=button.querySelector('span');
+  if(!filteredAnnouncements.length){notify('No records to export','warning');return}
+  button.disabled=true;label.textContent='Generating…';
+  try{await AdminExportPDF.exportTable({title:'Health Announcements Log',subtitle:'SKalinga Admin · San Antonio',filename:`skalinga-health-announcements-${AdminExportPDF.dateStamp()}.pdf`,
+    columns:[{header:'Announcement',dataKey:'title'},{header:'Category',dataKey:'category'},{header:'Date and time',dataKey:'date_time'},{header:'Venue',dataKey:'venue'},{header:'Status',dataKey:'status'}],
+    rows:filteredAnnouncements.map(p=>({title:p.title,category:p.category,date_time:[dateText(p.event_date),timeRange(p.start_time,p.end_time)].filter(Boolean).join(' · '),venue:p.venue||'—',status:p.status})),
+    meta:{statusFilter:activeStatus||'All',categoryFilter:$('categoryFilter').value||'All',searchQuery:$('search').value.trim(),generatedBy:$('userFullName').textContent}})}
+  catch(error){notify(error.message||'Unable to generate PDF','error')}
+  finally{button.disabled=false;label.textContent='Export PDF'}
+}
+$('exportPdfBtn').addEventListener('click',exportAnnouncements);
 $('search').addEventListener('input',render);$('categoryFilter').addEventListener('change',render);
 $('tabs').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;activeStatus=b.dataset.status;document.querySelectorAll('#tabs .chip').forEach(x=>x.setAttribute('aria-pressed',x===b));render()});
 

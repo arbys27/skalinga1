@@ -168,6 +168,7 @@ table.it{width:100%;border-collapse:collapse;font-size:14px}
           <option value="">All urgency</option><option value="emergency">Emergency</option><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option>
         </select>
         <button class="btn green" id="refreshBtn" type="button"><i class="fas fa-rotate"></i><span>Refresh</span></button>
+        <button type="button" class="btn soft" id="exportPdfBtn"><i class="fas fa-file-pdf"></i><span>Export PDF</span></button>
       </div>
 
       <div class="chips" id="statusChips" role="group" aria-label="Filter by status">
@@ -234,11 +235,15 @@ table.it{width:100%;border-collapse:collapse;font-size:14px}
 
 <div id="toastContainer" aria-live="polite"></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
+<script src="js/admin-export-pdf.js"></script>
 <script>
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
 const safeUrl=u=>{const s=String(u||'').trim();return !!s&&!/^\s*(javascript|data|vbscript):/i.test(s)};
 let incidentsData=[],statusFilter='',current=null,photos=[],photoIdx=0,incidentHandlers=[],currentAdminId=null,csrfToken='';
+let filteredIncidents=[];
 const STATUS_LABEL={pending:'Submitted',in_review:'Under Review',under_action:'Referred',resolved:'Resolved',closed:'Closed'};
 const label=s=>STATUS_LABEL[s]||String(s||'').replace(/_/g,' ');
 const open=i=>i.status!=='resolved'&&i.status!=='closed';
@@ -306,8 +311,22 @@ function renderIncidentsTable(list){
 function filterIncidents(){
   renderStats();
   const q=$('searchInput').value.toLowerCase().trim(),urg=$('filterUrgency').value;
-  renderIncidentsTable(incidentsData.filter(i=>`${i.id} ${i.firstname} ${i.lastname} ${i.member_id} ${i.location} ${i.category}`.toLowerCase().includes(q)&&(!statusFilter||i.status===statusFilter)&&(!urg||i.urgency===urg)));
+  filteredIncidents=incidentsData.filter(i=>`${i.id} ${i.firstname} ${i.lastname} ${i.member_id} ${i.location} ${i.category}`.toLowerCase().includes(q)&&(!statusFilter||i.status===statusFilter)&&(!urg||i.urgency===urg));
+  renderIncidentsTable(filteredIncidents);
 }
+async function exportIncidents(){
+  const button=$('exportPdfBtn'),label=button.querySelector('span');
+  if(!filteredIncidents.length){notify('No records to export','warning');return}
+  button.disabled=true;label.textContent='Generating…';
+  try{
+    await AdminExportPDF.exportTable({title:'Incident Reports Log',subtitle:'SKalinga Admin · San Antonio',filename:`skalinga-incidents-${AdminExportPDF.dateStamp()}.pdf`,orientation:'landscape',
+      columns:[{header:'Incident ID',dataKey:'id'},{header:'Reported by',dataKey:'reported_by'},{header:'Member ID',dataKey:'member_id'},{header:'Category',dataKey:'category'},{header:'Location',dataKey:'location'},{header:'Urgency',dataKey:'urgency'},{header:'Status',dataKey:'status'},{header:'Handler',dataKey:'handler'},{header:'Submitted',dataKey:'submitted'}],
+      rows:filteredIncidents.map(i=>({id:`#${i.id}`,reported_by:fullName(i),member_id:i.member_id,category:String(i.category||'').replace(/_/g,' '),location:i.location,urgency:i.urgency,status:label(i.status),handler:i.handler_name||'Unassigned',submitted:dShort(i.submitted_date)})),
+      meta:{statusFilter:statusFilter?label(statusFilter):'All',searchQuery:$('searchInput').value.trim(),urgencyFilter:$('filterUrgency').value||'All',generatedBy:$('userFullName').textContent}});
+  }catch(error){notify(error.message||'Unable to generate PDF','error')}
+  finally{button.disabled=false;label.textContent='Export PDF'}
+}
+$('exportPdfBtn').addEventListener('click',exportIncidents);
 $('searchInput').addEventListener('input',filterIncidents);
 $('filterUrgency').addEventListener('change',filterIncidents);
 $('statusChips').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;statusFilter=b.dataset.s;document.querySelectorAll('.chip').forEach(x=>x.setAttribute('aria-pressed',x===b));filterIncidents()});

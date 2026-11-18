@@ -53,6 +53,7 @@
           </select>
           <input id="search-filter" class="search-input freedom-search" type="search" maxlength="120" placeholder="Search title or message" aria-label="Search title or message">
           <button id="refresh-button" class="freedom-button primary" type="button"><i class="fas fa-rotate"></i> Refresh</button>
+          <button id="exportPdfBtn" class="freedom-button primary" type="button"><i class="fas fa-file-pdf"></i> Export PDF</button>
         </div>
         <div id="posts" class="freedom-list" aria-live="polite"></div>
       </div>
@@ -63,10 +64,13 @@
   <script src="assets/js/loader.js?v=3"></script>
   <script src="js/admin-common.js"></script>
   <script src="js/admin-sidebar.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
+  <script src="js/admin-export-pdf.js"></script>
   <script>
     (() => {
-      const posts=document.getElementById('posts'),statusFilter=document.getElementById('status-filter'),categoryFilter=document.getElementById('category-filter'),searchFilter=document.getElementById('search-filter'),refreshButton=document.getElementById('refresh-button');
-      let csrfToken='',searchTimer;
+      const posts=document.getElementById('posts'),statusFilter=document.getElementById('status-filter'),categoryFilter=document.getElementById('category-filter'),searchFilter=document.getElementById('search-filter'),refreshButton=document.getElementById('refresh-button'),exportButton=document.getElementById('exportPdfBtn');
+      let csrfToken='',searchTimer,filteredPosts=[];
       const element=(tag,className,text)=>{const node=document.createElement(tag);if(className)node.className=className;if(text!==undefined)node.textContent=text;return node};
       async function request(url,options={}){const response=await fetch(url,{credentials:'same-origin',...options});const data=await response.json();if(!response.ok||!data.success)throw new Error(data.message||'The request could not be completed.');return data}
       function updateDateTime(){const now=new Date();document.getElementById('dashboard-datetime').textContent=`${now.toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric',year:'numeric'})} • ${now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}`}
@@ -85,7 +89,9 @@
         else if(post.status==='approved'){const action=post.is_hidden?'unhide':'hide';actions.append(actionButton(post.is_hidden?'Unhide':'Hide from public board',post.is_hidden?'approve':'hide',()=>moderate(post.id,action,reason.value)));card.append(reason,actions)}
         posts.append(card);
       }
-      async function loadPosts(){posts.replaceChildren(element('p','freedom-empty','Loading submissions...'));const params=new URLSearchParams({status:statusFilter.value,category:categoryFilter.value,search:searchFilter.value.trim()});try{const result=await request(`api/freedom_wall/list_admin.php?${params}`);posts.replaceChildren();if(!result.data.length){posts.append(element('p','freedom-empty','No submissions match these filters.'));return}result.data.forEach(renderPost)}catch(error){posts.replaceChildren(element('p','freedom-empty',error.message));window.showAlert(error.message,'error')}}
+      async function loadPosts(){posts.replaceChildren(element('p','freedom-empty','Loading submissions...'));const params=new URLSearchParams({status:statusFilter.value,category:categoryFilter.value,search:searchFilter.value.trim()});try{const result=await request(`api/freedom_wall/list_admin.php?${params}`);filteredPosts=result.data||[];posts.replaceChildren();if(!filteredPosts.length){posts.append(element('p','freedom-empty','No submissions match these filters.'));return}filteredPosts.forEach(renderPost)}catch(error){filteredPosts=[];posts.replaceChildren(element('p','freedom-empty',error.message));window.showAlert(error.message,'error')}}
+      async function exportPosts(){if(!filteredPosts.length){window.showAlert('No records to export','warning');return}const original=exportButton.innerHTML;exportButton.disabled=true;exportButton.textContent='Generating…';try{await AdminExportPDF.exportTable({title:'Freedom Wall Moderation Log',subtitle:'SKalinga Admin · San Antonio',filename:`skalinga-freedom-wall-${AdminExportPDF.dateStamp()}.pdf`,orientation:'portrait',columns:[{header:'Post ID',dataKey:'id'},{header:'Display name',dataKey:'display_name'},{header:'Category',dataKey:'category'},{header:'Title',dataKey:'title'},{header:'Message',dataKey:'body'},{header:'Status',dataKey:'status'},{header:'Submitted',dataKey:'submitted'}],rows:filteredPosts.map(post=>{const anonymous=['1','true','yes'].includes(String(post.is_anonymous).toLowerCase());return{id:post.id,display_name:anonymous?'Anonymous':([post.firstname,post.lastname].filter(Boolean).join(' ')||post.display_name||'Youth member'),category:post.category,title:post.title,body:post.body,status:post.is_hidden?'Hidden':post.status,submitted:new Date(post.created_at).toLocaleString()}}),meta:{statusFilter:statusFilter.value==='all'?'All':statusFilter.value,categoryFilter:categoryFilter.value==='all'?'All':categoryFilter.value,searchQuery:searchFilter.value.trim(),generatedBy:document.getElementById('userFullName').textContent}})}catch(error){window.showAlert(error.message||'Unable to generate PDF','error')}finally{exportButton.disabled=false;exportButton.innerHTML=original}}
+      exportButton.addEventListener('click',exportPosts);
       async function moderate(id,action,reason){try{csrfToken=csrfToken||(await request('api/csrf_token.php')).csrf_token;await request('api/freedom_wall/moderate.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrfToken},body:JSON.stringify({id,action,reason})});window.showAlert('Moderation action saved.','success');await loadPosts()}catch(error){window.showAlert(error.message,'error')}}
       statusFilter.addEventListener('change',loadPosts);categoryFilter.addEventListener('change',loadPosts);searchFilter.addEventListener('input',()=>{clearTimeout(searchTimer);searchTimer=setTimeout(loadPosts,250)});refreshButton.addEventListener('click',loadPosts);
       updateDateTime();setInterval(updateDateTime,1000);loadProfile();loadPosts();

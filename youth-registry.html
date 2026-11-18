@@ -293,6 +293,7 @@
                     <i class="fas fa-search"></i>
                     <input type="text" id="searchInput" class="search-input" placeholder="Search by name, ID, or contact number" aria-label="Search members">
                 </div>
+                <button type="button" class="btn-add-youth" id="exportPdfBtn"><i class="fas fa-file-pdf"></i> Export PDF</button>
                 <button class="btn-add-youth" id="addYouthBtn">
                     <i class="fas fa-plus"></i> Register youth
                 </button>
@@ -506,6 +507,9 @@
     </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
+<script src="js/admin-export-pdf.js"></script>
 <script>
 // ────────────────────────────────────────────────
 // Helpers
@@ -594,6 +598,7 @@ updateDashboardDateTime();
 // ────────────────────────────────────────────────
 let youthData = [];
 let currentStatus = 'active';
+let filteredYouth = [];
 
 function showLoadingRows() {
     const tbody = document.getElementById('youthTableBody');
@@ -714,8 +719,44 @@ function filterTable() {
     const filtered = youthData.filter(y =>
         `${youthFullName(y)} ${y.member_id} ${y.phone || ''}`.toLowerCase().includes(search)
     );
+    filteredYouth = filtered;
     renderYouthTable(filtered);
 }
+async function exportYouth() {
+    const button = document.getElementById('exportPdfBtn');
+    const original = button.innerHTML;
+    if (!filteredYouth.length) { showAlert('No records to export', 'warning'); return; }
+    button.disabled = true;
+    button.textContent = 'Generating…';
+    try {
+        await AdminExportPDF.exportTable({
+            title: 'Youth Registry',
+            subtitle: 'SKalinga Admin · San Antonio',
+            filename: `skalinga-youth-registry-${AdminExportPDF.dateStamp()}.pdf`,
+            orientation: 'landscape',
+            columns: [
+                { header: 'Member ID', dataKey: 'member_id' }, { header: 'Full name', dataKey: 'name' },
+                { header: 'Contact number', dataKey: 'phone' }, { header: 'Full address', dataKey: 'address' },
+                { header: 'Status', dataKey: 'status' }, { header: 'Status reason', dataKey: 'status_reason' }
+            ],
+            rows: filteredYouth.map(youth => ({
+                member_id: youth.member_id,
+                name: youthFullName(youth),
+                phone: youth.phone || 'N/A',
+                address: youthFullAddress(youth),
+                status: youth.status,
+                status_reason: youth.status_reason || ''
+            })),
+            meta: { statusFilter: currentStatus, searchQuery: document.getElementById('searchInput').value.trim(), generatedBy: adminInfo ? adminInfo.username : '' }
+        });
+    } catch (error) {
+        showAlert(error.message || 'Unable to generate PDF', 'error');
+    } finally {
+        button.disabled = false;
+        button.innerHTML = original;
+    }
+}
+document.getElementById('exportPdfBtn').addEventListener('click', exportYouth);
 document.getElementById('searchInput').addEventListener('input', filterTable);
 document.querySelectorAll('.status-filter').forEach(button => button.addEventListener('click', () => {
     if (currentStatus === button.dataset.status) return;

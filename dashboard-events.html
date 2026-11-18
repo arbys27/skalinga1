@@ -103,6 +103,7 @@
                         <option value="Past">Past</option>
                     </select>
                 </div>
+                <button type="button" class="btn-add-event" id="exportPdfBtn"><i class="fas fa-file-pdf"></i> Export PDF</button>
                 <button class="btn-add-event" id="addEventBtn">
                     <i class="fas fa-plus"></i> Add New Event
                 </button>
@@ -252,6 +253,9 @@
     </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
+<script src="js/admin-export-pdf.js"></script>
 <script>
 // ────────────────────────────────────────────────
 // Toast Notification
@@ -321,6 +325,7 @@ loadUserProfile();
 // Data & Storage - Using MySQL API
 // ────────────────────────────────────────────────
 let eventsData = [];
+let filteredEvents = [];
 
 // ────────────────────────────────────────────────
 // Load events from API
@@ -396,8 +401,46 @@ function filterEvents() {
         return text.includes(search) && (!status || e.status === status);
     });
 
+    filteredEvents = filtered;
     renderEventsTable(filtered);
 }
+
+async function exportEvents() {
+    const button = document.getElementById('exportPdfBtn');
+    const original = button.innerHTML;
+    if (!filteredEvents.length) { showAlert('No records to export', 'warning'); return; }
+    button.disabled = true;
+    button.textContent = 'Generating…';
+    try {
+        await AdminExportPDF.exportTable({
+            title: 'Events / Announcements Log',
+            subtitle: 'SKalinga Admin · San Antonio',
+            filename: `skalinga-events-${AdminExportPDF.dateStamp()}.pdf`,
+            columns: [
+                { header: 'Event ID', dataKey: 'id' }, { header: 'Title', dataKey: 'title' },
+                { header: 'Date & time', dataKey: 'date_time' }, { header: 'Location', dataKey: 'location' },
+                { header: 'Type', dataKey: 'type' }, { header: 'Status', dataKey: 'status' },
+                { header: 'Registration link', dataKey: 'registration' }
+            ],
+            rows: filteredEvents.map(event => ({
+                id: event.id,
+                title: event.title,
+                date_time: `${new Date(`${event.date}T${event.time}`).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} · ${event.time}`,
+                location: event.location,
+                type: event.type,
+                status: event.status,
+                registration: event.regLink || '—'
+            })),
+            meta: { statusFilter: document.getElementById('filterStatus').value || 'All', searchQuery: document.getElementById('searchInput').value.trim(), generatedBy: document.getElementById('userFullName').textContent }
+        });
+    } catch (error) {
+        showAlert(error.message || 'Unable to generate PDF', 'error');
+    } finally {
+        button.disabled = false;
+        button.innerHTML = original;
+    }
+}
+document.getElementById('exportPdfBtn').addEventListener('click', exportEvents);
 
 document.getElementById('searchInput')?.addEventListener('input', filterEvents);
 document.getElementById('filterStatus')?.addEventListener('change', filterEvents);

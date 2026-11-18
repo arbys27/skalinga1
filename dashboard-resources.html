@@ -199,6 +199,7 @@ body.resources-sidebar-open{overflow:hidden}
         <div class="acts">
           <button class="btn pink" type="button" data-scan="borrow"><i class="fas fa-qrcode"></i>Scan Borrow QR</button>
           <button class="btn green" type="button" data-scan="return"><i class="fas fa-rotate-left"></i>Scan Return QR</button>
+          <button type="button" class="btn soft" id="exportPdfBtn"><i class="fas fa-file-pdf"></i><span>Export PDF</span></button>
         </div>
       </div>
 
@@ -219,7 +220,7 @@ body.resources-sidebar-open{overflow:hidden}
         <section class="tw pending-card">
           <div class="card-h">
             <div><h3>Pending requests</h3><p>Youth who entered their code and are waiting for you</p></div>
-            <span class="count-badge zero" id="pendingCount">0</span>
+            <div><button type="button" class="btn soft" id="exportPendingPdfBtn"><i class="fas fa-file-pdf"></i><span>Export requests</span></button> <span class="count-badge zero" id="pendingCount">0</span></div>
           </div>
           <div class="scroll">
             <table class="lt admin-table" aria-label="Pending borrow and return requests">
@@ -318,6 +319,9 @@ body.resources-sidebar-open{overflow:hidden}
 
 <div id="toastContainer" aria-live="polite"></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
+<script src="js/admin-export-pdf.js"></script>
 <script>
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
@@ -342,6 +346,7 @@ document.addEventListener('keydown',event=>{if(event.key==='Escape'&&document.bo
 mobileSidebar.addEventListener('change',()=>setSidebarOpen(false));
 setSidebarOpen(false);
 let itemsData=[],lendingData=[],pendingRequests=[],statusFilter='',view='records';
+let filteredItems=[],filteredLending=[];
 let csrfToken='';
 let scannerService='borrow',scannerStream=null,scannerDetector=null,scannerFrame=0,processingRequest=null;
 
@@ -428,6 +433,7 @@ function renderPendingRequests(){
 }
 function renderInventory(){
   const q=$('searchInput').value.toLowerCase().trim(),list=itemsData.filter(i=>`${i.name} ${i.description||''}`.toLowerCase().includes(q));
+  filteredItems=list;
   $('inventoryView').innerHTML=`<div class="inventory-toolbar"><button class="btn pink" id="addItemBtn" type="button"><i class="fas fa-plus"></i>Add item</button></div>`+(list.length?list.map(i=>{
     const a=Number(i.available)||0,t=Number(i.quantity)||0,pct=t?Math.round(a/t*100):0,k=a===0?'out':pct<=30?'low':'ok';
     return `<article class="item ${k==='ok'?'':k+'c'}"><div class="top"><h3>${esc(i.name)}</h3><span class="pill ${k}">${k==='out'?'Out of stock':k==='low'?'Low stock':'Available'}</span></div>
@@ -440,8 +446,22 @@ function filterLending(){
   renderPendingRequests();
   if(view==='inventory'){renderInventory();return}
   const q=$('searchInput').value.toLowerCase().trim();
-  renderLendingTable(lendingData.filter(r=>`${r.item_name} ${r.member_id} ${r.borrower_name}`.toLowerCase().includes(q)&&(!statusFilter||statusOf(r)===statusFilter)));
+  filteredLending=lendingData.filter(r=>`${r.item_name} ${r.member_id} ${r.borrower_name}`.toLowerCase().includes(q)&&(!statusFilter||statusOf(r)===statusFilter));
+  renderLendingTable(filteredLending);
 }
+async function runResourceExport(button,title,filename,columns,rows,meta={}){
+  if(!rows.length){notify('No records to export','warning');return}
+  const label=button.querySelector('span')||button;
+  const original=label.textContent;
+  button.disabled=true;label.textContent='Generating…';
+  try{await AdminExportPDF.exportTable({title,subtitle:'SKalinga Admin · San Antonio',filename:`skalinga-${filename}-${AdminExportPDF.dateStamp()}.pdf`,columns,rows,meta:{...meta,generatedBy:$('userFullName').textContent}})}
+  catch(error){notify(error.message||'Unable to generate PDF','error')}
+  finally{button.disabled=false;label.textContent=original}
+}
+$('exportPdfBtn').addEventListener('click',()=>view==='inventory'
+  ?runResourceExport($('exportPdfBtn'),'Resources Inventory Log','resources-inventory',[{header:'Item ID',dataKey:'item_id'},{header:'Name',dataKey:'name'},{header:'Description',dataKey:'description'},{header:'Total quantity',dataKey:'quantity'},{header:'Available',dataKey:'available'},{header:'Stock status',dataKey:'stock_status'}],filteredItems.map(i=>({item_id:i.item_id,name:i.name,description:i.description,quantity:i.quantity,available:i.available,stock_status:Number(i.available)>0?'Available':'Out of stock'})),{searchQuery:$('searchInput').value.trim()})
+  :runResourceExport($('exportPdfBtn'),'Resources Borrow Records','resource-borrow-records',[{header:'Borrow ID',dataKey:'borrow_id'},{header:'Item',dataKey:'item'},{header:'Quantity',dataKey:'quantity'},{header:'Borrower',dataKey:'borrower'},{header:'Member ID',dataKey:'member_id'},{header:'Borrowed',dataKey:'borrowed'},{header:'Due',dataKey:'due'},{header:'Status',dataKey:'status'}],filteredLending.map(r=>({borrow_id:r.borrow_id,item:r.item_name,quantity:r.quantity||1,borrower:r.borrower_name,member_id:r.member_id,borrowed:fmt(r.borrow_date),due:fmt(r.due_date),status:statusOf(r)})),{statusFilter:statusFilter||'All',searchQuery:$('searchInput').value.trim()}));
+$('exportPendingPdfBtn').addEventListener('click',()=>runResourceExport($('exportPendingPdfBtn'),'Resources Pending Requests','resource-pending-requests',[{header:'Request ID',dataKey:'request_id'},{header:'Type',dataKey:'type'},{header:'Youth',dataKey:'youth'},{header:'Member ID',dataKey:'member_id'},{header:'Submitted',dataKey:'submitted'}],pendingRequests.map(r=>({request_id:r.request_id,type:r.service_type==='return'?'Return':'Borrow',youth:r.borrower_name,member_id:r.member_id,submitted:fmt(r.requested_at)})),{statusFilter:'Pending'}));
 $('searchInput').addEventListener('input',filterLending);
 $('statusChips').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;statusFilter=b.dataset.s;document.querySelectorAll('.chip').forEach(x=>x.setAttribute('aria-pressed',x===b));filterLending()});
 document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{

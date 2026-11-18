@@ -67,7 +67,7 @@
       <div class="dashboard-content">
         <div class="search-filter-bar masterlist-toolbar">
           <div class="search-group"><input type="search" id="searchInput" class="search-input" placeholder="Search voter ID, name, or address"><select id="claimedFilter" class="filter-select" aria-label="Filter by account status"><option value="">All records</option><option value="0">Available for activation</option><option value="1">Already claimed</option></select></div>
-          <div class="masterlist-actions"><button class="masterlist-button secondary" id="templateButton" type="button">CSV Template</button><button class="masterlist-button" id="toggleImport" type="button">Import Masterlist</button></div>
+          <div class="masterlist-actions"><button class="masterlist-button secondary" id="exportPdfBtn" type="button"><i class="fas fa-file-pdf"></i> Export PDF</button><button class="masterlist-button secondary" id="templateButton" type="button">CSV Template</button><button class="masterlist-button" id="toggleImport" type="button">Import Masterlist</button></div>
         </div>
         <div class="status-filters" role="tablist" aria-label="Filter KK Masterlist by status">
           <button class="status-filter active" type="button" data-status="active" role="tab" aria-selected="true">Active</button>
@@ -89,6 +89,9 @@
       </div>
     </main>
   </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
+  <script src="js/admin-export-pdf.js"></script>
   <script>
     const body = document.getElementById('masterlistBody');
     const report = document.getElementById('importReport');
@@ -97,6 +100,7 @@
     const recordCount = document.getElementById('recordCount');
     let previewReady = false;
     let currentStatus = 'active';
+    let filteredMasterlist = [];
 
     function addCell(row, value, className) {
       const cell = document.createElement('td');
@@ -110,10 +114,11 @@
       const response = await fetch(`api/masterlist_list.php?${params}`);
       const data = await response.json();
       if (!data.success) throw new Error(data.message || 'Unable to load masterlist');
+      filteredMasterlist = data.data || [];
       body.replaceChildren();
-      recordCount.textContent = `${data.data.length} record${data.data.length === 1 ? '' : 's'}`;
-      emptyState.hidden = data.data.length > 0;
-      data.data.forEach(record => {
+      recordCount.textContent = `${filteredMasterlist.length} record${filteredMasterlist.length === 1 ? '' : 's'}`;
+      emptyState.hidden = filteredMasterlist.length > 0;
+      filteredMasterlist.forEach(record => {
         const row = document.createElement('tr');
         addCell(row, record.voter_id);
         addCell(row, [record.first_name, record.middle_name, record.last_name].filter(Boolean).join(' '));
@@ -150,6 +155,49 @@
         body.appendChild(row);
       });
     }
+
+    document.getElementById('exportPdfBtn').addEventListener('click', async event => {
+      const button = event.currentTarget;
+      const original = button.innerHTML;
+      if (!filteredMasterlist.length) { window.showAlert('No records to export', 'warning'); return; }
+      button.disabled = true;
+      button.textContent = 'Generating…';
+      try {
+        await AdminExportPDF.exportTable({
+          title: 'KK Masterlist',
+          subtitle: 'SKalinga Admin · San Antonio',
+          filename: `skalinga-kk-masterlist-${AdminExportPDF.dateStamp()}.pdf`,
+          orientation: 'landscape',
+          columns: [
+            { header: 'Voter ID', dataKey: 'voter_id' }, { header: 'Name', dataKey: 'name' },
+            { header: 'Birthday', dataKey: 'birthday' }, { header: 'Age / Sex', dataKey: 'age_sex' },
+            { header: 'Address', dataKey: 'address' }, { header: 'Account status', dataKey: 'account_status' },
+            { header: 'Lifecycle status', dataKey: 'status' }, { header: 'Status reason', dataKey: 'status_reason' }
+          ],
+          rows: filteredMasterlist.map(record => ({
+            voter_id: record.voter_id,
+            name: [record.first_name, record.middle_name, record.last_name].filter(Boolean).join(' '),
+            birthday: record.birthday,
+            age_sex: `${record.age || ''} / ${record.sex || ''}`,
+            address: [record.address, record.purok_or_barangay].filter(Boolean).join(', '),
+            account_status: Number(record.is_claimed) === 1 ? 'Claimed account' : 'Available for activation',
+            status: record.status,
+            status_reason: record.status_reason || ''
+          })),
+          meta: {
+            statusFilter: currentStatus,
+            searchQuery: document.getElementById('searchInput').value.trim(),
+            accountFilter: document.getElementById('claimedFilter').value === '' ? 'All account statuses' : Number(document.getElementById('claimedFilter').value) === 1 ? 'Claimed account' : 'Available for activation',
+            generatedBy: document.getElementById('userFullName').textContent
+          }
+        });
+      } catch (error) {
+        window.showAlert(error.message || 'Unable to generate PDF', 'error');
+      } finally {
+        button.disabled = false;
+        button.innerHTML = original;
+      }
+    });
 
     async function changeMasterlistStatus(id, status) {
       const nextStatus = status === 'active' ? 'inactive' : 'active';

@@ -147,6 +147,7 @@ table.pt{width:100%;border-collapse:collapse;font-size:14px}
         <div style="display:flex;gap:10px;flex-wrap:wrap">
           <a class="btn pink" href="admin-service-verification.html"><i class="fas fa-qrcode"></i><span>Verify new request</span></a>
           <button class="btn green" id="refreshBtn" type="button"><i class="fas fa-rotate"></i><span>Refresh requests</span></button>
+          <button type="button" class="btn soft" id="exportPdfBtn"><i class="fas fa-file-pdf"></i><span>Export PDF</span></button>
         </div>
       </div>
 
@@ -244,6 +245,9 @@ table.pt{width:100%;border-collapse:collapse;font-size:14px}
 
 <div id="toastContainer" aria-live="polite"></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
+<script src="js/admin-export-pdf.js"></script>
 <script>
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
@@ -257,6 +261,7 @@ const safeUrl=u=>{
   }catch{return false}
 };
 let printRequests=[],statusFilter='',csrfToken='';
+let filteredPrintRequests=[];
 
 function notify(msg,type='success'){
   if(typeof showAlert==='function'){showAlert(msg,type);return}
@@ -326,8 +331,22 @@ function renderPrintTable(list){
 function filterTable(){
   renderStats();
   const q=$('searchInput').value.toLowerCase().trim();
-  renderPrintTable(printRequests.filter(r=>`${r.member_id} ${r.member_name} ${r.file_name} ${r.document_title}`.toLowerCase().includes(q)&&(!statusFilter||r.status===statusFilter)));
+  filteredPrintRequests=printRequests.filter(r=>`${r.member_id} ${r.member_name} ${r.file_name} ${r.document_title}`.toLowerCase().includes(q)&&(!statusFilter||r.status===statusFilter));
+  renderPrintTable(filteredPrintRequests);
 }
+async function exportPrintRequests(){
+  const button=$('exportPdfBtn'),label=button.querySelector('span');
+  if(!filteredPrintRequests.length){notify('No records to export','warning');return}
+  button.disabled=true;label.textContent='Generating…';
+  try{
+    await AdminExportPDF.exportTable({title:'Print Requests Log',subtitle:'SKalinga Admin · San Antonio',filename:`skalinga-print-requests-${AdminExportPDF.dateStamp()}.pdf`,orientation:'landscape',
+      columns:[{header:'Request ID',dataKey:'request_id'},{header:'Youth',dataKey:'member_name'},{header:'Member ID',dataKey:'member_id'},{header:'Document title',dataKey:'document_title'},{header:'File name',dataKey:'file_name'},{header:'Print details',dataKey:'print_details'},{header:'Sent',dataKey:'sent'},{header:'Status',dataKey:'status'}],
+      rows:filteredPrintRequests.map(r=>({request_id:reqRef(r.request_id),member_name:r.member_name||'Unknown',member_id:r.member_id,document_title:r.document_title||'Untitled',file_name:r.file_name||'—',print_details:specs(r),sent:dt(r.created_at,{dateStyle:'short',timeStyle:'short'}),status:r.status||''})),
+      meta:{statusFilter:statusFilter||'All',searchQuery:$('searchInput').value.trim(),generatedBy:$('userFullName').textContent}});
+  }catch(error){notify(error.message||'Unable to generate PDF','error')}
+  finally{button.disabled=false;label.textContent='Export PDF'}
+}
+$('exportPdfBtn').addEventListener('click',exportPrintRequests);
 $('searchInput').addEventListener('input',filterTable);
 $('statusChips').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;statusFilter=b.dataset.s;document.querySelectorAll('.chip').forEach(x=>x.setAttribute('aria-pressed',x===b));filterTable()});
 $('printingTableBody').addEventListener('click',e=>{
