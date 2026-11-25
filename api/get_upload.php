@@ -33,7 +33,7 @@ try {
             http_response_code(404);
             exit;
         }
-        if (empty($record['print_verified_at']) && empty($record['verified_at'])) {
+        if (!$isAdmin && empty($record['print_verified_at']) && empty($record['verified_at'])) {
             http_response_code(403);
             exit;
         }

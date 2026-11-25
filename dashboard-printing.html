@@ -256,10 +256,18 @@ const safeUrl=u=>{
   if(!value||/^\s*(javascript|data|vbscript):/i.test(value))return false;
   try{
     const parsed=new URL(value,window.location.href);
-    return ['http:','https:'].includes(parsed.protocol)
-      && (parsed.origin===window.location.origin||/^https?:\/\//i.test(value));
+    return ['http:','https:'].includes(parsed.protocol)&&parsed.origin===window.location.origin;
   }catch{return false}
 };
+const printDocumentUrl=value=>{
+  if(!safeUrl(value))return '';
+  try{
+    const parsed=new URL(value,window.location.href);
+    return parsed.pathname.endsWith('/api/get_print_file.php')?value:'';
+  }catch{return ''}
+};
+const documentUrl=r=>printDocumentUrl(r.document_url)||printDocumentUrl(r.file_path);
+const requestDocumentUrl=id=>`api/get_print_file.php?id=${encodeURIComponent(id)}`;
 let printRequests=[],statusFilter='',csrfToken='';
 let filteredPrintRequests=[];
 
@@ -314,7 +322,8 @@ function renderPrintTable(list){
   if(!list.length){tb.innerHTML=`<tr><td colspan="6" class="empty nl"><i class="fas fa-print"></i>No print requests found</td></tr>`;return}
   tb.innerHTML=list.map(r=>{
     const done=r.status==='Completed',pending=r.status==='Pending',id=esc(r.request_id),name=r.member_name||'Unknown';
-    const link=r.file_path&&safeUrl(r.file_path)?`<a class="file" href="${esc(r.file_path)}" target="_blank" rel="noopener" download><i class="fas ${fileIcon(r.file_name)}"></i><span>${esc(r.file_name||'Document')}</span></a>`:'—';
+    const fileUrl=documentUrl(r);
+    const link=fileUrl?`<a class="file" href="${esc(fileUrl)}" target="_blank" rel="noopener" download><i class="fas ${fileIcon(r.file_name)}"></i><span>${esc(r.file_name||'Document')}</span></a>`:'—';
     return `<tr>
       <td data-l="Youth" class="nl"><div class="who"><span class="av">${esc(name.charAt(0).toUpperCase())}</span><div><b>${esc(name)}</b><span class="mono">${esc(r.member_id)}</span></div></div></td>
       <td data-l="Details"><div><b style="font-weight:600">${esc(r.document_title||'Untitled')}</b><div class="specs">${esc(specs(r))}</div></div></td>
@@ -322,7 +331,7 @@ function renderPrintTable(list){
       <td data-l="Status"><span class="pill ${done?'completed':'pending'}">${esc(r.status)}</span></td>
       <td data-l="Document">${link}</td>
       <td class="ab-td nl"><div class="ab">
-        ${r.file_path&&safeUrl(r.file_path)?`<button class="ib" type="button" data-act="document" data-id="${id}" aria-label="Preview document" title="Preview document"><i class="fas fa-eye"></i></button>`:''}
+        ${fileUrl?`<button class="ib" type="button" data-act="document" data-id="${id}" aria-label="Preview document" title="Preview document"><i class="fas fa-eye"></i></button>`:''}
         <button class="ib" type="button" data-act="view" data-id="${id}" aria-label="View details" title="View details"><i class="fas fa-circle-info"></i></button>
         ${pending?`<button class="ib scan" type="button" data-act="process" data-id="${id}" aria-label="Process request" title="Process request"><i class="fas fa-qrcode"></i></button>`:done?'':`<button class="ib" type="button" data-act="complete" data-id="${id}" aria-label="Mark completed" title="Mark completed"><i class="fas fa-check"></i></button>`}
         <button class="ib del" type="button" data-act="delete" data-id="${id}" aria-label="Delete request" title="Delete request"><i class="fas fa-trash"></i></button></div></td></tr>`;
@@ -437,7 +446,8 @@ function showVerifiedDetails(details){
     ['Youth name',details.member_name],['Member ID',details.member_id],['Document title',details.document_title],
     ['Print type',details.print_type],['Paper size',details.paper_size],['Copies',details.copies]
   ].map(([key,value])=>`<div><dt>${esc(key)}</dt><dd>${esc(value)}</dd></div>`).join('');
-  const url=details.file_url&&safeUrl(details.file_url)?details.file_url:'';
+  const url=printDocumentUrl(details.document_url)||printDocumentUrl(details.file_url)
+    ||requestDocumentUrl(requestId);
   $('verifiedDocument').innerHTML=`<i class="fas ${fileIcon(details.file_name)}"></i><div style="flex:1;min-width:0"><b>${esc(details.file_name||'Document')}</b><span>Verified document</span></div>${url?`<a class="btn soft" href="${esc(url)}" target="_blank" rel="noopener" download="${esc(details.file_name||'')}"><i class="fas fa-download"></i>Download</a>`:''}`;
   $('finishPrintButton').dataset.requestId=String(requestId||'');
   openM('printDetailsModal');
@@ -480,8 +490,8 @@ function viewDetails(id){
   const done=r.status==='Completed';
   $('detailsContent').innerHTML=[['Request ID',reqRef(r.request_id)],['Member ID',r.member_id],['Name',r.member_name],['Document title',r.document_title],['Date and time sent',dt(r.created_at,{dateStyle:'full',timeStyle:'short'})],['Print type',r.print_type||'N/A'],['Paper size',r.paper_size||'N/A'],['Copies',r.copies||'1']]
     .map(([k,v])=>`<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('')+`<div><dt>Status</dt><dd><span class="pill ${done?'completed':'pending'}">${done?'Completed':'Pending'}</span></dd></div>`;
-  const ok=r.file_path&&safeUrl(r.file_path);
-  $('docPreview').innerHTML=`<i class="fas ${fileIcon(r.file_name)}"></i><div style="flex:1;min-width:0"><b>${esc(r.file_name||'Document')}</b><span>${esc(ext(r.file_name).toUpperCase()||'FILE')} document</span></div>${ok?`<a class="btn soft" href="${esc(r.file_path)}" target="_blank" rel="noopener" download="${esc(r.file_name||'')}"><i class="fas fa-download"></i>Download</a>`:''}`;
+  const fileUrl=documentUrl(r);
+  $('docPreview').innerHTML=`<i class="fas ${fileIcon(r.file_name)}"></i><div style="flex:1;min-width:0"><b>${esc(r.file_name||'Document')}</b><span>${esc(ext(r.file_name).toUpperCase()||'FILE')} document</span></div>${fileUrl?`<a class="btn soft" href="${esc(fileUrl)}" target="_blank" rel="noopener" download="${esc(r.file_name||'')}"><i class="fas fa-download"></i>Download</a>`:''}`;
   $('viewActions').innerHTML=done?'':r.status==='Pending'
     ?`<button class="btn pink" type="button" id="vProcess"><i class="fas fa-qrcode"></i>Process request</button>`
     :`<button class="btn pink" type="button" id="vComplete"><i class="fas fa-check"></i>Mark completed</button>`;
@@ -491,19 +501,24 @@ function viewDetails(id){
 }
 function viewDocument(id){
   const r=recOf(id);
-  if(!r||!r.file_path||!safeUrl(r.file_path)){notify('Document is unavailable','error');return}
-  const url=`${r.file_path}&preview=1`;
+  const fileUrl=r&&documentUrl(r);
+  if(!fileUrl){notify('Document is unavailable','error');return}
+  const url=`${fileUrl}${fileUrl.includes('?')?'&':'?'}preview=1`;
   const extension=ext(r.file_name);
   const canPreview=['pdf','jpg','jpeg','png','gif','txt'].includes(extension);
   $('documentViewerTitle').textContent='Document preview';
   $('documentViewerName').textContent=`${r.file_name||'Document'} · ${reqRef(r.request_id)}`;
-  $('documentDownload').href=r.file_path;
+  $('documentDownload').href=fileUrl;
   $('documentDownload').download=r.file_name||'document';
   $('documentViewerFrame').hidden=!canPreview;
   $('documentViewerNote').hidden=canPreview;
   $('documentViewerNote').textContent=canPreview
     ? ''
     : 'This file type cannot be previewed in the browser. Use Download document to open it in the appropriate application.';
+  $('documentViewerFrame').onerror=()=>{
+    $('documentViewerNote').textContent='The preview could not be loaded. Use Download document to open the file.';
+    $('documentViewerNote').hidden=false;
+  };
   if(canPreview)$('documentViewerFrame').src=url;
   else $('documentViewerFrame').removeAttribute('src');
   openM('documentViewerModal');

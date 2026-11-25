@@ -52,9 +52,13 @@ try {
     
     $requests = $stmt->fetchAll(PDO::FETCH_ASSOC);
     foreach ($requests as &$request) {
-        $request['file_path'] = empty($request['print_verified_at']) && empty($request['verified_at'])
-            ? null
-            : 'api/get_print_file.php?id=' . (int)$request['request_id'];
+        $documentUrl = is_string($request['file_path'] ?? null)
+            && trim($request['file_path']) !== ''
+            ? 'api/get_print_file.php?id=' . (int)$request['request_id']
+            : null;
+        $request['document_url'] = $documentUrl;
+        // Keep the legacy response field, but never expose the storage object key.
+        $request['file_path'] = $documentUrl;
     }
     unset($request);
     

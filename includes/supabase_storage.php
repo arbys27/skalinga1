@@ -168,7 +168,37 @@ function supabaseStorageCreateSignedUrl(
         throw new RuntimeException('Supabase Storage signed URL request failed.');
     }
     if ($status < 200 || $status >= 300) {
-        throw new RuntimeException('Supabase Storage rejected the signed URL request (HTTP ' . $status . ').');
+        $payload = json_decode($response, true);
+        $detail = '';
+        if (is_array($payload)) {
+            foreach (['message', 'error'] as $field) {
+                if (is_string($payload[$field] ?? null) && trim($payload[$field]) !== '') {
+                    $detail = trim($payload[$field]);
+                    break;
+                }
+            }
+        }
+        if ($status === 404) {
+            $reason = stripos($detail, 'bucket') !== false
+                ? 'bucket not found'
+                : (stripos($detail, 'object') !== false
+                    ? 'object not found'
+                    : 'bucket or object not found; check the bucket name and object key');
+            throw new RuntimeException(
+                'Supabase Storage ' . $reason . ' (HTTP 404)'
+                . ($detail !== '' ? ': ' . $detail : '.')
+            );
+        }
+        if ($status === 400 && (stripos($detail, 'key') !== false || stripos($detail, 'path') !== false)) {
+            throw new RuntimeException(
+                'Supabase Storage rejected the object key (bad key, HTTP 400).'
+                . ($detail !== '' ? ' ' . $detail : '')
+            );
+        }
+        throw new RuntimeException(
+            'Supabase Storage rejected the signed URL request (HTTP ' . $status . ').'
+            . ($detail !== '' ? ' ' . $detail : '')
+        );
     }
 
     $payload = json_decode($response, true);
@@ -179,9 +209,22 @@ function supabaseStorageCreateSignedUrl(
         throw new RuntimeException('Supabase Storage returned an invalid signed URL.');
     }
 
-    if (str_starts_with($signedPath, 'http://') || str_starts_with($signedPath, 'https://')) {
-        return $signedPath;
+    if (preg_match('/^https?:\/\//i', $signedPath) === 1) {
+        $signedUrl = filter_var($signedPath, FILTER_VALIDATE_URL);
+        if (!is_string($signedUrl) || !preg_match('/^https:\/\//i', $signedUrl)) {
+            throw new RuntimeException('Supabase Storage returned a non-HTTPS signed URL.');
+        }
+        return $signedUrl;
     }
 
-    return $settings['url'] . '/' . ltrim($signedPath, '/');
+    $relativePath = ltrim($signedPath, '/');
+    if (!str_starts_with($relativePath, 'storage/v1/')) {
+        $relativePath = 'storage/v1/' . $relativePath;
+    }
+    $signedUrl = $settings['url'] . '/' . $relativePath;
+    if (filter_var($signedUrl, FILTER_VALIDATE_URL) === false
+        || !preg_match('/^https:\/\//i', $signedUrl)) {
+        throw new RuntimeException('Supabase Storage returned an invalid relative signed URL.');
+    }
+    return $signedUrl;
 }
