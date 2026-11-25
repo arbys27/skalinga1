@@ -42,6 +42,11 @@ try {
                     p.phone,
                     p.address,
                     p.barangay,
+                    p.house_number,
+                    p.street_name,
+                    p.subdivision_purok,
+                    p.city,
+                    p.province,
                     p.avatar_path,
                     p.bio
                 FROM users u
@@ -84,6 +89,11 @@ try {
                     p.phone,
                     p.address,
                     p.barangay,
+                    p.house_number,
+                    p.street_name,
+                    p.subdivision_purok,
+                    p.city,
+                    p.province,
                     p.avatar_path,
                     p.bio
                 FROM users u
@@ -104,6 +114,23 @@ try {
         echo json_encode(['success' => false, 'message' => $member_id_param ? 'Member ID not found' : 'User not found']);
         exit;
     }
+
+    $addressParts = [
+        trim(($user['house_number'] ?? '') . ' ' . ($user['street_name'] ?? '')),
+        $user['subdivision_purok'] ?? '',
+        $user['barangay'] ?? '',
+        $user['city'] ?? '',
+        $user['province'] ?? ''
+    ];
+    $addressParts = array_values(array_filter($addressParts, static function ($part) {
+        return trim((string)$part) !== '';
+    }));
+    $hasFullAddress = !empty($user['house_number'])
+        && !empty($user['street_name'])
+        && !empty($user['subdivision_purok'])
+        && !empty($user['city'])
+        && !empty($user['province']);
+    $address = $hasFullAddress ? implode(', ', $addressParts) : ($user['address'] ?? '');
     
     // Get event attendance count (if events table exists)
     $events_count = 0;
@@ -136,7 +163,7 @@ try {
         'birthday' => $user['birthday'],
         'age' => $user['age'],
         'gender' => $user['gender'],
-        'address' => $user['address'],
+        'address' => $address,
         'barangay' => $user['barangay'],
         'avatar_path' => $user['avatar_path'],
         'bio' => $user['bio'],
