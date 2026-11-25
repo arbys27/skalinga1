@@ -18,6 +18,7 @@
 <link rel="stylesheet" href="assets/css/dashboard.css">
 <link rel="stylesheet" href="assets/css/admin-theme.css">
 <link rel="stylesheet" href="assets/css/loader.css?v=3">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <style>
 .main-content{min-width:0}
 .dashboard-content{min-width:0;max-width:100%}
@@ -112,9 +113,6 @@ table.ht{width:100%;border-collapse:collapse;font-size:14px}
 .pvc .meta{display:grid;gap:6px;margin:0 0 14px;color:var(--mu);font-size:14px}.pvc .meta i{width:20px;color:var(--g)}
 .pvc p{margin:0 0 12px;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6}
 .pvc .rq{padding:12px 14px;border-radius:14px;background:#fff0f5;font-size:14px}
-#toastContainer{position:fixed;z-index:10001;right:20px;bottom:20px;display:grid;gap:10px;width:min(360px,calc(100% - 40px))}
-.toast{padding:14px 16px;border-radius:14px;background:#fff;border-left:4px solid var(--g);box-shadow:0 12px 32px rgba(22,48,63,.2);font-size:14px;font-weight:600}
-.toast.error{border-color:#d64545}.toast.warning{border-color:#e0a100}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -200,16 +198,6 @@ table.ht{width:100%;border-collapse:collapse;font-size:14px}
   </div>
 </div>
 
-<!-- Confirm -->
-<div id="confirmModal" class="hm-modal" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle">
-  <div class="box sm">
-    <h2 id="confirmTitle">Confirm action</h2><p class="lead" id="confirmMessage"></p>
-    <div class="fa-end"><button id="confirmCancel" class="btn soft" type="button">Cancel</button><button id="confirmOk" class="btn red" type="button"><span id="confirmOkText">Confirm</span></button></div>
-  </div>
-</div>
-
-<div id="toastContainer" aria-live="polite"></div>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
 <script src="js/admin-export-pdf.js"></script>
@@ -223,19 +211,12 @@ const icon=c=>ICON[c]||'fa-heart-pulse';
 let all=[],activeStatus='',objectUrl=null,filteredAnnouncements=[];
 CATS.forEach(c=>{$('category').add(new Option(c,c));$('categoryFilter').add(new Option(c,c))});
 
-function notify(msg,type='success'){
-  if(typeof showAlert==='function'){showAlert(msg,type);return}
-  const t=document.createElement('div');t.className='toast '+type;t.textContent=msg;$('toastContainer').appendChild(t);setTimeout(()=>t.remove(),4000);
-}
+const notify=(msg,type='success')=>window.showAlert(msg,type);
 const openM=id=>{$(id).classList.add('on');document.body.style.overflow='hidden'};
 const closeM=id=>{$(id).classList.remove('on');if(!document.querySelector('.hm-modal.on'))document.body.style.overflow=''};
 document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>closeM(b.dataset.close)));
 document.querySelectorAll('.hm-modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeM(m.id)}));
 addEventListener('keydown',e=>{if(e.key==='Escape'){const top=[...document.querySelectorAll('.hm-modal.on')].pop();if(top)closeM(top.id)}});
-function confirmBox(message,label,onOk){
-  $('confirmMessage').textContent=message;$('confirmOkText').textContent=label;openM('confirmModal');$('confirmCancel').focus();
-  $('confirmOk').onclick=()=>{closeM('confirmModal');onOk()};$('confirmCancel').onclick=()=>closeM('confirmModal');
-}
 
 /* ---- formatting ---- */
 const dateText=v=>{const d=new Date(`${v}T00:00:00`);return v&&!isNaN(d)?d.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}):'—'};
@@ -358,8 +339,8 @@ $('rows').addEventListener('click',e=>{
   const post=all.find(p=>String(p.id)===b.dataset.id),a=b.dataset.action;if(!post)return;
   if(a==='edit')openForm(post);
   else if(a==='view'){$('previewContent').innerHTML=previewHtml({...post,image:post.image_path});openM('previewModal')}
-  else if(a==='cancel')confirmBox('Cancel this activity? Youth will see it marked as cancelled.','Cancel activity',()=>statusAction(post.id,'cancel'));
-  else if(a==='archive')confirmBox('Archive this announcement? It will no longer be shown to youth.','Archive',()=>statusAction(post.id,'archive'));
+  else if(a==='cancel')window.showConfirm('Cancel this activity? Youth will see it marked as cancelled.',{confirmButtonText:'Cancel activity',confirmButtonColor:'#dc2626'}).then(confirmed=>{if(confirmed)statusAction(post.id,'cancel')});
+  else if(a==='archive')window.showConfirm('Archive this announcement? It will no longer be shown to youth.',{confirmButtonText:'Archive',confirmButtonColor:'#dc2626'}).then(confirmed=>{if(confirmed)statusAction(post.id,'archive')});
   else statusAction(post.id,a);
 });
 
@@ -375,6 +356,7 @@ load();
 </script>
 <script src="js/auth-guard.js" data-roles="admin,sk_official"></script>
 <script src="assets/js/loader.js?v=3"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 <script src="js/admin-common.js"></script>
 <script src="js/admin-sidebar.js"></script>
 </body>

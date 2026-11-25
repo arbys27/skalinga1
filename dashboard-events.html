@@ -24,6 +24,7 @@
 
     <!-- Professional Loader System -->
     <link rel="stylesheet" href="assets/css/loader.css?v=3">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
     <style>
 
@@ -231,57 +232,10 @@
     </div>
 </div>
 
-<!-- Toast Notification Container -->
-<div id="toastContainer"></div>
-
-<!-- Confirmation Modal -->
-<div class="modal" id="confirmationModal">
-    <div class="modal-content" style="max-width: 420px;">
-        <h2 style="margin-bottom: 12px; color: #E74C3C;">
-            <i class="fas fa-exclamation-triangle" style="margin-right: 8px;"></i> Confirm Action
-        </h2>
-        <p id="confirmMessage" style="color: #666; margin: 0 0 28px 0; font-size: 15px; line-height: 1.5;"></p>
-        <div style="display: flex; gap: 12px; justify-content: flex-end;">
-            <button id="confirmCancelBtn" class="btn-add-event" style="background: #95A5A6; margin: 0; padding: 10px 24px;">
-                Cancel
-            </button>
-            <button id="confirmOkBtn" class="btn-add-event" style="background: linear-gradient(135deg, #E74C3C 0%, #C0392B 100%); margin: 0; padding: 10px 24px;">
-                <i class="fas fa-trash" style="margin-right: 6px;"></i> Delete
-            </button>
-        </div>
-    </div>
-</div>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
 <script src="js/admin-export-pdf.js"></script>
 <script>
-// ────────────────────────────────────────────────
-// Toast Notification
-// ────────────────────────────────────────────────
-
-// ────────────────────────────────────────────────
-// Confirmation Modal
-// ────────────────────────────────────────────────
-function showConfirm(message, onConfirm) {
-    const confirmModal = document.getElementById('confirmationModal');
-    const confirmMessage = document.getElementById('confirmMessage');
-    const confirmOkBtn = document.getElementById('confirmOkBtn');
-    const confirmCancelBtn = document.getElementById('confirmCancelBtn');
-    
-    confirmMessage.textContent = message;
-    confirmModal.style.display = 'flex';
-    
-    confirmOkBtn.onclick = () => {
-        confirmModal.style.display = 'none';
-        if (onConfirm) onConfirm();
-    };
-    
-    confirmCancelBtn.onclick = () => {
-        confirmModal.style.display = 'none';
-    };
-}
-
 // ────────────────────────────────────────────────
 // Live date & time
 // ────────────────────────────────────────────────
@@ -344,7 +298,7 @@ async function loadEvents() {
         }
     } catch (error) {
         console.error('Error fetching events:', error);
-        alert('Error loading events from server');
+        showAlert('Error loading events from server', 'error');
     }
 }
 
@@ -579,29 +533,33 @@ function editEvent(id) {
 // Delete Event
 // ────────────────────────────────────────────────
 async function deleteEvent(id) {
-    showConfirm('Delete this event?', async () => {
-        try {
-            const response = await fetch('api/delete_event.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ id })
-            });
-            
-            const result = await response.json();
-            
-            if (result.success) {
-                await loadEvents();
-                showAlert('Event deleted successfully', 'success');
-            } else {
-                showAlert('Error: ' + result.error, 'error');
-        }
-        } catch (error) {
-            console.error('Error deleting event:', error);
-            showAlert('Error deleting event: ' + error.message, 'error');
-        }
+    const confirmed = await window.showConfirm('Delete this event?', {
+        confirmButtonText: 'Delete',
+        confirmButtonColor: '#dc2626'
     });
+    if (!confirmed) return;
+
+    try {
+        const response = await fetch('api/delete_event.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ id })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            await loadEvents();
+            showAlert('Event deleted successfully', 'success');
+        } else {
+            showAlert('Error: ' + result.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error deleting event:', error);
+        showAlert('Error deleting event: ' + error.message, 'error');
+    }
 }
 
 // ────────────────────────────────────────────────
@@ -647,6 +605,7 @@ loadEvents();
 <!-- Professional Loader System -->
 <script src="js/auth-guard.js" data-roles="admin,sk_official"></script>
 <script src="assets/js/loader.js?v=3"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 <script src="js/admin-common.js"></script>
 <script src="js/admin-sidebar.js"></script>
 </body>

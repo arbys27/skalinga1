@@ -18,6 +18,7 @@
 <link rel="stylesheet" href="assets/css/dashboard.css">
 <link rel="stylesheet" href="assets/css/admin-theme.css">
 <link rel="stylesheet" href="assets/css/loader.css?v=3">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <style>
 /* layout fix: let the content column shrink so wide tables scroll inside their card */
 .main-content{min-width:0}
@@ -139,9 +140,6 @@ table.it{width:100%;border-collapse:collapse;font-size:14px}
 .lb .nv:hover{background:var(--pk);color:var(--ink)}.lb .prev{left:18px}.lb .next{right:18px}
 .lb .cl{top:18px;right:18px;background:rgba(255,255,255,.16);border-color:transparent;color:#fff;width:46px;height:46px}
 .lb .cnt{position:absolute;bottom:20px;left:0;right:0;text-align:center;color:#fff;font-size:13px;font-weight:600}
-#toastContainer{position:fixed;z-index:10001;right:20px;bottom:20px;display:grid;gap:10px;width:min(360px,calc(100% - 40px))}
-.toast{padding:14px 16px;border-radius:14px;background:#fff;border-left:4px solid var(--g);box-shadow:0 12px 32px rgba(22,48,63,.2);font-size:14px;font-weight:600}
-.toast.error{border-color:#d64545}.toast.warning{border-color:#e0a100}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -225,16 +223,6 @@ table.it{width:100%;border-collapse:collapse;font-size:14px}
   <div class="cnt" id="lbCount"></div>
 </div>
 
-<!-- Confirm -->
-<div class="im-modal" id="confirmationModal" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle">
-  <div class="box sm">
-    <h2 id="confirmTitle">Confirm action</h2><p class="lead" id="confirmMessage"></p>
-    <div class="fa-end"><button id="confirmCancelBtn" class="btn soft" type="button">Cancel</button><button id="confirmOkBtn" class="btn red" type="button"><i class="fas fa-trash"></i>Delete</button></div>
-  </div>
-</div>
-
-<div id="toastContainer" aria-live="polite"></div>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
 <script src="js/admin-export-pdf.js"></script>
@@ -248,10 +236,7 @@ const STATUS_LABEL={pending:'Submitted',in_review:'Under Review',under_action:'R
 const label=s=>STATUS_LABEL[s]||String(s||'').replace(/_/g,' ');
 const open=i=>i.status!=='resolved'&&i.status!=='closed';
 
-function notify(msg,type='success'){
-  if(typeof showAlert==='function'){showAlert(msg,type);return}
-  const t=document.createElement('div');t.className='toast '+type;t.textContent=msg;$('toastContainer').appendChild(t);setTimeout(()=>t.remove(),4000);
-}
+const notify=(msg,type='success')=>window.showAlert(msg,type);
 const openM=id=>{$(id).classList.add('on');document.body.style.overflow='hidden'};
 const closeM=id=>{$(id).classList.remove('on');if(!document.querySelector('.im-modal.on'))document.body.style.overflow=''};
 $('closeDetailModal').onclick=()=>closeM('incidentDetailModal');
@@ -260,11 +245,6 @@ addEventListener('keydown',e=>{
   if(e.key==='Escape'){const top=[...document.querySelectorAll('.im-modal.on')].pop();if(top)closeM(top.id)}
   if($('photoLightbox').classList.contains('on')){if(e.key==='ArrowLeft')stepPhoto(-1);if(e.key==='ArrowRight')stepPhoto(1)}
 });
-function showConfirm(message,onConfirm){
-  $('confirmMessage').textContent=message;openM('confirmationModal');$('confirmCancelBtn').focus();
-  $('confirmOkBtn').onclick=()=>{closeM('confirmationModal');if(onConfirm)onConfirm()};
-  $('confirmCancelBtn').onclick=()=>closeM('confirmationModal');
-}
 function updateDashboardDateTime(){
   $('dashboard-datetime').textContent=new Date().toLocaleString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true});
 }
@@ -399,13 +379,13 @@ $('saveStatusBtn').onclick=async()=>{
   }catch(e){console.error('Update error:',e);notify('Error updating incident status','error')}
   b.disabled=false;
 };
-function deleteIncident(id){
-  showConfirm('Delete this incident report? This cannot be undone.',async()=>{
-    try{
-      const r=await fetch('api/delete_incident.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({incident_id:id})}),d=await r.json();
-      if(d.success){notify(d.warning||'Incident deleted successfully',d.warning?'warning':'success');loadIncidents()}else notify('Error: '+(d.error||'Failed to delete'),'error');
-    }catch(e){console.error('Delete error:',e);notify('Error deleting incident','error')}
-  });
+async function deleteIncident(id){
+  const confirmed=await window.showConfirm('Delete this incident report? This cannot be undone.',{confirmButtonText:'Delete',confirmButtonColor:'#dc2626'});
+  if(!confirmed)return;
+  try{
+    const r=await fetch('api/delete_incident.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({incident_id:id})}),d=await r.json();
+    if(d.success){notify(d.warning||'Incident deleted successfully',d.warning?'warning':'success');loadIncidents()}else notify('Error: '+(d.error||'Failed to delete'),'error');
+  }catch(e){console.error('Delete error:',e);notify('Error deleting incident','error')}
 }
 
 /* ---- profile + init ---- */
@@ -461,6 +441,7 @@ initializePage();
 </script>
 <script src="js/auth-guard.js" data-roles="admin,sk_official"></script>
 <script src="assets/js/loader.js?v=3"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 <script src="js/admin-common.js"></script>
 <script src="js/admin-sidebar.js"></script>
 </body>

@@ -18,6 +18,7 @@
 <link rel="stylesheet" href="assets/css/dashboard.css">
 <link rel="stylesheet" href="assets/css/admin-theme.css">
 <link rel="stylesheet" href="assets/css/loader.css?v=3">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <style>
 .pm,.pm-modal{--g:#228B57;--gd:#0F4D31;--mint:#A8E6CF;--pk:#FF6B9D;--pkd:#E04F7E;--ink:#16303F;--mu:#5F7788;--ln:#E3ECE7;--mono:"JetBrains Mono",ui-monospace,monospace}
 .pm *,.pm-modal *{box-sizing:border-box}
@@ -119,9 +120,6 @@ table.pt{width:100%;border-collapse:collapse;font-size:14px}
 .msg{min-height:20px;margin:10px 0 0;font-size:13.5px;font-weight:600;color:#b42318}
 .ok{display:flex;gap:12px;align-items:flex-start;margin-top:14px;padding:14px;border:1.5px solid #b9d9c8;border-radius:16px;background:#e9f7ef}
 .ok>i{color:var(--g);font-size:22px;margin-top:2px}.ok h3{margin:0 0 4px;font-size:15px}.ok p{margin:2px 0;font-size:13.5px}.ok small{display:block;margin-top:8px;color:var(--mu)}
-#toastContainer{position:fixed;z-index:10000;right:20px;bottom:20px;display:grid;gap:10px;width:min(360px,calc(100% - 40px))}
-.toast{padding:14px 16px;border-radius:14px;background:#fff;border-left:4px solid var(--g);box-shadow:0 12px 32px rgba(22,48,63,.2);font-size:14px;font-weight:600}
-.toast.error{border-color:#d64545}.toast.warning{border-color:#e0a100}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -194,14 +192,6 @@ table.pt{width:100%;border-collapse:collapse;font-size:14px}
   </div>
 </div>
 
-<!-- Confirm -->
-<div class="pm-modal" id="confirmationModal" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle">
-  <div class="box sm">
-    <h2 id="confirmTitle">Confirm action</h2><p class="lead" id="confirmMessage"></p>
-    <div class="fa-end"><button id="confirmCancelBtn" class="btn soft" type="button">Cancel</button><button id="confirmOkBtn" class="btn red" type="button"><i class="fas fa-trash"></i><span id="confirmOkText">Delete</span></button></div>
-  </div>
-</div>
-
 <!-- Print verification -->
 <div class="pm-modal" id="processModal" role="dialog" aria-modal="true" aria-labelledby="processTitle">
   <div class="box">
@@ -243,8 +233,6 @@ table.pt{width:100%;border-collapse:collapse;font-size:14px}
   </div>
 </div>
 
-<div id="toastContainer" aria-live="polite"></div>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
 <script src="js/admin-export-pdf.js"></script>
@@ -271,10 +259,7 @@ const requestDocumentUrl=id=>`api/get_print_file.php?id=${encodeURIComponent(id)
 let printRequests=[],statusFilter='',csrfToken='';
 let filteredPrintRequests=[];
 
-function notify(msg,type='success'){
-  if(typeof showAlert==='function'){showAlert(msg,type);return}
-  const t=document.createElement('div');t.className='toast '+type;t.textContent=msg;$('toastContainer').appendChild(t);setTimeout(()=>t.remove(),4000);
-}
+const notify=(msg,type='success')=>window.showAlert(msg,type);
 const openM=id=>{$(id).classList.add('on');document.body.style.overflow='hidden'};
 const closeM=id=>{$(id).classList.remove('on');if(!document.querySelector('.pm-modal.on'))document.body.style.overflow=''};
 $('closeViewDetails').onclick=()=>closeM('viewDetailsModal');
@@ -283,12 +268,6 @@ $('closeProcess').onclick=()=>closeProcessModal();
 $('closePrintDetails').onclick=()=>closeM('printDetailsModal');
 document.querySelectorAll('.pm-modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeM(m.id)}));
 addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.pm-modal.on').forEach(m=>closeM(m.id))});
-function showConfirm(message,onConfirm,label='Delete'){
-  $('confirmMessage').textContent=message;$('confirmOkText').textContent=label;openM('confirmationModal');$('confirmCancelBtn').focus();
-  $('confirmOkBtn').onclick=()=>{closeM('confirmationModal');if(onConfirm)onConfirm()};
-  $('confirmCancelBtn').onclick=()=>closeM('confirmationModal');
-}
-
 function updateDashboardDateTime(){
   $('dashboard-datetime').textContent=new Date().toLocaleString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true});
 }
@@ -545,13 +524,13 @@ async function getCsrfToken(){
   return csrfToken;
 }
 /* ---- delete ---- */
-function deleteRequest(id){
-  showConfirm('Are you sure you want to delete this request? This action cannot be undone.',async()=>{
-    try{
-      const r=await fetch('api/delete_print_request.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({request_id:Number(id)})}),d=await r.json();
-      if(d.success){notify('Request deleted successfully.');loadPrintRequests()}else notify(d.message||'Failed to delete request','error');
-    }catch(e){console.error('Error deleting request:',e);notify('Error deleting request. Please try again.','error')}
-  });
+async function deleteRequest(id){
+  const confirmed=await window.showConfirm('Are you sure you want to delete this request? This action cannot be undone.',{confirmButtonText:'Delete',confirmButtonColor:'#dc2626'});
+  if(!confirmed)return;
+  try{
+    const r=await fetch('api/delete_print_request.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({request_id:Number(id)})}),d=await r.json();
+    if(d.success){notify('Request deleted successfully.');loadPrintRequests()}else notify(d.message||'Failed to delete request','error');
+  }catch(e){console.error('Error deleting request:',e);notify('Error deleting request. Please try again.','error')}
 }
 
 /* ---- profile + init ---- */
@@ -565,6 +544,7 @@ window.addEventListener('load',()=>{loadUserProfile();loadPrintRequests()});
 </script>
 <script src="js/auth-guard.js" data-roles="admin,sk_official"></script>
 <script src="assets/js/loader.js?v=3"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 <script src="js/admin-common.js"></script>
 <script src="js/admin-sidebar.js"></script>
 </body>

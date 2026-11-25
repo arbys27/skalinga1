@@ -1,9 +1,9 @@
 (function () {
-    const toastIcons = {
-        success: '✓',
-        error: '❌',
-        warning: '⚠️',
-        info: 'ℹ️'
+    const alertTypes = {
+        success: { icon: 'success', title: 'Success' },
+        error: { icon: 'error', title: 'Error' },
+        warning: { icon: 'warning', title: 'Warning' },
+        info: { icon: 'info', title: 'Notice' }
     };
 
     window.esc = function (value) {
@@ -17,56 +17,95 @@
     };
 
     window.showAlert = function (message, type = 'info') {
-        let container = document.getElementById('toastContainer');
-        if (!container) {
-            container = document.createElement('div');
-            container.id = 'toastContainer';
-            container.className = 'admin-toast-container';
-            container.setAttribute('aria-live', 'polite');
-            document.body.appendChild(container);
+        const alertType = alertTypes[type] || alertTypes.info;
+        const text = String(message ?? '');
+
+        if (!window.Swal) {
+            window.alert(text);
+            return Promise.resolve();
         }
 
-        const toastType = Object.prototype.hasOwnProperty.call(toastIcons, type) ? type : 'info';
-        const toast = document.createElement('div');
-        toast.className = `toast ${toastType}`;
-        toast.innerHTML = `<span class="toast-icon">${toastIcons[toastType]}</span><span class="toast-message">${window.esc(message)}</span>`;
-        container.appendChild(toast);
+        const isTimed = alertType.icon === 'success' || alertType.icon === 'info';
+        return window.Swal.fire({
+            title: alertType.title,
+            text,
+            icon: alertType.icon,
+            confirmButtonText: 'OK',
+            buttonsStyling: true,
+            showClass: { popup: 'swal2-show' },
+            hideClass: { popup: 'swal2-hide' },
+            customClass: {
+                popup: 'skalinga-swal-popup',
+                confirmButton: 'skalinga-swal-confirm',
+                cancelButton: 'skalinga-swal-cancel'
+            },
+            confirmButtonColor: '#228B57',
+            timer: isTimed ? 2800 : undefined,
+            timerProgressBar: isTimed,
+            allowOutsideClick: alertType.icon !== 'error'
+        });
+    };
 
-        window.setTimeout(() => {
-            toast.classList.add('removing');
-            window.setTimeout(() => toast.remove(), 300);
-        }, 4000);
+    window.showConfirm = function (message, options = {}) {
+        const settings = options || {};
+        const confirmButtonText = settings.confirmButtonText || 'Confirm';
+        const cancelButtonText = settings.cancelButtonText || 'Cancel';
+
+        if (!window.Swal) {
+            return Promise.resolve(window.confirm(String(message ?? '')));
+        }
+
+        return window.Swal.fire({
+            title: settings.title || 'Are you sure?',
+            text: String(message ?? ''),
+            icon: settings.icon || 'warning',
+            showCancelButton: true,
+            confirmButtonText,
+            cancelButtonText,
+            buttonsStyling: true,
+            customClass: {
+                popup: 'skalinga-swal-popup',
+                confirmButton: 'skalinga-swal-confirm',
+                cancelButton: 'skalinga-swal-cancel'
+            },
+            confirmButtonColor: settings.confirmButtonColor || '#228B57',
+            cancelButtonColor: '#6b7280',
+            reverseButtons: true,
+            allowOutsideClick: false
+        }).then(result => result.isConfirmed);
     };
 
     window.confirmLogout = function (event) {
         if (event) event.preventDefault();
-        if (document.getElementById('logoutModal')) return;
 
-        const modal = document.createElement('div');
-        modal.id = 'logoutModal';
-        modal.className = 'admin-logout-overlay';
-        modal.setAttribute('role', 'presentation');
-        modal.innerHTML = '<section class="admin-logout-card" role="dialog" aria-modal="true" aria-labelledby="logoutTitle" aria-describedby="logoutDescription"><h2 id="logoutTitle">Log out?</h2><p id="logoutDescription">You will need to log in again to access the dashboard.</p><div class="admin-logout-actions"><button type="button" class="admin-logout-cancel">Cancel</button><button type="button" class="admin-logout-confirm">Log out</button></div></section>';
-        document.body.appendChild(modal);
-
-        const cancelButton = modal.querySelector('.admin-logout-cancel');
-        const confirmButton = modal.querySelector('.admin-logout-confirm');
-        const closeModal = () => {
-            document.removeEventListener('keydown', handleKeydown);
-            modal.remove();
-        };
-        const handleKeydown = keyEvent => {
-            if (keyEvent.key === 'Escape') closeModal();
-        };
-
-        cancelButton.addEventListener('click', closeModal);
-        confirmButton.addEventListener('click', () => {
+        const logout = () => {
             window.location.href = 'api/logout.php';
+        };
+
+        if (!window.Swal) {
+            if (window.confirm('You will need to log in again to access the dashboard.')) logout();
+            return Promise.resolve();
+        }
+
+        return window.Swal.fire({
+            title: 'Log out?',
+            text: 'You will need to log in again to access the dashboard.',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Log out',
+            cancelButtonText: 'Cancel',
+            buttonsStyling: true,
+            customClass: {
+                popup: 'skalinga-swal-popup',
+                confirmButton: 'skalinga-swal-confirm',
+                cancelButton: 'skalinga-swal-cancel'
+            },
+            confirmButtonColor: '#228B57',
+            cancelButtonColor: '#6b7280',
+            reverseButtons: true,
+            allowOutsideClick: false
+        }).then(result => {
+            if (result.isConfirmed) logout();
         });
-        modal.addEventListener('click', clickEvent => {
-            if (clickEvent.target === modal) closeModal();
-        });
-        document.addEventListener('keydown', handleKeydown);
-        cancelButton.focus();
     };
 })();

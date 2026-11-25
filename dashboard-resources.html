@@ -18,6 +18,7 @@
 <link rel="stylesheet" href="assets/css/dashboard.css">
 <link rel="stylesheet" href="assets/css/admin-theme.css">
 <link rel="stylesheet" href="assets/css/loader.css?v=3">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <style>
 .lm,.lm-modal{--g:#228B57;--gd:#0F4D31;--mint:#A8E6CF;--pk:#FF6B9D;--pkd:#E04F7E;--ink:#16303F;--mu:#5F7788;--ln:#E3ECE7;--mono:"JetBrains Mono",ui-monospace,monospace}
 .lm *,.lm-modal *{box-sizing:border-box}
@@ -153,9 +154,6 @@ table.lt{width:100%;border-collapse:collapse;font-size:14px}
 .loan input[type=number]{width:90px;min-height:38px;padding:7px;border:1px solid var(--ln);border-radius:9px;font:inherit}
 .loan input:disabled{opacity:.55}
 .fa-end{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
-#toastContainer{position:fixed;z-index:10000;right:20px;bottom:20px;display:grid;gap:10px;width:min(360px,calc(100% - 40px))}
-.toast{padding:14px 16px;border-radius:14px;background:#fff;border-left:4px solid var(--g);box-shadow:0 12px 32px rgba(22,48,63,.2);font-size:14px;font-weight:600}
-.toast.error{border-color:#d64545}.toast.warning{border-color:#e0a100}
 .sidebar-toggle{display:none;place-items:center;flex:none;width:42px;height:42px;border:1px solid var(--ln);border-radius:12px;background:#fff;color:var(--ink);cursor:pointer}
 .sidebar-toggle:focus-visible{outline:3px solid var(--pkd);outline-offset:2px}
 .sidebar-backdrop{display:none}
@@ -309,16 +307,6 @@ body.resources-sidebar-open{overflow:hidden}
   </div>
 </div>
 
-<!-- Confirm -->
-<div class="lm-modal" id="confirmationModal" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle">
-  <div class="box sm">
-    <h2 id="confirmTitle">Confirm action</h2><p class="lead" id="confirmMessage"></p>
-    <div class="fa-end"><button id="confirmCancelBtn" class="btn soft" type="button">Cancel</button><button id="confirmOkBtn" class="btn red" type="button"><span id="confirmOkBtnText">Confirm</span></button></div>
-  </div>
-</div>
-
-<div id="toastContainer" aria-live="polite"></div>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
 <script src="js/admin-export-pdf.js"></script>
@@ -359,11 +347,7 @@ async function getCsrfToken(){
   return csrfToken;
 }
 
-/* ---- feedback (uses showAlert from admin-common.js when present) ---- */
-function notify(msg,type='success'){
-  if(typeof showAlert==='function'){showAlert(msg,type);return}
-  const t=document.createElement('div');t.className='toast '+type;t.textContent=msg;$('toastContainer').appendChild(t);setTimeout(()=>t.remove(),4000);
-}
+const notify=(msg,type='success')=>window.showAlert(msg,type);
 
 /* ---- modals ---- */
 const openM=id=>{$(id).classList.add('on');document.body.style.overflow='hidden'};
@@ -372,12 +356,6 @@ document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',
 [['closeItemModal','addItemModal'],['closeEditItemModal','editItemModal'],['closeViewLending','viewLendingModal'],['closeVerificationScan','verificationScanModal'],['closeProcessRequest','processRequestModal']].forEach(([b,m])=>$(b).onclick=()=>closeM(m));
 document.querySelectorAll('.lm-modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeM(m.id)}));
 addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.lm-modal.on').forEach(m=>closeM(m.id))});
-
-function showConfirm(message,onConfirm,label='Confirm'){
-  $('confirmMessage').textContent=message;$('confirmOkBtnText').textContent=label;openM('confirmationModal');$('confirmCancelBtn').focus();
-  $('confirmOkBtn').onclick=()=>{closeM('confirmationModal');if(onConfirm)onConfirm()};
-  $('confirmCancelBtn').onclick=()=>closeM('confirmationModal');
-}
 
 /* ---- clock ---- */
 function updateDashboardDateTime(){
@@ -640,7 +618,11 @@ async function post(url,borrow_id,okMsg,failMsg){
   }catch(err){console.error(err);notify(failMsg,'error')}
 }
 const recOf=id=>lendingData.find(r=>String(r.borrow_id)===String(id));
-function deleteLending(id){closeM('viewLendingModal');showConfirm('Delete this lending record? This cannot be undone.',()=>post('api/delete_borrow_record.php',Number(id),'Lending record deleted successfully!','Failed to delete record. Please try again.'),'Delete')}
+async function deleteLending(id){
+  closeM('viewLendingModal');
+  const confirmed=await window.showConfirm('Delete this lending record? This cannot be undone.',{confirmButtonText:'Delete',confirmButtonColor:'#dc2626'});
+  if(confirmed)await post('api/delete_borrow_record.php',Number(id),'Lending record deleted successfully!','Failed to delete record. Please try again.');
+}
 function viewLending(id){
   const r=recOf(id);if(!r){notify('Record not found','error');return}
   const st=statusOf(r),dt=d=>{const x=new Date(d);return isNaN(x)?'—':x.toLocaleString()};
@@ -661,6 +643,7 @@ window.addEventListener('load',async()=>{await getCsrfToken().catch(error=>conso
 </script>
 <script src="js/auth-guard.js" data-roles="admin,sk_official"></script>
 <script src="assets/js/loader.js?v=3"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 <script src="js/admin-common.js"></script>
 <script src="js/admin-sidebar.js"></script>
 </body>
