@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
     <title>SKalinga - Youth Registry</title>
     <link rel="icon" type="image/x-icon" href="/SKalinga/assets/icons/favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="/SKalinga/assets/icons/favicon-32x32.png">
@@ -22,199 +22,154 @@
     <link rel="stylesheet" href="assets/css/digital-youth-id.css">
 
     <style>
-.main-content { background: var(--page); }
-        .dashboard-content { padding: 28px 32px 48px; max-width: 1400px; }
+        .main-content { background: var(--page); }
+        .dashboard-content { padding: 28px 32px 56px; max-width: 1400px; font-family: 'IBM Plex Sans', sans-serif; }
+        .dashboard-content *, .modal * { box-sizing: border-box; }
+        .dashboard-content button:focus-visible, .modal button:focus-visible,
+        .close-modal:focus-visible { outline: 3px solid rgba(93, 173, 226, 0.55); outline-offset: 2px; }
 
         /* ───────── Summary strip ───────── */
-        .summary {
-            display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px;
-            margin-bottom: 22px;
-        }
+        .summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-bottom: 22px; }
         .summary-card {
-            display: flex; align-items: center; gap: 14px;
-            padding: 18px 20px;
-            background: var(--surface);
-            border: 1px solid var(--line);
-            border-radius: var(--radius);
+            display: flex; align-items: center; gap: 16px; padding: 20px 22px;
+            background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+            box-shadow: 0 1px 2px rgba(20, 26, 40, 0.04);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-        .summary-icon {
-            width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
-            display: grid; place-items: center; font-size: 18px;
-        }
+        .summary-card:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(20, 26, 40, 0.08); }
+        .summary-icon { width: 48px; height: 48px; border-radius: 14px; flex-shrink: 0; display: grid; place-items: center; font-size: 19px; }
         .summary-card:nth-child(1) .summary-icon { background: #e8f3fc; color: #2b86c5; }
         .summary-card:nth-child(2) .summary-icon { background: #fde9f0; color: #d63f78; }
         .summary-card:nth-child(3) .summary-icon { background: #e6f4ec; color: var(--green); }
-        .summary-value { font-size: 26px; font-weight: 700; color: var(--ink); line-height: 1.1; font-variant-numeric: tabular-nums; }
-        .summary-label { font-size: 13px; color: var(--ink-soft); margin-top: 2px; }
+        .summary-value { font: 800 28px/1.1 'Plus Jakarta Sans', 'IBM Plex Sans', sans-serif; letter-spacing: -0.02em; color: var(--ink); font-variant-numeric: tabular-nums; }
+        .summary-label { font-size: 13px; color: var(--ink-soft); margin-top: 3px; }
 
-        /* ───────── Toolbar ───────── */
-        .search-filter-bar {
-            display: flex; align-items: center; justify-content: space-between; gap: 16px;
-            margin-bottom: 16px; flex-wrap: wrap;
+        /* ───────── Main card: toolbar + tabs + table ───────── */
+        .table-card {
+            background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+            box-shadow: 0 1px 2px rgba(20, 26, 40, 0.04); overflow: hidden;
         }
-        .search-group { position: relative; flex: 1 1 340px; max-width: 480px; }
-        .search-group > i {
-            position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
-            color: var(--ink-soft); pointer-events: none;
+        .card-top {
+            display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+            padding: 18px 20px; border-bottom: 1px solid var(--line);
         }
+        .search-group { position: relative; flex: 1 1 320px; max-width: 460px; }
+        .search-group > i { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--ink-soft); pointer-events: none; }
         .search-input {
-            width: 100%; box-sizing: border-box;
-            padding: 13px 16px 13px 44px;
-            background: var(--surface);
-            border: 1px solid var(--line);
-            border-radius: 12px;
+            width: 100%; padding: 12px 16px 12px 44px; background: #f8f9fc;
+            border: 1px solid var(--line); border-radius: 12px;
             font: 500 14px 'IBM Plex Sans', sans-serif; color: var(--ink);
-            transition: border-color 0.2s, box-shadow 0.2s;
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
         }
         .search-input::placeholder { color: #9aa1b2; }
-        .search-input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 4px rgba(93, 173, 226, 0.18); }
+        .search-input:focus { outline: none; background: #fff; border-color: var(--blue); box-shadow: 0 0 0 4px rgba(93, 173, 226, 0.18); }
 
+        .top-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .btn-add-youth, .btn-secondary {
+            display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+            padding: 12px 20px; border-radius: 12px; cursor: pointer; white-space: nowrap;
+            font: 600 14px 'IBM Plex Sans', sans-serif; transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+        }
         .btn-add-youth {
-            display: inline-flex; align-items: center; gap: 10px;
-            padding: 13px 22px; border: none; border-radius: 12px; cursor: pointer;
-            background: linear-gradient(135deg, var(--pink), #e8508a);
-            color: #fff; font: 600 14px 'IBM Plex Sans', sans-serif;
+            border: none; color: #fff; background: linear-gradient(135deg, var(--pink), #e8508a);
             box-shadow: 0 6px 18px rgba(255, 107, 157, 0.32);
-            transition: transform 0.15s, box-shadow 0.15s;
         }
         .btn-add-youth:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(255, 107, 157, 0.4); }
-        .btn-add-youth:focus-visible { outline: 3px solid rgba(93, 173, 226, 0.5); outline-offset: 2px; }
+        .btn-secondary { border: 1px solid var(--line); background: #fff; color: var(--ink); }
+        .btn-secondary:hover { background: #f0f3f9; transform: translateY(-1px); }
+        .btn-secondary:disabled, .btn-add-youth:disabled { opacity: 0.6; cursor: wait; transform: none; }
+        .btn-secondary i { color: #d33f3f; }
+
+        .status-filters { display: flex; gap: 6px; margin: 0; padding: 12px 20px; flex-wrap: wrap; border-bottom: 1px solid var(--line); background: #fbfcfe; }
+        .status-filter {
+            border: 1px solid transparent; border-radius: 999px; padding: 8px 16px; background: transparent;
+            color: var(--ink-soft); cursor: pointer; font: 600 13px 'IBM Plex Sans', sans-serif; transition: background 0.15s, color 0.15s;
+        }
+        .status-filter:hover { background: #eef1f7; color: var(--ink); }
+        .status-filter.active { background: #e8f3fc; border-color: #bfdcf1; color: #236d9e; }
 
         /* ───────── Table ───────── */
-        .table-card {
-            background: var(--surface);
-            border: 1px solid var(--line);
-            border-radius: var(--radius);
-            overflow: hidden;
-        }
         .table-scroll { overflow-x: auto; }
         .admin-table { width: 100%; border-collapse: collapse; margin: 0; background: transparent; box-shadow: none; }
         .admin-table thead th {
-            padding: 14px 20px; text-align: left;
-            background: #f8f9fc; color: var(--ink-soft);
-            font-size: 12px; font-weight: 600; letter-spacing: 0.04em;
-            border-bottom: 1px solid var(--line);
-            white-space: nowrap;
+            padding: 13px 20px; text-align: left; background: #f8f9fc; color: var(--ink-soft);
+            font-size: 11.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+            border-bottom: 1px solid var(--line); white-space: nowrap;
         }
-        .admin-table tbody td {
-            padding: 14px 20px; color: var(--ink); font-size: 14px;
-            border-bottom: 1px solid var(--line); vertical-align: middle;
-        }
+        .admin-table tbody td { padding: 14px 20px; color: var(--ink); font-size: 14px; border-bottom: 1px solid var(--line); vertical-align: middle; }
         .admin-table tbody tr:last-child td { border-bottom: none; }
         .admin-table tbody tr { transition: background 0.15s; }
         .admin-table tbody tr:hover { background: #f8fafe; }
 
-        .member-id {
-            display: inline-block; padding: 4px 10px; border-radius: 8px;
-            background: #f0f3f9; color: #3b4660;
-            font: 600 12.5px 'JetBrains Mono', monospace;
-        }
+        .member-id { display: inline-block; padding: 4px 10px; border-radius: 8px; background: #f0f3f9; color: #3b4660; font: 600 12.5px 'JetBrains Mono', monospace; }
         .person { display: flex; align-items: center; gap: 12px; }
-        .person-avatar {
-            width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
-            display: grid; place-items: center;
-            color: #fff; font-size: 13px; font-weight: 700;
-        }
+        .person-avatar { width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; display: grid; place-items: center; color: #fff; font-size: 13px; font-weight: 700; }
         .person-name { font-weight: 600; }
         .person-sub { font-size: 12px; color: var(--ink-soft); margin-top: 1px; }
-        .address-column { max-width: 320px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--ink-soft); }
+        .address-column { max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--ink-soft); }
 
         .action-buttons { white-space: nowrap; text-align: right; }
-        .action-btn {
-            width: 34px; height: 34px; margin-left: 6px;
-            border: none; border-radius: 10px; cursor: pointer; font-size: 14px;
-            transition: transform 0.15s, background 0.15s;
-        }
+        .action-btn { width: 36px; height: 36px; margin-left: 6px; border: none; border-radius: 10px; cursor: pointer; font-size: 14px; transition: transform 0.15s, background 0.15s; }
         .action-btn:hover { transform: translateY(-2px); }
-        .action-btn:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
         .btn-view   { background: #e8f3fc; color: #2b86c5; }
         .btn-edit   { background: #fff4e0; color: #c47d0a; }
         .btn-delete { background: #fdeaea; color: #d33f3f; }
         .btn-view:hover   { background: #d5e9f8; }
         .btn-edit:hover   { background: #ffeacc; }
         .btn-delete:hover { background: #fbd7d7; }
-        .status-filters { display: flex; gap: 8px; margin: 0 0 16px; flex-wrap: wrap; }
-        .status-filter { border: 1px solid var(--line); border-radius: 999px; padding: 9px 16px; background: var(--surface); color: var(--ink-soft); cursor: pointer; font: 600 13px 'IBM Plex Sans', sans-serif; }
-        .status-filter.active { border-color: var(--blue); background: #e8f3fc; color: #236d9e; }
-        .status-badge { display: inline-block; border-radius: 999px; padding: 4px 9px; font-size: 12px; font-weight: 600; text-transform: capitalize; }
+
+        .status-badge { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 4px 11px; font-size: 12px; font-weight: 700; text-transform: capitalize; }
+        .status-badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
         .status-badge.active { background: #e6f4ec; color: #228B57; }
         .status-badge.inactive { background: #fff4e0; color: #a56b08; }
         .status-badge.archived { background: #fde9f0; color: #b62d61; }
-        .btn-status { background: #fff4e0; color: #a56b08; }
-        .btn-reactivate { background: #e6f4ec; color: #228B57; }
 
-        .state-row td { padding: 56px 20px !important; text-align: center; color: var(--ink-soft); }
-        .state-row i { display: block; font-size: 34px; margin-bottom: 12px; color: #c4cadb; }
+        .state-row td { padding: 64px 20px !important; text-align: center; color: var(--ink-soft); }
+        .state-row i { display: block; font-size: 36px; margin-bottom: 12px; color: #c4cadb; }
         .state-row strong { display: block; color: var(--ink); font-size: 16px; margin-bottom: 4px; }
-        .skeleton-bar {
-            height: 14px; border-radius: 7px;
-            background: linear-gradient(90deg, #eef1f7 25%, #f7f8fc 50%, #eef1f7 75%);
-            background-size: 200% 100%; animation: shimmer 1.2s infinite linear;
-        }
+        .skeleton-bar { height: 14px; border-radius: 7px; background: linear-gradient(90deg, #eef1f7 25%, #f7f8fc 50%, #eef1f7 75%); background-size: 200% 100%; animation: shimmer 1.2s infinite linear; }
         @keyframes shimmer { to { background-position: -200% 0; } }
 
         /* ───────── Modals ───────── */
-        .modal {
-            display: none; position: fixed; inset: 0; z-index: 5000;
-            align-items: center; justify-content: center; padding: 20px;
-            background: rgba(20, 26, 40, 0.55); backdrop-filter: blur(4px);
-        }
+        .modal { display: none; position: fixed; inset: 0; z-index: 5000; align-items: center; justify-content: center; padding: 20px; background: rgba(20, 26, 40, 0.55); backdrop-filter: blur(6px); }
         .modal-content {
-            position: relative; width: 100%; max-width: 560px; max-height: 92vh; overflow-y: auto;
-            box-sizing: border-box; padding: 32px;
-            background: var(--surface); border-radius: 20px;
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
-            animation: pop 0.25s ease-out;
+            position: relative; width: 100%; max-width: 580px; max-height: 92vh; overflow-y: auto; padding: 32px;
+            background: var(--surface); border-radius: 22px; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+            font-family: 'IBM Plex Sans', sans-serif; animation: pop 0.25s ease-out;
         }
         @keyframes pop { from { opacity: 0; transform: translateY(16px) scale(0.98); } to { opacity: 1; transform: none; } }
-        .modal-content h2 { margin: 0 0 20px; font-size: 21px; color: var(--ink); }
-        .modal-content h3 { margin: 8px 0 14px; font-size: 16px; color: var(--ink); }
-        .close-modal {
-            position: absolute; top: 16px; right: 16px;
-            width: 34px; height: 34px; border-radius: 50%;
-            display: grid; place-items: center; cursor: pointer;
-            background: #f0f3f9; color: var(--ink-soft); font-size: 20px; line-height: 1;
-            transition: background 0.15s;
-        }
-        .close-modal:hover { background: #e3e8f2; color: var(--ink); }
+        .modal-content h2 { margin: 0 44px 22px 0; font: 800 22px/1.2 'Plus Jakarta Sans', 'IBM Plex Sans', sans-serif; letter-spacing: -0.02em; color: var(--ink); }
+        .modal-content h3 { margin: 8px 0 14px; font: 700 16px 'Plus Jakarta Sans', 'IBM Plex Sans', sans-serif; color: var(--ink); }
+        .close-modal { position: absolute; top: 18px; right: 18px; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; background: #f0f3f9; color: var(--ink-soft); font-size: 22px; line-height: 1; transition: background 0.15s, color 0.15s; }
+        .close-modal:hover { background: #fde9f0; color: #d63f78; }
 
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
         .form-group { margin-bottom: 16px; }
         .form-group label { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #3b4660; }
         .form-group input[type="text"], .form-group input[type="date"], .form-group input[type="number"],
-        .form-group input[type="tel"], .form-group input[type="email"], .form-group input[type="password"],
-        .form-group select {
-            width: 100%; box-sizing: border-box; padding: 12px 14px;
-            background: #fbfcfe; border: 1px solid var(--line); border-radius: 10px;
-            font: 14px 'IBM Plex Sans', sans-serif; color: var(--ink);
-            transition: border-color 0.2s, box-shadow 0.2s;
+        .form-group input[type="tel"], .form-group input[type="email"], .form-group input[type="password"], .form-group select {
+            width: 100%; min-height: 46px; padding: 11px 14px; background: #fbfcfe; border: 1px solid var(--line); border-radius: 12px;
+            font: 14px 'IBM Plex Sans', sans-serif; color: var(--ink); transition: border-color 0.2s, box-shadow 0.2s;
         }
-        .form-group input:focus, .form-group select:focus {
-            outline: none; border-color: var(--blue); background: #fff; box-shadow: 0 0 0 4px rgba(93, 173, 226, 0.16);
-        }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--blue); background: #fff; box-shadow: 0 0 0 4px rgba(93, 173, 226, 0.16); }
         .form-group input[readonly] { background: #f0f3f9; color: var(--ink-soft); }
-        .form-group.privacy { display: flex; gap: 10px; align-items: flex-start; }
+        .form-group.privacy { display: flex; gap: 10px; align-items: flex-start; padding: 14px; background: #f8f9fc; border: 1px solid var(--line); border-radius: 12px; }
         .form-group.privacy label { margin: 0; font-weight: 400; color: var(--ink-soft); line-height: 1.5; }
-        .form-group.privacy input { margin-top: 3px; }
+        .form-group.privacy input { margin-top: 3px; width: 18px; height: 18px; accent-color: var(--pink); flex: none; }
         .password-warning { display: none; margin-top: 6px; color: #d33f3f; font-size: 12px; }
         .password-warning.show { display: block; }
 
         .btn-submit {
-            width: 100%; padding: 14px; border: none; border-radius: 12px; cursor: pointer;
-            background: linear-gradient(135deg, var(--blue), #3f93cc);
-            color: #fff; font: 600 15px 'IBM Plex Sans', sans-serif;
-            transition: transform 0.15s, opacity 0.15s;
+            width: 100%; min-height: 50px; padding: 14px; border: none; border-radius: 12px; cursor: pointer;
+            background: linear-gradient(135deg, var(--pink), #e8508a); color: #fff; font: 600 15px 'IBM Plex Sans', sans-serif;
+            box-shadow: 0 6px 18px rgba(255, 107, 157, 0.32); transition: transform 0.15s, opacity 0.15s;
         }
         .btn-submit:hover:not(:disabled) { transform: translateY(-2px); }
-        .btn-submit:disabled { opacity: 0.45; cursor: not-allowed; }
+        .btn-submit:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
 
-        .detail-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px;
-            padding: 18px; margin-bottom: 24px;
-            background: #f8f9fc; border: 1px solid var(--line); border-radius: 14px;
-        }
+        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 20px; margin: 0 0 24px; padding: 18px; background: #f8f9fc; border: 1px solid var(--line); border-radius: 16px; }
         .detail-grid .full { grid-column: 1 / -1; }
-        .detail-grid dt { font-size: 12px; color: var(--ink-soft); margin-bottom: 2px; }
+        .detail-grid dt { font-size: 11.5px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 3px; }
         .detail-grid dd { margin: 0; font-size: 14px; font-weight: 600; color: var(--ink); word-break: break-word; }
         @keyframes slideInRight  { from { transform: translateX(400px); opacity: 0; } to { transform: none; opacity: 1; } }
         @keyframes slideOutRight { from { transform: none; opacity: 1; } to { transform: translateX(400px); opacity: 0; } }
@@ -222,16 +177,32 @@
         /* ───────── Responsive ───────── */
         @media (max-width: 900px) {
             .dashboard-content { padding: 20px 16px 40px; }
-            .summary { grid-template-columns: 1fr; }
-            .btn-add-youth { width: 100%; justify-content: center; }
-            .search-group { max-width: none; }
+            .summary { grid-template-columns: 1fr; gap: 12px; }
+            .search-group { max-width: none; flex-basis: 100%; }
+            .top-actions { width: 100%; }
+            .top-actions > button { flex: 1; }
+        }
+        @media (max-width: 760px) {
+            .admin-table thead { display: none; }
+            .admin-table, .admin-table tbody, .admin-table tr, .admin-table td { display: block; width: 100%; }
+            .admin-table tbody tr:not(.state-row) { padding: 14px 18px; border-bottom: 1px solid var(--line); }
+            .admin-table tbody tr:not(.state-row) td { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 6px 0; border: 0; text-align: right; }
+            .admin-table tbody tr:not(.state-row) td::before { color: var(--ink-soft); font-size: 12px; font-weight: 700; text-align: left; flex: none; }
+            .admin-table tbody tr:not(.state-row) td:nth-child(1)::before { content: "Member ID"; }
+            .admin-table tbody tr:not(.state-row) td:nth-child(2)::before { content: "Name"; }
+            .admin-table tbody tr:not(.state-row) td:nth-child(3)::before { content: "Contact"; }
+            .admin-table tbody tr:not(.state-row) td:nth-child(4)::before { content: "Address"; }
+            .admin-table tbody tr:not(.state-row) td:nth-child(5)::before { content: "Status"; }
+            .admin-table tbody tr:not(.state-row) td:nth-child(6)::before { display: none; }
+            .address-column { max-width: 60%; }
+            .action-buttons { justify-content: flex-end !important; padding-top: 10px !important; }
         }
         @media (max-width: 560px) {
             .form-row, .detail-grid { grid-template-columns: 1fr; }
             .modal-content { padding: 24px 20px; }
         }
         @media (prefers-reduced-motion: reduce) {
-            .btn-add-youth, .action-btn { transition: none; }
+            .btn-add-youth, .btn-secondary, .action-btn, .summary-card { transition: none; }
         }
     </style>
 </head>
@@ -287,25 +258,29 @@
                 </div>
             </div>
 
-            <!-- Toolbar -->
-            <div class="search-filter-bar">
-                <div class="search-group">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="searchInput" class="search-input" placeholder="Search by name, ID, or contact number" aria-label="Search members">
-                </div>
-                <button type="button" class="btn-add-youth" id="exportPdfBtn"><i class="fas fa-file-pdf"></i> Export PDF</button>
-                <button class="btn-add-youth" id="addYouthBtn">
-                    <i class="fas fa-plus"></i> Register youth
-                </button>
-            </div>
-            <div class="status-filters" role="tablist" aria-label="Filter youth by status">
-                <button class="status-filter active" type="button" data-status="active" role="tab" aria-selected="true">Active</button>
-                <button class="status-filter" type="button" data-status="inactive" role="tab" aria-selected="false">Inactive / Ghost</button>
-                <button class="status-filter" type="button" data-status="archived" role="tab" aria-selected="false">Archived (Age exceeded)</button>
-            </div>
-
-            <!-- Table -->
             <div class="table-card">
+                <!-- Toolbar: search left, actions right -->
+                <div class="card-top search-filter-bar">
+                    <div class="search-group">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" class="search-input" placeholder="Search by name, ID, or contact number" aria-label="Search members">
+                    </div>
+                    <div class="top-actions">
+                        <button type="button" class="btn-secondary" id="exportPdfBtn"><i class="fas fa-file-pdf"></i> Export PDF</button>
+                        <button class="btn-add-youth" id="addYouthBtn">
+                            <i class="fas fa-plus"></i> Register youth
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Status filters -->
+                <div class="status-filters" role="tablist" aria-label="Filter youth by status">
+                    <button class="status-filter active" type="button" data-status="active" role="tab" aria-selected="true">Active</button>
+                    <button class="status-filter" type="button" data-status="inactive" role="tab" aria-selected="false">Inactive / Ghost</button>
+                    <button class="status-filter" type="button" data-status="archived" role="tab" aria-selected="false">Archived (Age exceeded)</button>
+                </div>
+
+                <!-- Table -->
                 <div class="table-scroll">
                     <table class="admin-table" id="youthTable">
                         <thead>
@@ -495,18 +470,6 @@
 <!-- Toast Notification Container -->
 <div id="toastContainer"></div>
 
-<!-- Confirmation Modal -->
-<div class="modal" id="confirmationModal">
-    <div class="modal-content" style="max-width: 420px;">
-        <h2 style="color: #E74C3C;"><i class="fas fa-exclamation-triangle" style="margin-right: 8px;"></i> Confirm action</h2>
-        <p id="confirmMessage" style="color: var(--ink-soft); margin: 0 0 28px; font-size: 15px; line-height: 1.5;"></p>
-        <div style="display: flex; gap: 12px; justify-content: flex-end;">
-            <button id="confirmCancelBtn" class="btn-add-youth" style="background: #95A5A6; box-shadow:none; padding: 10px 22px;">Cancel</button>
-            <button id="confirmOkBtn" class="btn-add-youth" style="background: linear-gradient(135deg, #E74C3C, #C0392B); box-shadow:none; padding: 10px 22px;"><i class="fas fa-trash"></i> Delete</button>
-        </div>
-    </div>
-</div>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
 <script src="js/admin-export-pdf.js"></script>
@@ -524,23 +487,6 @@ function avatarColor(seed) {
 // ────────────────────────────────────────────────
 // Toast Notification
 // ────────────────────────────────────────────────
-// ────────────────────────────────────────────────
-// Confirmation Modal
-// ────────────────────────────────────────────────
-function showConfirm(message, onConfirm) {
-    const confirmModal = document.getElementById('confirmationModal');
-    document.getElementById('confirmMessage').textContent = message;
-    confirmModal.style.display = 'flex';
-
-    document.getElementById('confirmOkBtn').onclick = () => {
-        confirmModal.style.display = 'none';
-        if (onConfirm) onConfirm();
-    };
-    document.getElementById('confirmCancelBtn').onclick = () => {
-        confirmModal.style.display = 'none';
-    };
-}
-
 // ────────────────────────────────────────────────
 // Session Check & Admin Info
 // ────────────────────────────────────────────────
@@ -608,6 +554,7 @@ function showLoadingRows() {
             <td><div class="skeleton-bar" style="width:160px"></div></td>
             <td><div class="skeleton-bar" style="width:110px"></div></td>
             <td><div class="skeleton-bar" style="width:240px"></div></td>
+            <td><div class="skeleton-bar" style="width:70px"></div></td>
             <td></td>
         </tr>`).join('');
 }
@@ -657,10 +604,11 @@ function youthFullAddress(youth) {
         youth.house_number,
         youth.street_name,
         youth.subdivision_purok,
+        youth.barangay,
         youth.city,
         youth.province
     ].map(part => String(part || '').trim()).filter(Boolean).join(', ');
-    return structured || youth.address || 'N/A';
+    return structured || String(youth.address || '').trim() || 'N/A';
 }
 
 function renderYouthTable(filtered = youthData) {
@@ -704,7 +652,6 @@ function renderYouthTable(filtered = youthData) {
             </td>
             <td class="action-buttons">
                 <button class="action-btn btn-view" onclick="viewYouth('${id}')" title="View details &amp; ID" aria-label="View ${esc(fullName)}"><i class="fas fa-eye"></i></button>
-                ${youth.status !== 'archived' ? `<button class="action-btn ${youth.status === 'active' ? 'btn-status' : 'btn-reactivate'}" onclick="changeYouthStatus('${id}', '${youth.status === 'active' ? 'inactive' : 'active'}')" title="${youth.status === 'active' ? 'Mark inactive' : 'Reactivate'}" aria-label="${youth.status === 'active' ? 'Mark inactive' : 'Reactivate'} ${esc(fullName)}"><i class="fas ${youth.status === 'active' ? 'fa-user-slash' : 'fa-user-check'}"></i></button>` : ''}
                 ${youth.status !== 'archived' ? `<button class="action-btn btn-edit" onclick="editYouth('${id}')" title="Edit member" aria-label="Edit ${esc(fullName)}"><i class="fas fa-pen"></i></button>` : ''}
             </td>`;
         tbody.appendChild(tr);
@@ -736,7 +683,7 @@ async function exportYouth() {
             orientation: 'landscape',
             columns: [
                 { header: 'Member ID', dataKey: 'member_id' }, { header: 'Full name', dataKey: 'name' },
-                { header: 'Contact number', dataKey: 'phone' }, { header: 'Full address', dataKey: 'address' },
+                { header: 'Contact number', dataKey: 'phone' }, { header: 'Full address', dataKey: 'address', preserveFullText: true },
                 { header: 'Status', dataKey: 'status' }, { header: 'Status reason', dataKey: 'status_reason' }
             ],
             rows: filteredYouth.map(youth => ({
@@ -931,41 +878,6 @@ function editYouth(member_id) {
 }
 
 // ────────────────────────────────────────────────
-// Change Youth Status
-// ────────────────────────────────────────────────
-async function changeYouthStatus(member_id, status) {
-    const reason = status === 'inactive' ? prompt('Why is this youth being marked inactive?') : '';
-    if (status === 'inactive' && (!reason || !reason.trim())) return;
-    showConfirm(status === 'inactive'
-        ? 'Mark this youth inactive? Their record and personal information will be retained.'
-        : 'Reactivate this youth account?', async () => {
-        const formData = new FormData();
-        formData.append('member_id', member_id);
-        formData.append('status', status);
-        if (reason) formData.append('reason', reason.trim());
-
-        try {
-            const csrfResponse = await fetch('api/csrf_token.php', { credentials: 'same-origin', cache: 'no-store' });
-            const csrfData = await csrfResponse.json();
-            if (!csrfResponse.ok || !csrfData.success || !csrfData.csrf_token) throw new Error('Unable to prepare a secure request.');
-            formData.append('csrf_token', csrfData.csrf_token);
-            const response = await fetch('api/update_youth_status.php', { method: 'POST', body: formData });
-            const data = await response.json();
-
-            if (data.success) {
-                showAlert(data.message, 'success');
-                loadYouthData();
-            } else {
-                showAlert('Error: ' + (data.message || 'Unknown error'), 'error');
-            }
-        } catch (error) {
-            console.error('Status update error:', error);
-            showAlert(error.message || 'Failed to update youth status', 'error');
-        }
-    });
-}
-
-// ────────────────────────────────────────────────
 // View Youth
 // ────────────────────────────────────────────────
 function viewYouth(member_id) {
@@ -1004,9 +916,6 @@ function showIdPreview(youth) {
     idPreview.style.display = 'flex';
 }
 
-// ────────────────────────────────────────────────
-// Logout Confirmation
-// ────────────────────────────────────────────────
 // ────────────────────────────────────────────────
 // Initial Load
 // ────────────────────────────────────────────────

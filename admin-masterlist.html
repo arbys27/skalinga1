@@ -43,8 +43,6 @@
     .lifecycle-badge.active { background: #e6f4ec; color: #228B57; }
     .lifecycle-badge.inactive { background: #fff4e0; color: #a56b08; }
     .lifecycle-badge.archived { background: #fde9f0; color: #b62d61; }
-    .status-action { border: 0; border-radius: 6px; padding: 7px 10px; cursor: pointer; font-weight: 600; background: #fff4e0; color: #a56b08; }
-    .status-action.reactivate { background: #e6f4ec; color: #228B57; }
     .table-wrap { overflow-x: auto; }
     .masterlist-card { overflow: hidden; }
     .masterlist-card .card-body { padding: 0; }
@@ -84,7 +82,7 @@
         </section>
         <section class="content-card masterlist-card">
           <div class="card-header"><h3>Official Youth Records</h3><span class="status-badge active" id="recordCount">Loading...</span></div>
-          <div class="card-body"><div class="table-wrap"><table class="admin-table"><thead><tr><th>Voter ID</th><th>Name</th><th>Birthday</th><th>Age / Sex</th><th>Address</th><th>Status / reason</th><th>Action</th></tr></thead><tbody id="masterlistBody"></tbody></table><div class="empty-state" id="emptyState" hidden><strong>No masterlist records found</strong>Try a different search or import the official CSV.</div></div></div>
+          <div class="card-body"><div class="table-wrap"><table class="admin-table"><thead><tr><th>Voter ID</th><th>Name</th><th>Birthday</th><th>Age / Sex</th><th>Address</th><th>Status / reason</th></tr></thead><tbody id="masterlistBody"></tbody></table><div class="empty-state" id="emptyState" hidden><strong>No masterlist records found</strong>Try a different search or import the official CSV.</div></div></div>
         </section>
       </div>
     </main>
@@ -140,18 +138,6 @@
           statusCell.appendChild(reason);
         }
         row.appendChild(statusCell);
-        const actionCell = document.createElement('td');
-        if (record.status !== 'archived') {
-          const action = document.createElement('button');
-          action.type = 'button';
-          action.className = `status-action${record.status === 'inactive' ? ' reactivate' : ''}`;
-          action.textContent = record.status === 'active' ? 'Mark inactive' : 'Reactivate';
-          action.addEventListener('click', () => changeMasterlistStatus(record.id, record.status));
-          actionCell.appendChild(action);
-        } else {
-          actionCell.textContent = '—';
-        }
-        row.appendChild(actionCell);
         body.appendChild(row);
       });
     }
@@ -198,32 +184,6 @@
         button.innerHTML = original;
       }
     });
-
-    async function changeMasterlistStatus(id, status) {
-      const nextStatus = status === 'active' ? 'inactive' : 'active';
-      const reason = nextStatus === 'inactive' ? prompt('Why is this KK Masterlist record being marked inactive?') : '';
-      if (nextStatus === 'inactive' && (!reason || !reason.trim())) return;
-      const message = nextStatus === 'inactive'
-        ? 'Mark this record inactive? The personal information will be retained.'
-        : 'Reactivate this masterlist record?';
-      if (!window.confirm(message)) return;
-      const form = new FormData();
-      form.append('masterlist_id', id);
-      form.append('status', nextStatus);
-      if (reason) form.append('reason', reason.trim());
-      try {
-        const csrfResponse = await fetch('api/csrf_token.php', { credentials: 'same-origin', cache: 'no-store' });
-        const csrfData = await csrfResponse.json();
-        if (!csrfResponse.ok || !csrfData.success || !csrfData.csrf_token) throw new Error('Unable to prepare a secure request.');
-        form.append('csrf_token', csrfData.csrf_token);
-        const response = await fetch('api/update_youth_status.php', { method: 'POST', body: form });
-        const data = await response.json();
-        if (!response.ok || !data.success) throw new Error(data.message || 'Unable to update status.');
-        await loadMasterlist();
-      } catch (error) {
-        report.textContent = error.message;
-      }
-    }
 
     function showReport(data) {
       report.replaceChildren();

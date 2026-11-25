@@ -2,12 +2,13 @@
 (function (window) {
     'use strict';
 
-    function cleanText(value) {
+    function cleanText(value, maxLength) {
         const text = String(value == null ? '' : value)
             .replace(/[\u0000-\u001f\u007f]/g, ' ')
             .replace(/\s+/g, ' ')
             .trim();
-        return text.length > 240 ? `${text.slice(0, 237)}...` : text;
+        const limit = maxLength === undefined ? 240 : maxLength;
+        return limit !== null && text.length > limit ? `${text.slice(0, limit - 3)}...` : text;
     }
 
     function filterLines(meta) {
@@ -47,7 +48,9 @@
             columns: columns.map(column => ({ header: cleanText(column.header), dataKey: column.dataKey })),
             body: rows.map(row => {
                 const cleanRow = {};
-                columns.forEach(column => { cleanRow[column.dataKey] = cleanText(row[column.dataKey]); });
+                columns.forEach(column => {
+                    cleanRow[column.dataKey] = cleanText(row[column.dataKey], column.preserveFullText ? null : undefined);
+                });
                 return cleanRow;
             }),
             startY: headerHeight + 4,
